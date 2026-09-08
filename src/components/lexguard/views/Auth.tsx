@@ -16,6 +16,7 @@ export function AuthView() {
   const [mode, setMode] = useState<"register" | "login">("register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +26,7 @@ export function AuthView() {
     try {
       const u =
         mode === "register"
-          ? await api.register(email, password, app.userState ?? "TX", app.locale)
+          ? await api.register(email, password, app.userState ?? "TX", app.locale, ageConfirmed)
           : await api.login(email, password);
       app.setUser(u);
       app.setMode("account");
@@ -61,8 +62,27 @@ export function AuthView() {
             />
             {mode === "register" ? <p className="text-xs text-muted-foreground">≥ 8 {app.locale === "es" ? "caracteres" : "characters"}</p> : null}
           </div>
+          {mode === "register" ? (
+            <div className="flex items-start gap-2">
+              <input
+                id="age-gate"
+                type="checkbox"
+                checked={ageConfirmed}
+                onChange={(e) => setAgeConfirmed(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-700"
+                required
+              />
+              <label htmlFor="age-gate" className="text-sm text-muted-foreground">
+                {tr.ageGate}
+              </label>
+            </div>
+          ) : null}
           {error ? <p className="text-sm text-red-700">{error}</p> : null}
-          <Button className="w-full bg-emerald-700 hover:bg-emerald-800" disabled={busy || !email || password.length < 8} onClick={() => void submit()}>
+          <Button
+            className="w-full bg-emerald-700 hover:bg-emerald-800"
+            disabled={busy || !email || password.length < 8 || (mode === "register" && !ageConfirmed)}
+            onClick={() => void submit()}
+          >
             {busy ? tr.loading : mode === "register" ? tr.register : tr.login}
           </Button>
           <Button variant="link" className="w-full" onClick={() => setMode(mode === "register" ? "login" : "register")}>

@@ -7,11 +7,11 @@ async function j<T>(res: Response): Promise<T> {
 }
 
 export const api = {
-  register: (email: string, password: string, state: string, locale: string) =>
+  register: (email: string, password: string, state: string, locale: string, ageConfirmed: boolean) =>
     fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, state, locale }),
+      body: JSON.stringify({ email, password, state, locale, ageConfirmed }),
     }).then(j<{ id: string; email: string; state: string | null; locale: string }>),
   login: (email: string, password: string) =>
     fetch("/api/auth/login", {

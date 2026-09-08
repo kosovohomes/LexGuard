@@ -34,6 +34,16 @@ LexGuard is a lawyer-free web application that helps individuals dealing with (o
 | Privacy | 25 MB document cap, sha256 dedup, ownership-enforced downloads, count-only admin stats, full export + delete |
 | i18n | Full English/Spanish parity across UI, guides, rules and router content |
 
+### Phase 2 (public launch)
+
+| Area | What's included |
+|---|---|
+| Deadline intelligence | Cross-case **Deadlines view**: user-set deadlines surfaced as overdue/upcoming, plus informational statutory windows computed from journal facts — CA Client Security Fund 4-year window from logged settlement receipt, TX CSF grievance-first conditions, TX/CA malpractice limitations info on engagement end. All neutral wording, all "verify on official pages" |
+| Referral directory (FR-7) | 15 vetted TX/CA listings — LSC legal aid, bar referral services, law-school clinics, self-help, government victim-compensation programs — with phones, verified dates, search, kind filters, and a permanent no-paid-placement notice |
+| Legal & trust pages | Privacy Policy, Terms of Use, Accessibility Statement (bilingual, draft-pending-counsel per PRD §9.2/§11), reachable from the footer |
+| Age gate (PRD §9.2) | Neutral 16+ confirmation at registration, enforced in the UI and server-side |
+| Accessibility (WCAG 2.1 AA) | Skip-to-content link, `aria-current` navigation, `<html lang>` synced to locale, `prefers-reduced-motion` support, semantic landmarks, labelled controls |
+
 ## Screenshots
 
 | Desktop | Mobile |
@@ -79,7 +89,7 @@ src/components/lexguard/     UI views (single-page app at /)
 
 ## Scope & status
 
-Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
+Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
 
 ## Legal disclaimer
 

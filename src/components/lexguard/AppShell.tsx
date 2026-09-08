@@ -5,7 +5,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, BookOpen, FolderOpen, Compass, LifeBuoy, Settings as SettingsIcon, LogOut, Globe, ExternalLink } from "lucide-react";
+import { Shield, BookOpen, FolderOpen, Compass, LifeBuoy, CalendarClock, Settings as SettingsIcon, LogOut, Globe, ExternalLink } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import type { USState } from "@/lib/lexguard/types";
@@ -21,6 +21,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     document.title = app.discreet ? (app.locale === "es" ? "Mis notas" : "My Notes") : `LexGuard — ${tr.tagline}`;
   }, [app.discreet, app.locale, tr.tagline]);
+
+  // WCAG: <html lang> must match the active language
+  useEffect(() => {
+    document.documentElement.lang = app.locale === "es" ? "es" : "en";
+  }, [app.locale]);
 
   // FR-6.1 quick exit: button + triple-Esc shortcut
   useEffect(() => {
@@ -46,11 +51,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { view: () => app.navigate({ name: "guides" }), label: tr.navGuides, icon: <BookOpen className="h-4 w-4" />, active: v.name === "guides" || v.name === "guide" },
     { view: () => app.navigate({ name: "journal" }), label: tr.navJournal, icon: <FolderOpen className="h-4 w-4" />, active: ["journal", "case", "flags", "dossier"].includes(v.name) },
     { view: () => app.navigate({ name: "router" }), label: tr.navRouter, icon: <Compass className="h-4 w-4" />, active: v.name === "router" },
+    { view: () => app.navigate({ name: "deadlines" }), label: tr.navDeadlines, icon: <CalendarClock className="h-4 w-4" />, active: v.name === "deadlines" },
     { view: () => app.navigate({ name: "directory" }), label: tr.navDirectory, icon: <LifeBuoy className="h-4 w-4" />, active: v.name === "directory" },
   ];
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      {/* WCAG 2.1 AA: skip navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:border focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium"
+      >
+        {app.locale === "es" ? "Saltar al contenido" : "Skip to content"}
+      </a>
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto max-w-6xl px-4 h-14 flex items-center gap-2">
           <button onClick={() => app.home()} className="flex items-center gap-2 font-bold text-lg mr-2 shrink-0" aria-label="LexGuard home">
@@ -62,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <nav className="hidden md:flex items-center gap-1 flex-1" aria-label="Main">
             {navItems.map((n) => (
-              <Button key={n.label} variant={n.active ? "secondary" : "ghost"} size="sm" onClick={n.view} className="gap-1.5">
+              <Button key={n.label} variant={n.active ? "secondary" : "ghost"} size="sm" onClick={n.view} className="gap-1.5" aria-current={n.active ? "page" : undefined}>
                 {n.icon}
                 {n.label}
               </Button>
@@ -98,7 +111,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="md:hidden border-t">
           <div className="mx-auto max-w-6xl px-2 py-1.5 flex gap-1 overflow-x-auto">
             {navItems.map((n) => (
-              <Button key={n.label} variant={n.active ? "secondary" : "ghost"} size="sm" onClick={n.view} className="gap-1.5 shrink-0">
+              <Button key={n.label} variant={n.active ? "secondary" : "ghost"} size="sm" onClick={n.view} className="gap-1.5 shrink-0" aria-current={n.active ? "page" : undefined}>
                 {n.icon}
                 {n.label}
               </Button>
@@ -107,7 +120,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-6">{children}</main>
+      <main id="main-content" tabIndex={-1} className="flex-1 mx-auto w-full max-w-6xl px-4 py-6 outline-none">{children}</main>
 
       <footer className="mt-auto border-t bg-muted/40 pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-muted-foreground space-y-2">
@@ -116,6 +129,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-wrap items-center gap-4 pt-1">
             <button className="hover:underline inline-flex items-center gap-1" onClick={() => app.navigate({ name: "settings" })}>
               {tr.safetyTitle} <ExternalLink className="h-3 w-3" />
+            </button>
+            <button className="hover:underline" onClick={() => app.navigate({ name: "legal", slug: "privacy" })}>
+              {tr.footerPrivacy}
+            </button>
+            <button className="hover:underline" onClick={() => app.navigate({ name: "legal", slug: "terms" })}>
+              {tr.footerTerms}
+            </button>
+            <button className="hover:underline" onClick={() => app.navigate({ name: "legal", slug: "accessibility" })}>
+              {tr.footerA11y}
             </button>
             <button className="hover:underline" onClick={() => app.navigate({ name: "admin" })}>
               {tr.navAdmin}

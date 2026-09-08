@@ -1,4 +1,5 @@
 // LexGuard Referral Directory — PRD FR-7 (static, vetted listings; no paid placement)
+// Phase 2: phones, verified dates, victim-compensation programs, more coverage.
 
 import type { USState } from "./types";
 
@@ -6,9 +7,13 @@ export interface ReferralEntry {
   name: string;
   kind: "legal_aid" | "referral_service" | "clinic" | "self_help" | "government";
   url: string;
+  phone?: string;
   note: { en: string; es: string };
   states: USState[];
+  verified: string;
 }
+
+export const DIRECTORY_VERIFIED = "2026-09-09";
 
 export const REFERRALS: ReferralEntry[] = [
   {
@@ -16,9 +21,21 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "legal_aid",
     url: "https://www.lonestarlegal.org",
     states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "LSC-funded legal aid serving low-income Texans (family, housing, consumer).",
       es: "Asistencia legal con fondos LSC para texanos de bajos ingresos (familia, vivienda, consumo).",
+    },
+  },
+  {
+    name: "Texas RioGrande Legal Aid (TRLA)",
+    kind: "legal_aid",
+    url: "https://www.trla.org",
+    states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "LSC-funded legal aid for South and West Texas, including farmworker and border communities.",
+      es: "Asistencia legal con fondos LSC para el sur y oeste de Texas, incluidas comunidades de trabajadores agrícolas y fronterizas.",
     },
   },
   {
@@ -26,6 +43,7 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "self_help",
     url: "https://texaslawhelp.org",
     states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Free plain-language legal information and forms for Texans.",
       es: "Información legal gratuita en lenguaje claro y formularios para texanos.",
@@ -35,10 +53,35 @@ export const REFERRALS: ReferralEntry[] = [
     name: "State Bar of Texas — Lawyer Referral & Information Service",
     kind: "referral_service",
     url: "https://www.texasbar.com/lris",
+    phone: "800-252-9690",
     states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Official referral service; initial consultation at low or no cost.",
       es: "Servicio oficial de referencia; consulta inicial a bajo costo o gratis.",
+    },
+  },
+  {
+    name: "Texas Attorney General — Crime Victim Compensation",
+    kind: "government",
+    url: "https://www.texasattorneygeneral.gov/crime-victims/crime-victims-compensation-program",
+    phone: "800-983-9933",
+    states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "State program covering crime-related expenses for eligible victims (separate from attorney remedies).",
+      es: "Programa estatal que cubre gastos relacionados con delitos para víctimas elegibles (independiente de los remedios contra abogados).",
+    },
+  },
+  {
+    name: "Texas State Law Library — legal help guides",
+    kind: "self_help",
+    url: "https://www.sll.texas.gov/legal-help/",
+    states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "Free guides, forms, and a librarian helpline for finding Texas legal help.",
+      es: "Guías, formularios y línea de ayuda de bibliotecarios para encontrar asistencia legal en Texas.",
     },
   },
   {
@@ -46,6 +89,7 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "clinic",
     url: "https://law.tamu.edu/current-students/clinics/",
     states: ["TX"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Law-school clinics (check current intake areas) — supervised student work.",
       es: "Clínicas universitarias (verifique áreas de admisión vigentes) — trabajo estudiantil supervisado.",
@@ -56,6 +100,7 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "legal_aid",
     url: "https://baylegal.org",
     states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "LSC-funded legal aid for the Bay Area (family, housing, consumer, health).",
       es: "Asistencia legal con fondos LSC para el Área de la Bahía (familia, vivienda, consumo, salud).",
@@ -66,16 +111,41 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "legal_aid",
     url: "https://lafla.org",
     states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Legal aid for low-income Angelenos; multiple offices.",
       es: "Asistencia legal para angelinos de bajos ingresos; varias oficinas.",
     },
   },
   {
+    name: "Legal Aid Association of California — find local legal aid",
+    kind: "legal_aid",
+    url: "https://laaconline.org",
+    states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "Statewide directory of local legal aid organizations by county.",
+      es: "Directorio estatal de organizaciones locales de asistencia legal por condado.",
+    },
+  },
+  {
+    name: "LawHelpCA.org",
+    kind: "self_help",
+    url: "https://lawhelpca.org",
+    states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "Free legal information and referrals statewide (available in Spanish).",
+      es: "Información legal gratuita y referencias en todo el estado (disponible en español).",
+    },
+  },
+  {
     name: "State Bar of California — Lawyer Referral Service Directory",
     kind: "referral_service",
     url: "https://www.calbar.ca.gov/Public/Need-Lawyer-Help/Lawyer-Referral-Service",
+    phone: "800-843-7053",
     states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Find your county's certified lawyer referral service.",
       es: "Encuentre el servicio de referencia certificado de su condado.",
@@ -86,9 +156,22 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "self_help",
     url: "https://selfhelp.courts.ca.gov",
     states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Official court self-help guides and forms (in Spanish available).",
       es: "Guías y formularios oficiales de autoayuda judicial (disponible en español).",
+    },
+  },
+  {
+    name: "California Victim Compensation Board (CalVCB)",
+    kind: "government",
+    url: "https://victims.ca.gov",
+    phone: "800-777-9229",
+    states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
+    note: {
+      en: "State program covering crime-related expenses for eligible victims (separate from attorney remedies).",
+      es: "Programa estatal que cubre gastos relacionados con delitos para víctimas elegibles (independiente de los remedios contra abogados).",
     },
   },
   {
@@ -96,6 +179,7 @@ export const REFERRALS: ReferralEntry[] = [
     kind: "clinic",
     url: "https://www.calbar.ca.gov/Access-Justice/Free-Low-Cost-Legal-Help",
     states: ["CA"],
+    verified: DIRECTORY_VERIFIED,
     note: {
       en: "Free/low-cost clinics list maintained by the State Bar.",
       es: "Lista de clínicas gratuitas/de bajo costo mantenida por el Colegio.",
@@ -108,5 +192,5 @@ export const KIND_LABELS: Record<string, { en: string; es: string }> = {
   referral_service: { en: "Lawyer referral", es: "Referencia de abogados" },
   clinic: { en: "Law-school clinic", es: "Clínica universitaria" },
   self_help: { en: "Self-help", es: "Autoayuda" },
-  government: { en: "Government", es: "Gobierno" },
+  government: { en: "Government program", es: "Programa gubernamental" },
 };

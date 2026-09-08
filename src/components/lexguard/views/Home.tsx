@@ -27,7 +27,7 @@ export function HomeView() {
       <section className="rounded-2xl border bg-gradient-to-br from-emerald-50 to-background p-6 sm:p-10">
         <p className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-          {app.locale === "es" ? "Texas · California · Fase 1" : "Texas · California · Phase 1"}
+          {app.locale === "es" ? "Texas · California · Fase 2" : "Texas · California · Phase 2"}
         </p>
         <h1 className="mt-4 max-w-3xl text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{tr.homeHeroTitle}</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">{tr.homeHeroSub}</p>

@@ -18,6 +18,8 @@ export type ViewName =
   | "router"
   | "dossier"
   | "directory"
+  | "deadlines"
+  | "legal"
   | "settings"
   | "admin";
 

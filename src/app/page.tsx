@@ -17,6 +17,8 @@ import { FlagsView } from "@/components/lexguard/views/Flags";
 import { RouterView } from "@/components/lexguard/views/Router";
 import { DossierView } from "@/components/lexguard/views/Dossier";
 import { DirectoryView } from "@/components/lexguard/views/Directory";
+import { DeadlinesView } from "@/components/lexguard/views/Deadlines";
+import { LegalView } from "@/components/lexguard/views/Legal";
 import { SettingsView } from "@/components/lexguard/views/Settings";
 import { AdminView } from "@/components/lexguard/views/Admin";
 
@@ -73,6 +75,12 @@ export default function Page() {
       break;
     case "directory":
       view = <DirectoryView />;
+      break;
+    case "deadlines":
+      view = <DeadlinesView />;
+      break;
+    case "legal":
+      view = <LegalView slug={v.slug} />;
       break;
     case "settings":
       view = <SettingsView />;
