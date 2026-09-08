@@ -52,3 +52,26 @@ Stage Summary:
 - github.com/kosovohomes/LexGuard is live: main @ 59dc378, verified via ls-remote + HTTP 200
 - 136 tracked files: full app source, prisma schema, docs/ (PRD + screenshots), README
 - All future pushes can reuse: git push origin main
+
+---
+Task ID: 3
+Agent: Super Z (main agent)
+Task: Build Phase-2 features (public launch) per PRD §13 roadmap and push to GitHub
+
+Work Log:
+- Scope derived from PRD §13: Phase 2 = referral directory, accessibility, launch hardening; pulled deadline intelligence forward from Phase 3 (promised in prior session)
+- Built src/lib/lexguard/deadlines.ts: deterministic engine deriving user-deadline items (overdue/soon/upcoming from deadline entries) + statutory windows (CA CSF 4y from settlement receipt with no disbursement; TX CSF grievance-first conditions; TX 2y/10y + CA 1y/4y malpractice info on engagementEnd). All bilingual, neutral, "verify officially" disclaimers
+- Built Deadlines view: cross-case read-only digest (uses api.getCase/localStore.getCase directly, never mutates store.active); fixed initial gating bug where mode=null (journal-created implicit local cases) showed setup prompt instead of computed items
+- Directory upgrade: 9 → 15 vetted listings (added TRLA, TX OAG Crime Victim Compensation, TX State Law Library, LAA of California, LawHelpCA, CalVCB), phone numbers (published lines only), verified dates, search + kind filter chips with aria-pressed, count with aria-live, no-paid-placement notice
+- Legal pages: src/lib/lexguard/legal.ts (bilingual privacy/terms/accessibility docs, draft-pending-counsel marker) + Legal view with slug routing; footer links in AppShell
+- Age gate: Auth register checkbox (neutral 16+), submit disabled until checked; register API returns 400 age_required without ageConfirmed:true — both paths browser-verified
+- Accessibility pass: skip-to-content link, aria-current on nav (desktop + mobile), document.documentElement.lang synced to locale, prefers-reduced-motion CSS in globals.css, sr-only labelled search
+- i18n: ~45 new keys EN/ES, compile-time parity via Record<keyof typeof en, string>
+- E2E (agent-browser): created CA case → logged settlement_received Dec 8 2025 + overdue deadline Aug 1 2026 + upcoming Oct 15 2026 (datetime-local inputs driven via native setter + input events; segment-level a11y fills silently failed — noted pitfall) → Deadlines view correctly showed 39d overdue, 36d upcoming, CSF window ending Dec 7 2029 → ES toggle verified (lang=es, Spanish content) → directory filters (Government=1, search "victim"=1) → legal tabs switch → age gate UI+API → screenshots: deadlines-desktop/mobile, directory-desktop
+- Verified: tsc clean, eslint clean, production build succeeds, dev.log no runtime errors
+- Pushed: main @ 6b5d961 to github.com/kosovohomes/LexGuard (verified via ls-remote)
+
+Stage Summary:
+- Phase 2 complete: deadlines intelligence, directory v2, legal/trust pages, age gate, WCAG pass
+- Pitfall for future agents: radix/datetime-local a11y "spinbutton" segments cannot be filled via refs — drive the single input[type=datetime-local] with the native value setter + dispatched input/change events
+- Note: Journal allows case creation with mode=null (implicit local); new views must not gate on mode presence — mirror loadCases' fallback logic
