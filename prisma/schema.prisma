@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// LexGuard data model — adapted from PRD §10 (Phase 1, Mode A standard accounts).
+// Mode B (anonymous local) never touches the database: data lives in browser storage.
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique // stored lowercase; PRD calls for minimal PII + separation from case content
+  passwordHash String // scrypt hash
+  state        String? // "TX" | "CA"
+  locale       String    @default("en") // "en" | "es"
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime? // soft-delete marker; purge job erases fully (PRD §9.2)
+
+  sessions     Session[]
+  cases        Case[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // sha256 of session token; raw token only in user cookie
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Case {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attorneyName   String // private — never displayed publicly (PRD principle 2)
+  firm           String?
+  caseType       String // family | personal_injury | criminal | immigration | probate | business | other
+  state          String // "TX" | "CA"
+  engagementStart DateTime?
+  engagementEnd  DateTime?
+  status         String    @default("active") // active | ended
+  // fee-agreement facts used by the red-flag engine
+  feeType        String? // hourly | flat | contingency | none
+  agreedFeeAmount Float?
+  contingencyPercent Float?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  entries    Entry[]
+  documents  Document[]
+  dossiers   Dossier[]
+}
+
+model Entry {
+  id         String    @id @default(cuid())
+  caseId     String
+  case       Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  type       String // communication | payment | document | promise | note | deadline
+  occurredAt DateTime // user-supplied event date
+  createdAt  DateTime  @default(now()) // immutable audit timestamp (PRD FR-2.3)
+  editedAt   DateTime? // visible "edited" marker when user edits
+  title      String
+  body       String?
+  // structured payload (JSON string) — channel/amount/method/flags per entry type
+  data       String?
+  documentId String?   // logical link to Document (no FK — avoids circular relation)
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  entryId   String?  @unique
+  filename  String
+  mime      String
+  size      Int
+  sha256    String
+  tags      String   @default("other") // comma-separated: fee_agreement,receipt,invoice,court,correspondence,contract,other
+  data      Bytes    // file bytes (MVP: DB-stored, per-user isolated by case ownership)
+  createdAt DateTime @default(now())
+}
+
+model Dossier {
+  id         String   @id @default(cuid())
+  caseId     String
+  case       Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  specJson   String   // options + rule library version used
+  unbranded  Boolean  @default(false)
+  fileUri    String?  // MVP: generated client-side; URI reserved for server-side generation
+}
