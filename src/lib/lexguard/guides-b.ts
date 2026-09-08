@@ -312,10 +312,28 @@ export const GUIDES_B: Guide[] = [
         p: [
           {
             en: "Check each item against your journal. The red-flag panel turns checked patterns into neutral observations you can use in a complaint. Nothing here is a conclusion — it is a way to organize facts.",
-            es: "Revise cada punto con su diario. El panel de alertas convierte los patrones marcados en observaciones neutral es que puede usar en una queja. Nada aquí es una conclusión: es una forma de organizar hechos.",
+            es: "Revise cada punto con su diario. El panel de alertas convierte los patrones marcados en observaciones neutrales que puede usar en una queja. Nada aquí es una conclusión: es una forma de organizar hechos.",
           },
         ],
       },
     ],
+    stateNotes: {
+      TX: [
+        {
+          h: { en: "Check the Texas attorney's public record", es: "Consulte el expediente público del abogado en Texas" },
+          p: [
+            { en: "The State Bar of Texas offers a free online attorney search that shows licensing status and public disciplinary history. Prior grievances or sanctions involving similar patterns are factual information you can note in your journal — it is public record, not an accusation.", es: "El Colegio de Abogados de Texas ofrece una búsqueda gratuita de abogados en línea que muestra el estado de la licencia y el historial disciplinario público. Quejas o sanciones previas con patrones similares son información fáctica que puede registrar en su diario: es un expediente público, no una acusación." },
+          ],
+        },
+      ],
+      CA: [
+        {
+          h: { en: "Check the California attorney's public record", es: "Consulte el expediente público del abogado en California" },
+          p: [
+            { en: "The State Bar of California's attorney search shows each lawyer's license status, public disciplinary record, and administrative actions. Reviewing it is a neutral fact-gathering step — note what you find and when, and rely on the official record rather than unofficial websites.", es: "La búsqueda de abogados del Colegio de Abogados de California muestra el estado de la licencia, el expediente disciplinario público y las acciones administrativas de cada abogado. Consultarlo es un paso neutral de recopilación de hechos: registre lo que encuentre y cuándo, y confíe en el expediente oficial en lugar de sitios no oficiales." },
+          ],
+        },
+      ],
+    },
   },
 ];

@@ -95,7 +95,7 @@ export function computeFacts(
       if (c.requestedDirectAttorneyContact) f.requestedDirectContact = true;
       if (c.requestedFileReturn) {
         f.fileReturnRequested = true;
-        if (!f.fileReturnRequestedAt) (f as { fileReturnRequestedAt?: Date }).fileReturnRequestedAt = at;
+        if (!f.fileReturnRequestedAt) f.fileReturnRequestedAt = at.toISOString();
       }
       if (c.fileReturnRefused) f.fileReturnRefused = true;
       if (c.settledWithoutAuthorization) f.settledWithoutAuthorization = true;
@@ -174,7 +174,7 @@ export function computeFacts(
   if (f.caseEnded && f.endedAt) {
     const end = new Date(f.endedAt);
     if (f.fileReturnRequestedAt) {
-      f.fileReturnDaysWaiting = Math.max(days(now, f.fileReturnRequestedAt as Date), 1);
+      f.fileReturnDaysWaiting = Math.max(days(now, new Date(f.fileReturnRequestedAt)), 1);
     }
     void end;
   }

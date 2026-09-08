@@ -73,7 +73,10 @@ export const api = {
 
   adminStats: (code: string) =>
     fetch(`/api/admin/stats?code=${encodeURIComponent(code)}`).then(
-      j<{ stats: Record<string, number>; rules: unknown[] }>,
+      j<{
+        stats: { users: number; cases: number; entries: number; documents: number; dossiers: number; rulesLive: number; ruleLibraryVersion: string };
+        rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
+      }>,
     ),
 };
 

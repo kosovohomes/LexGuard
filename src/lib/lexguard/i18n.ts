@@ -317,7 +317,9 @@ const en = {
   verifyFirst: "State bar processes change. Verify deadlines and links on official pages before filing.",
 } as const;
 
-type Dict = typeof en;
+// Same key set as `en` (parity enforced at compile time), but values are plain
+// strings so the Spanish dictionary can hold its own translations.
+type Dict = Record<keyof typeof en, string>;
 
 const es: Dict = {
   appName: "LexGuard",

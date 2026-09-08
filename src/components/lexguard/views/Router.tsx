@@ -56,10 +56,10 @@ export function RouterView({ caseId }: { caseId?: string }) {
       const has = (pred: (x: (typeof e)[number]) => boolean) => e.some(pred);
       const harm = new Set<string>();
       if (has((x) => x.type === "payment" && ["settlement_received", "retainer"].includes((x.data as { kind?: string }).kind ?? ""))) harm.add("money_stolen");
-      if (has((x) => x.type === "payment" && (x.data as { notInAgreement?: boolean }).notInAgreement)) harm.add("fee_dispute");
-      if (has((x) => x.type === "communication" && (x.data as { settledWithoutAuthorization?: boolean }).settledWithoutAuthorization)) harm.add("settled_without_permission");
-      if (has((x) => x.type === "communication" && (x.data as { requestedFileReturn?: boolean }).requestedFileReturn)) harm.add("file_not_returned");
-      if (has((x) => x.type === "communication" && (x.data as { askedToLie?: boolean; guaranteedOutcome?: boolean; conflictFlag?: boolean }).askedToLie)) harm.add("dishonesty");
+      if (has((x) => x.type === "payment" && (x.data as { notInAgreement?: boolean }).notInAgreement === true)) harm.add("fee_dispute");
+      if (has((x) => x.type === "communication" && (x.data as { settledWithoutAuthorization?: boolean }).settledWithoutAuthorization === true)) harm.add("settled_without_permission");
+      if (has((x) => x.type === "communication" && (x.data as { requestedFileReturn?: boolean }).requestedFileReturn === true)) harm.add("file_not_returned");
+      if (has((x) => x.type === "communication" && ((x.data as { askedToLie?: boolean }).askedToLie === true || (x.data as { guaranteedOutcome?: boolean }).guaranteedOutcome === true || (x.data as { conflictFlag?: boolean }).conflictFlag === true))) harm.add("dishonesty");
       if (has((x) => x.type === "deadline" && (x.data as { status?: string }).status === "missed")) harm.add("missed_deadline");
       if (harm.size) setA((prev) => ({ ...prev, harm: [...harm] }));
     };

@@ -40,8 +40,8 @@ export function DossierView({ caseId }: { caseId: string }) {
   const observations = useMemo(() => {
     const a = app.active;
     if (!a) return [];
-    return evaluateCase(a.case, a.entries, a.documents.some((d) => d.tags.includes("fee_agreement")));
-  }, [app.active]);
+    return evaluateCase(a.case, a.entries, a.documents.some((d) => d.tags.includes("fee_agreement")), app.locale);
+  }, [app.active, app.locale]);
 
   // Deterministic narrative draft — regenerate unless user edited
   useEffect(() => {

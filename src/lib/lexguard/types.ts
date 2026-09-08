@@ -166,6 +166,7 @@ export interface CaseFacts {
   lastActivityAt?: string;
   dormantDays: number;
   fileReturnRequested: boolean;
+  fileReturnRequestedAt?: string; // when the client first asked for the file back
   fileReturnDaysWaiting: number;
   fileReturnRefused: boolean;
   settledWithoutAuthorization: boolean;
