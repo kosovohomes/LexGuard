@@ -27,3 +27,28 @@ Stage Summary:
 - Key artifacts: src/lib/lexguard/* (domain), src/app/api/* (backend), src/components/lexguard/* (UI), prisma/schema.prisma
 - Screenshots: download/lexguard-mobile.png, download/lexguard-desktop.png
 - Verified: lint clean, dev.log clean, all golden-path flows browser-verified
+
+---
+Task ID: 2
+Agent: Super Z (main agent)
+Task: Review codebase integrity, fix outstanding errors, publish LexGuard to github.com/kosovohomes/LexGuard
+
+Work Log:
+- Found repo had no remote configured (previous session built MVP but never pushed)
+- Repo hygiene: untracked .env, db/custom.db, .zscripts/dev.pid; extended .gitignore (*.db, *.pid, download/, upload/, tool-results/)
+- Docs: wrote root README.md (overview, principles, features, stack, setup, structure, disclaimer); moved PRD to docs/ and screenshots to docs/screenshots/
+- Ran tsc --noEmit for the first time (previous session only ran eslint) — 14 real errors surfaced and all fixed:
+  - i18n.ts: Dict was typeof en (as const literal types) so ES dict could never typecheck → Record<keyof typeof en, string>
+  - types.ts + engine.ts: added CaseFacts.fileReturnRequestedAt, removed unsafe casts
+  - Flags.tsx / Dossier.tsx: evaluateCase was called without locale → observations now recompute on language switch
+  - Router.tsx: 4 optional-boolean predicates in harm prefill made strict (=== true)
+  - api.ts + Admin.tsx: adminStats response fully typed
+  - guides-b.ts: added missing TX/CA stateNotes to warning-signs guide; fixed ES typo "neutral es que" → "neutrales que"
+- tsconfig: excluded scaffold folders (examples, skills, mini-services)
+- Verified: tsc clean, eslint clean, production build succeeds
+- Added origin with embedded PAT (token lives only in local .git/config, never committed) and pushed main
+
+Stage Summary:
+- github.com/kosovohomes/LexGuard is live: main @ 59dc378, verified via ls-remote + HTTP 200
+- 136 tracked files: full app source, prisma schema, docs/ (PRD + screenshots), README
+- All future pushes can reuse: git push origin main
