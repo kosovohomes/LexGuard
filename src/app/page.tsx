@@ -21,6 +21,7 @@ import { DeadlinesView } from "@/components/lexguard/views/Deadlines";
 import { LegalView } from "@/components/lexguard/views/Legal";
 import { SettingsView } from "@/components/lexguard/views/Settings";
 import { AdminView } from "@/components/lexguard/views/Admin";
+import { SearchView } from "@/components/lexguard/views/Search";
 
 export default function Page() {
   const app = useApp();
@@ -78,6 +79,9 @@ export default function Page() {
       break;
     case "deadlines":
       view = <DeadlinesView />;
+      break;
+    case "search":
+      view = <SearchView />;
       break;
     case "legal":
       view = <LegalView slug={v.slug} />;

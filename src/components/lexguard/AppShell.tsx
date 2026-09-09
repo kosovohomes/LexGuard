@@ -5,10 +5,11 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, BookOpen, FolderOpen, Compass, LifeBuoy, CalendarClock, Settings as SettingsIcon, LogOut, Globe, ExternalLink } from "lucide-react";
+import { Shield, BookOpen, FolderOpen, Compass, LifeBuoy, CalendarClock, Search, Settings as SettingsIcon, LogOut, Globe, ExternalLink } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import type { USState } from "@/lib/lexguard/types";
+import { QuickLog } from "@/components/lexguard/QuickLog";
 
 const EXIT_URL = "https://weather.com";
 
@@ -48,6 +49,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const navItems: { view: () => void; label: string; icon: React.ReactNode; active: boolean }[] = [
     { view: () => app.home(), label: tr.navHome, icon: <Shield className="h-4 w-4" />, active: v.name === "home" },
+    { view: () => app.navigate({ name: "search" }), label: tr.navSearch, icon: <Search className="h-4 w-4" />, active: v.name === "search" },
     { view: () => app.navigate({ name: "guides" }), label: tr.navGuides, icon: <BookOpen className="h-4 w-4" />, active: v.name === "guides" || v.name === "guide" },
     { view: () => app.navigate({ name: "journal" }), label: tr.navJournal, icon: <FolderOpen className="h-4 w-4" />, active: ["journal", "case", "flags", "dossier"].includes(v.name) },
     { view: () => app.navigate({ name: "router" }), label: tr.navRouter, icon: <Compass className="h-4 w-4" />, active: v.name === "router" },
@@ -156,6 +158,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         {tr.quickExit} ✕
       </button>
+
+      {/* Phase 3 — mobile-first quick log (FAB bottom-left) */}
+      <QuickLog />
     </div>
   );
 }

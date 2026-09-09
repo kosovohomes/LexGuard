@@ -12,7 +12,16 @@ import { t } from "@/lib/lexguard/i18n";
 import { PageTitle } from "@/components/lexguard/AppShell";
 
 interface AdminData {
-  stats: { users: number; cases: number; entries: number; documents: number; dossiers: number; rulesLive: number; ruleLibraryVersion: string };
+  stats: {
+    users: number;
+    cases: number;
+    entries: number;
+    documents: number;
+    dossiers: number;
+    rulesLive: number;
+    ruleLibraryVersion: string;
+    surveys: { total: number; filed: number; actionRate: number | null };
+  };
   rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
 }
 
@@ -59,6 +68,7 @@ export function AdminView() {
                 { label: tr.totalDocs, v: data.stats.documents },
                 { label: tr.totalDossiers, v: data.stats.dossiers },
                 { label: tr.rulesCount, v: data.stats.rulesLive },
+                { label: tr.adminActionRate, v: data.stats.surveys?.actionRate != null ? `${Math.round(data.stats.surveys.actionRate * 100)}%` : "—" },
               ].map((s) => (
                 <Card key={s.label}>
                   <CardContent className="p-4 text-center">
@@ -70,6 +80,7 @@ export function AdminView() {
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               {tr.ruleVersion}: v{data.stats.ruleLibraryVersion}
+              {data.stats.surveys ? ` · ${tr.adminSurveyDetail.replace("{filed}", String(data.stats.surveys.filed)).replace("{exports}", String(data.stats.dossiers))}` : ""}
             </p>
           </section>
 

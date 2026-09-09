@@ -21,6 +21,7 @@ model User {
 
   sessions     Session[]
   cases        Case[]
+  surveys      Survey[]
 }
 
 model Session {
@@ -81,6 +82,7 @@ model Document {
   sha256    String
   tags      String   @default("other") // comma-separated: fee_agreement,receipt,invoice,court,correspondence,contract,other
   data      Bytes    // file bytes (MVP: DB-stored, per-user isolated by case ownership)
+  ocrText   String?  // client-side extracted text (PDF text layer or image OCR) — Phase 3 search
   createdAt DateTime @default(now())
 }
 
@@ -92,4 +94,21 @@ model Dossier {
   specJson   String   // options + rule library version used
   unbranded  Boolean  @default(false)
   fileUri    String?  // MVP: generated client-side; URI reserved for server-side generation
+}
+
+// Outcome tracking (PRD §14 action-rate metric): self-reported follow-up
+// 30/90 days after a dossier export. Aggregate counts only in admin.
+model Survey {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dossierId  String
+  milestone  Int      // 30 | 90 (days after export)
+  status     String   // filed | not_yet | declined
+  channels   String?  // JSON array of ChannelKind attempted (self-reported)
+  notes      String?  // optional free text, never shown in admin aggregates
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, dossierId, milestone])
 }

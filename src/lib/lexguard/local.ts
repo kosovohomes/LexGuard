@@ -3,6 +3,8 @@
 // Files are capped at 1 MB (base64 in localStorage) with a clear notice.
 
 import type { CaseData, DocumentMeta, EntryData } from "./types";
+import type { SearchDoc } from "./search";
+import type { SurveyResponse, SurveyStatus } from "./surveys";
 
 const KEY = "lexguard.local.v1";
 const LOCAL_FILE_LIMIT = 1024 * 1024;
@@ -12,17 +14,19 @@ interface LocalDB {
   entries: EntryData[];
   documents: (DocumentMeta & { dataUrl: string })[];
   dossiers: { id: string; caseId: string; createdAt: string; unbranded: boolean }[];
+  surveys: SurveyResponse[];
 }
 
 function empty(): LocalDB {
-  return { cases: [], entries: [], documents: [], dossiers: [] };
+  return { cases: [], entries: [], documents: [], dossiers: [], surveys: [] };
 }
 
 function load(): LocalDB {
   if (typeof window === "undefined") return empty();
   try {
     const raw = window.localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as LocalDB) : empty();
+    // merge over empty() so DBs written before Phase 3 (no `surveys` key) still work
+    return raw ? { ...empty(), ...(JSON.parse(raw) as LocalDB) } : empty();
   } catch {
     return empty();
   }
@@ -39,6 +43,53 @@ function uid(): string {
 export const localStore = {
   listCases(): CaseData[] {
     return [...load().cases].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  },
+  // Global search index across every case in this browser (Phase 3)
+  searchDocs(): SearchDoc[] {
+    const db = load();
+    const caseLabel = (id: string) => {
+      const c = db.cases.find((x) => x.id === id);
+      return c ? c.firm ? `${c.attorneyName} — ${c.firm}` : c.attorneyName : "";
+    };
+    const docs: SearchDoc[] = [];
+    for (const c of db.cases) {
+      docs.push({
+        id: `case:${c.id}`,
+        kind: "case",
+        caseId: c.id,
+        caseLabel: caseLabel(c.id),
+        type: "case",
+        title: c.firm ? `${c.attorneyName} — ${c.firm}` : c.attorneyName,
+        text: [c.caseType, c.state, c.status].join(" "),
+      });
+    }
+    for (const e of db.entries) {
+      const payload = (e.data && Object.keys(e.data).length > 0 ? JSON.stringify(e.data) : "") ?? "";
+      docs.push({
+        id: `entry:${e.id}`,
+        kind: "entry",
+        caseId: e.caseId,
+        caseLabel: caseLabel(e.caseId),
+        type: e.type,
+        occurredAt: e.occurredAt,
+        title: e.title,
+        text: [e.body ?? "", payload].join("\n"),
+        amount: e.type === "payment" ? (e.data as { amount?: number })?.amount : undefined,
+      });
+    }
+    for (const d of db.documents) {
+      docs.push({
+        id: `doc:${d.id}`,
+        kind: "document",
+        caseId: d.caseId,
+        caseLabel: caseLabel(d.caseId),
+        type: d.tags.join(","),
+        occurredAt: d.createdAt,
+        title: d.filename,
+        text: [d.tags.join(" "), d.ocrText ?? ""].join("\n"),
+      });
+    }
+    return docs;
   },
   getCase(id: string): { case: CaseData; entries: EntryData[]; documents: DocumentMeta[] } | null {
     const db = load();
@@ -105,6 +156,31 @@ export const localStore = {
   },
   getDocumentDataUrl(id: string): string | null {
     return load().documents.find((d) => d.id === id)?.dataUrl ?? null;
+  },
+  // store extracted text (PDF layer / OCR) on a local document (Phase 3)
+  setDocumentText(id: string, text: string): void {
+    const db = load();
+    const i = db.documents.findIndex((x) => x.id === id);
+    if (i < 0) return;
+    db.documents[i] = { ...db.documents[i], ocrText: text };
+    save(db);
+  },
+  listDossiers(): { id: string; caseId: string; createdAt: string; unbranded: boolean }[] {
+    return [...load().dossiers].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  },
+  listSurveys(): SurveyResponse[] {
+    return [...load().surveys].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  },
+  saveSurvey(r: Omit<SurveyResponse, "updatedAt"> & { updatedAt?: string }): void {
+    const db = load();
+    const rec: SurveyResponse = { ...r, updatedAt: r.updatedAt ?? new Date().toISOString() };
+    const i = db.surveys.findIndex((x) => x.dossierId === r.dossierId && x.milestone === r.milestone);
+    if (i >= 0) db.surveys[i] = { ...db.surveys[i], ...rec };
+    else db.surveys.push(rec);
+    save(db);
+  },
+  surveyStatus(dossierId: string, milestone: number): SurveyStatus | null {
+    return load().surveys.find((s) => s.dossierId === dossierId && s.milestone === milestone)?.status ?? null;
   },
   recordDossier(caseId: string, unbranded: boolean): void {
     const db = load();

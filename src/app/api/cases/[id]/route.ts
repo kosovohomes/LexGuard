@@ -19,7 +19,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     db.document.findMany({
       where: { caseId: id },
       orderBy: { createdAt: "desc" },
-      select: { id: true, caseId: true, filename: true, mime: true, size: true, tags: true, createdAt: true, entryId: true },
+      select: { id: true, caseId: true, filename: true, mime: true, size: true, tags: true, createdAt: true, entryId: true, ocrText: true },
     }),
   ]);
   return NextResponse.json({ case: c, entries, documents });

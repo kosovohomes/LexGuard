@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, XCircle, BookOpen, FolderOpen, Radar, Compass, ArrowRight, AlertTriangle } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
+import { SurveyCard } from "@/components/lexguard/SurveyCard";
 
 export function HomeView() {
   const app = useApp();
@@ -24,10 +25,13 @@ export function HomeView() {
 
   return (
     <div className="space-y-10">
+      {/* Phase 3 — optional 30/90-day outcome check-in (PRD §14) */}
+      <SurveyCard />
+
       <section className="rounded-2xl border bg-gradient-to-br from-emerald-50 to-background p-6 sm:p-10">
         <p className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-          {app.locale === "es" ? "Texas · California · Fase 2" : "Texas · California · Phase 2"}
+          {app.locale === "es" ? "Texas · California · Fase 3" : "Texas · California · Phase 3"}
         </p>
         <h1 className="mt-4 max-w-3xl text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{tr.homeHeroTitle}</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">{tr.homeHeroSub}</p>

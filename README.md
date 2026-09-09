@@ -1,6 +1,6 @@
 # LexGuard
 
-**Client-side attorney accountability & case documentation platform — Texas & California (Phase 1)**
+**Client-side attorney accountability & case documentation platform — Texas & California (Phase 3)**
 
 LexGuard is a lawyer-free web application that helps individuals dealing with (or who have dealt with) an attorney to:
 
@@ -43,6 +43,15 @@ LexGuard is a lawyer-free web application that helps individuals dealing with (o
 | Legal & trust pages | Privacy Policy, Terms of Use, Accessibility Statement (bilingual, draft-pending-counsel per PRD §9.2/§11), reachable from the footer |
 | Age gate (PRD §9.2) | Neutral 16+ confirmation at registration, enforced in the UI and server-side |
 | Accessibility (WCAG 2.1 AA) | Skip-to-content link, `aria-current` navigation, `<html lang>` synced to locale, `prefers-reduced-motion` support, semantic landmarks, labelled controls |
+
+### Phase 3 (deepening)
+
+| Area | What's included |
+|---|---|
+| Document text extraction | Client-side extraction on upload — PDFs via their embedded text layer (bundled pdf.js worker, offline-safe), photos/scans via on-device OCR (tesseract.js, English + Spanish). Only the resulting text is saved; files never leave the device in local mode |
+| Global search | One search box over all cases, journal entries (incl. structured payloads), and documents (incl. extracted text), plus the rights guides. Deterministic accent-insensitive scoring with highlighted snippets; server-side in account mode (`/api/search`, ownership-scoped), in-browser in local mode |
+| Quick log (mobile) | Bottom-left FAB → 8 structured templates (calls/emails in & out, money in & out, deadline, note) → ≤3-tap logging with the same payloads the red-flag engine consumes |
+| Outcome tracking | Optional 30/90-day check-ins after a dossier export (PRD §14 action-rate metric): self-reported status + remedy channels, stored privately per user; admin sees anonymous counts only ("N of M exports reported action") |
 
 ## Screenshots
 
@@ -89,7 +98,7 @@ src/components/lexguard/     UI views (single-page app at /)
 
 ## Scope & status
 
-Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
+Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. **Phase 3 (deepening, PRD §13) adds document text extraction (PDF layer + on-device OCR), global search, mobile quick log, and 30/90-day outcome tracking** — all browser-verified in both storage modes. See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
 
 ## Legal disclaimer
 

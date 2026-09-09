@@ -18,11 +18,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Phone, Mail, MessageSquare, FileText, Landmark, NotebookPen, CalendarClock, Handshake, Upload, Download, Trash2, Radar, Compass, Building2, Loader2 } from "lucide-react";
+import { Phone, Mail, MessageSquare, FileText, Landmark, NotebookPen, CalendarClock, Handshake, Upload, Download, Trash2, Radar, Compass, Building2, Loader2, ScanText } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { PageTitle, StateBadge } from "@/components/lexguard/AppShell";
 import { EntryForm } from "./EntryForm";
+import { extractSupported } from "@/lib/lexguard/extract";
 import type { DeadlineData, EntryData, PaymentData, PromiseData } from "@/lib/lexguard/types";
 
 function typeIcon(e: EntryData) {
@@ -259,19 +260,43 @@ function DocumentsTab({ caseId }: { caseId: string }) {
   const [busy, setBusy] = useState(false);
   const [tag, setTag] = useState("other");
   const [q, setQ] = useState("");
+  // Phase 3 — extraction state per document
+  const [extractingId, setExtractingId] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
+  const [openTextId, setOpenTextId] = useState<string | null>(null);
 
   const TAGS = ["fee_agreement", "receipt", "invoice", "court", "correspondence", "contract", "other"];
 
+  const runExtract = async (docId: string) => {
+    setExtractingId(docId);
+    setProgress(0);
+    try {
+      const res = await app.extractDocText(docId, (p) => setProgress(p));
+      setFailedIds((prev) => {
+        const next = new Set(prev);
+        if (res.ok) next.delete(docId);
+        else next.add(docId);
+        return next;
+      });
+    } finally {
+      setExtractingId(null);
+    }
+  };
+
   const upload = async (file: File) => {
     setBusy(true);
+    let newDocId: string | null = null;
     try {
-      await app.uploadDoc(caseId, file, tag);
+      newDocId = await app.uploadDoc(caseId, file, tag);
     } catch (err) {
       const msg = err instanceof Error && err.message === "too_big_local" ? tr.localUploadNote : tr.fileTooBig;
       alert(msg);
     } finally {
       setBusy(false);
     }
+    // Phase 3 — auto-extract text for supported uploads (PDF layer / image OCR)
+    if (newDocId && extractSupported(file.type, file.name)) void runExtract(newDocId);
   };
 
   const filtered = docs.filter((d) => d.filename.toLowerCase().includes(q.toLowerCase()));
@@ -309,6 +334,7 @@ function DocumentsTab({ caseId }: { caseId: string }) {
           </span>
         </label>
         <p className="text-xs text-muted-foreground w-full sm:w-auto sm:flex-1">{app.mode === "local" ? tr.localUploadNote : tr.uploadHint}</p>
+        <p className="text-xs text-muted-foreground w-full">{tr.docExtractHint}</p>
       </div>
 
       <Input placeholder={tr.searchVault} value={q} onChange={(e) => setQ(e.target.value)} aria-label={tr.searchVault} />
@@ -317,46 +343,76 @@ function DocumentsTab({ caseId }: { caseId: string }) {
         <p className="text-muted-foreground">{tr.noDocs}</p>
       ) : (
         <div className="space-y-2">
-          {filtered.map((d) => (
-            <div key={d.id} className="flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm">
-              <FileText className="h-4 w-4 text-emerald-700" />
-              <span className="font-medium">{d.filename}</span>
-              <span className="text-muted-foreground">{Math.max(1, Math.round(d.size / 1024))} KB</span>
-              <div className="flex gap-1">
-                {d.tags.map((x) => (
-                  <Badge key={x} variant="outline" className="text-[11px]">
-                    {tr[`tag_${x}` as keyof typeof tr] ?? x}
-                  </Badge>
-                ))}
+          {filtered.map((d) => {
+            const supported = extractSupported(d.mime, d.filename);
+            const extracting = extractingId === d.id;
+            const searchable = !!d.ocrText;
+            return (
+              <div key={d.id} className="rounded-lg border p-3 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <FileText className="h-4 w-4 text-emerald-700" />
+                  <span className="font-medium">{d.filename}</span>
+                  <span className="text-muted-foreground">{Math.max(1, Math.round(d.size / 1024))} KB</span>
+                  <div className="flex gap-1">
+                    {d.tags.map((x) => (
+                      <Badge key={x} variant="outline" className="text-[11px]">
+                        {tr[`tag_${x}` as keyof typeof tr] ?? x}
+                      </Badge>
+                    ))}
+                  </div>
+                  {searchable ? (
+                    <Badge variant="secondary" className="text-[11px] bg-emerald-100 text-emerald-900">{tr.docSearchable}</Badge>
+                  ) : null}
+                  <div className="ml-auto flex items-center gap-1">
+                    {supported && !searchable ? (
+                      extracting ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground" role="status">
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {tr.docExtracting} {progress}%
+                        </span>
+                      ) : (
+                        <Button variant="outline" size="sm" className="h-8 gap-1" onClick={() => void runExtract(d.id)}>
+                          <ScanText className="h-3.5 w-3.5" /> {tr.docExtract}
+                        </Button>
+                      )
+                    ) : null}
+                    {searchable ? (
+                      <Button variant="ghost" size="sm" className="h-8" aria-expanded={openTextId === d.id} onClick={() => setOpenTextId(openTextId === d.id ? null : d.id)}>
+                        {openTextId === d.id ? tr.docHideText : tr.docTextView}
+                      </Button>
+                    ) : null}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      aria-label={tr.download}
+                      onClick={() => {
+                        if (app.mode === "account") {
+                          window.location.href = `/api/documents/${d.id}`;
+                        } else {
+                          const url = app.docDataUrl(d.id);
+                          if (url) {
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = d.filename;
+                            a.click();
+                          }
+                        }
+                      }}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-700" aria-label={tr.delete} onClick={() => void app.removeDoc(d.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                {failedIds.has(d.id) ? <p className="mt-2 text-xs text-amber-700">{tr.docExtractFail}</p> : null}
+                {searchable && openTextId === d.id ? (
+                  <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs text-foreground">{d.ocrText}</pre>
+                ) : null}
               </div>
-              <div className="ml-auto flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  aria-label={tr.download}
-                  onClick={() => {
-                    if (app.mode === "account") {
-                      window.location.href = `/api/documents/${d.id}`;
-                    } else {
-                      const url = app.docDataUrl(d.id);
-                      if (url) {
-                        const a = document.createElement("a");
-                        a.href = url;
-                        a.download = d.filename;
-                        a.click();
-                      }
-                    }
-                  }}
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-700" aria-label={tr.delete} onClick={() => void app.removeDoc(d.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

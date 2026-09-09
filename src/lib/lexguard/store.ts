@@ -20,6 +20,7 @@ export type ViewName =
   | "directory"
   | "deadlines"
   | "legal"
+  | "search"
   | "settings"
   | "admin";
 
@@ -100,9 +101,10 @@ interface AppState extends Prefs {
   addEntry: (caseId: string, e: Partial<EntryData> & { type: EntryType; title: string; occurredAt: string }) => Promise<void>;
   editEntry: (id: string, patch: Partial<EntryData>) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
-  uploadDoc: (caseId: string, file: File, tags: string) => Promise<void>;
+  uploadDoc: (caseId: string, file: File, tags: string) => Promise<string | null>;
   removeDoc: (id: string) => Promise<void>;
   docDataUrl: (id: string) => string | null;
+  extractDocText: (docId: string, onProgress?: (pct: number) => void) => Promise<{ ok: boolean; chars: number }>;
   recordDossier: (caseId: string, unbranded: boolean) => Promise<void>;
 }
 
@@ -304,7 +306,7 @@ export const useApp = create<AppState>((set, get) => ({
 
   uploadDoc: async (caseId, file, tags) => {
     if (get().mode === "account") {
-      await api.uploadDocument(caseId, file, tags);
+      const res = await api.uploadDocument(caseId, file, tags);
       // index the upload on the timeline as a document entry
       await api.createEntry(caseId, {
         type: "document",
@@ -312,6 +314,8 @@ export const useApp = create<AppState>((set, get) => ({
         occurredAt: new Date().toISOString(),
         body: null,
       });
+      await get().refreshActive();
+      return res.document?.id ?? null;
     } else {
       if (file.size > localStore.fileLimitBytes) throw new Error("too_big_local");
       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -320,10 +324,11 @@ export const useApp = create<AppState>((set, get) => ({
         r.onerror = () => reject(new Error("read"));
         r.readAsDataURL(file);
       });
-      localStore.createDocument({ caseId, filename: file.name, mime: file.type, size: file.size, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), dataUrl });
+      const meta = localStore.createDocument({ caseId, filename: file.name, mime: file.type, size: file.size, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), dataUrl });
       localStore.createEntry({ caseId, type: "document", occurredAt: new Date().toISOString(), title: file.name, body: null, data: {}, documentId: null });
+      await get().refreshActive();
+      return meta.id;
     }
-    await get().refreshActive();
   },
 
   removeDoc: async (id) => {
@@ -336,6 +341,34 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   docDataUrl: (id) => localStore.getDocumentDataUrl(id),
+
+  // Phase 3 — client-side text extraction (PDF text layer / image OCR).
+  // Runs in the browser; only the resulting text is saved to the user's own storage.
+  extractDocText: async (docId, onProgress) => {
+    const doc = get().active?.documents.find((d) => d.id === docId);
+    if (!doc) return { ok: false, chars: 0 };
+    try {
+      let blob: Blob;
+      if (get().mode === "account") {
+        const res = await fetch(api.documentUrl(docId));
+        if (!res.ok) throw new Error("fetch_failed");
+        blob = await res.blob();
+      } else {
+        const url = localStore.getDocumentDataUrl(docId);
+        if (!url) throw new Error("no_data");
+        blob = await (await fetch(url)).blob();
+      }
+      const { extractDocumentText } = await import("./extract");
+      const result = await extractDocumentText(blob, doc.mime, doc.filename, onProgress);
+      if (!result.text) return { ok: false, chars: 0 };
+      if (get().mode === "account") await api.updateDocumentText(docId, result.text);
+      else localStore.setDocumentText(docId, result.text);
+      await get().refreshActive();
+      return { ok: true, chars: result.text.length };
+    } catch {
+      return { ok: false, chars: 0 };
+    }
+  },
 
   recordDossier: async (caseId, unbranded) => {
     if (get().mode === "account") {

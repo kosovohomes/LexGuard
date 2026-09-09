@@ -75,3 +75,27 @@ Stage Summary:
 - Phase 2 complete: deadlines intelligence, directory v2, legal/trust pages, age gate, WCAG pass
 - Pitfall for future agents: radix/datetime-local a11y "spinbutton" segments cannot be filled via refs — drive the single input[type=datetime-local] with the native value setter + dispatched input/change events
 - Note: Journal allows case creation with mode=null (implicit local); new views must not gate on mode presence — mirror loadCases' fallback logic
+
+---
+Task ID: 4
+Agent: Super Z (main agent)
+Task: Build Phase-3 features (deepening) per PRD §13 and push to GitHub
+
+Work Log:
+- Scope from PRD §13 Phase 3 remaining items (deadline intelligence was pulled forward in Task 3): OCR/search quality, quick-log mobile, outcome tracking surveys
+- Deps: added pdfjs-dist@6.3.289 + tesseract.js@7.0.0; committed public/pdf.worker.min.mjs (bundled PDF worker, offline-safe, version-matched); excluded it from eslint
+- Schema: Document.ocrText String? + Survey model (userId/dossierId/milestone 30|90, status filed|not_yet|declined, channels JSON, notes; unique userId+dossierId+milestone); db push + generate
+- Domain libs: search.ts (isomorphic engine — index-preserving NFD normalization for accent-insensitive highlighting, AND semantics, word-boundary/title weighting, kind weights, numeric-amount matching, snippet windows); extract.ts (client-side: PDF text layer via bundled worker, image OCR eng+spa via tesseract, 100k-char cap, progress callbacks); surveys.ts (pendingMilestones + surveyAggregate, sanitize helpers); quicklog.ts (8 templates + payload builder, same structured shapes the engine consumes)
+- API: PATCH /api/documents/[id] (save extracted text, ownership-enforced); GET /api/search (server-side scoring of user's own cases/entries/docs — never selects document bytes); GET+POST /api/surveys (pending computation from dossier createdAt, upsert); admin/stats extended with count-only actionRate (filed/dossiers)
+- Client: store.extractDocText (fetches bytes in both modes, extracts in browser, saves text); uploadDoc now returns doc id (auto-extract on upload); local.ts gained surveys array (with backward-compatible load() merge for pre-Phase-3 DBs), setDocumentText, searchDocs, dossier/survey listers; api client gained search/surveys/updateDocumentText
+- UI: Search view (debounced, grouped Cases/Entries/Documents/Guides, <mark> highlighting, result navigation into case/guide); Documents tab (auto-extract supported uploads, progress %, "Searchable" badge, view/hide extracted text, neutral failure note); QuickLog (mobile FAB bottom-left + dialog, template grid → minimal form → save, reused existing i18n keys for methods/payees/kinds); SurveyCard on Home (status radio, channels checkboxes, optional notes, 7-day snooze, history list, ES variants); Admin action-rate card
+- i18n: ~78 new keys, EN/ES compile-time parity
+- E2E (agent-browser): account mode — jsPDF-generated PDF uploaded → auto-extracted (246 chars, PATCH verified) → "Searchable" badge + text viewer; SVG→PNG receipt OCR'd correctly ("RECEIPT | Cash retainer $1,500 received…"); search "retainer" hit both docs' extracted text + a guide with highlighted snippets; result click navigates into case; quick-log FAB on 390px viewport → "I paid money" $250/card/firm_trust saved to timeline; dossier recorded + backdated 40d via Prisma → Home showed 30-day check-in → filed+discipline+malpractice+note submitted → thanks + history; /api/surveys pending=0; admin shows Action rate 100% "1 of 1 exports"; 90-day milestone correctly not due; local mode — signed out, created case, PDF auto-extracted, search found it, seeded backdated local dossier → survey form → "not_yet" saved to localStorage; numeric search "250" matched payment entry payload; ES verified (search groups, admin rate, lang=es)
+- Screenshots: docs/screenshots/search.png, quicklog.png, survey.png (+ download/ copies)
+- Gates: tsc clean, eslint clean, production build clean (2 new routes), dev.log clean
+
+Stage Summary:
+- Phase 3 complete per PRD §13: OCR/search quality, quick-log mobile, outcome tracking (deadline intelligence shipped in Task 3)
+- Extraction is privacy-first: all OCR/PDF parsing client-side; only text stored; account-mode search scoped server-side, local-mode search in-browser
+- Pitfall notes for future agents: GET /api/cases/[id] document select must include ocrText; localStorage LocalDB needs load() merge-over-empty for schema migrations; eslint must ignore bundled worker in public/
+- Pushed to github.com/kosovohomes/LexGuard main

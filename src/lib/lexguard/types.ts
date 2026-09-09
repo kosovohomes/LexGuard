@@ -120,6 +120,7 @@ export interface DocumentMeta {
   tags: string[];
   createdAt: string;
   entryId?: string | null;
+  ocrText?: string | null; // extracted text (PDF layer or image OCR) — Phase 3 search
 }
 
 export interface Observation {

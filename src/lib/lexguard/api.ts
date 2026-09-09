@@ -1,5 +1,7 @@
 // LexGuard Mode A — account API client (calls same-origin /api endpoints)
 import type { CaseData, DocumentMeta, EntryData } from "./types";
+import type { SearchHit } from "./search";
+import type { PendingSurvey, SurveyResponse } from "./surveys";
 
 async function j<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`api_${res.status}`);
@@ -66,7 +68,25 @@ export const api = {
     return fetch("/api/documents", { method: "POST", body: fd }).then(j<{ document: DocumentMeta }>);
   },
   deleteDocument: (id: string) => fetch(`/api/documents/${id}`, { method: "DELETE" }).then(j<{ ok: boolean }>),
+  updateDocumentText: (id: string, ocrText: string) =>
+    fetch(`/api/documents/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ocrText }),
+    }).then(j<{ ok: boolean }>),
   documentUrl: (id: string) => `/api/documents/${id}`,
+
+  search: (q: string) =>
+    fetch(`/api/search?q=${encodeURIComponent(q)}`).then(j<{ hits: SearchHit[] }>),
+
+  listSurveys: () =>
+    fetch("/api/surveys").then(j<{ pending: PendingSurvey[]; responses: SurveyResponse[] }>),
+  saveSurvey: (data: { dossierId: string; milestone: number; status: string; channels?: string[]; notes?: string }) =>
+    fetch("/api/surveys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }).then(j<{ ok: boolean }>),
 
   exportAll: () => fetch("/api/account").then(j<unknown>),
   deleteAccount: () => fetch("/api/account", { method: "DELETE" }).then(j<{ ok: boolean }>),
@@ -74,7 +94,16 @@ export const api = {
   adminStats: (code: string) =>
     fetch(`/api/admin/stats?code=${encodeURIComponent(code)}`).then(
       j<{
-        stats: { users: number; cases: number; entries: number; documents: number; dossiers: number; rulesLive: number; ruleLibraryVersion: string };
+        stats: {
+          users: number;
+          cases: number;
+          entries: number;
+          documents: number;
+          dossiers: number;
+          rulesLive: number;
+          ruleLibraryVersion: string;
+          surveys: { total: number; filed: number; actionRate: number | null };
+        };
         rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
       }>,
     ),
