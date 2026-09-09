@@ -91,6 +91,14 @@ export const api = {
   exportAll: () => fetch("/api/account").then(j<unknown>),
   deleteAccount: () => fetch("/api/account", { method: "DELETE" }).then(j<{ ok: boolean }>),
 
+  // anonymous knowledge-lift submission (PRD §14) — no identifier attached
+  submitQuiz: (phase: "pre" | "post", score: number) =>
+    fetch("/api/quiz", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phase, score }),
+    }).then(j<{ ok: boolean }>),
+
   adminStats: (code: string) =>
     fetch(`/api/admin/stats?code=${encodeURIComponent(code)}`).then(
       j<{
@@ -103,6 +111,16 @@ export const api = {
           rulesLive: number;
           ruleLibraryVersion: string;
           surveys: { total: number; filed: number; actionRate: number | null };
+          quiz: { preCount: number; postCount: number; preAvg: number | null; postAvg: number | null; lift: number | null };
+          patterns: {
+            totalCasesConsidered: number;
+            casesWithObservations: number;
+            minCell: number;
+            cells: {
+              TX: Record<string, number | null>;
+              CA: Record<string, number | null>;
+            };
+          };
         };
         rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
       }>,

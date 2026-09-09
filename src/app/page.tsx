@@ -6,6 +6,7 @@
 import { useEffect } from "react";
 import { AppShell } from "@/components/lexguard/AppShell";
 import { LockScreen, useAutoLock } from "@/components/lexguard/LockScreen";
+import { VaultUnlock } from "@/components/lexguard/VaultUnlock";
 import { useApp } from "@/lib/lexguard/store";
 import { HomeView } from "@/components/lexguard/views/Home";
 import { OnboardingView } from "@/components/lexguard/views/Onboarding";
@@ -40,6 +41,15 @@ export default function Page() {
           LexGuard…
         </div>
       </div>
+    );
+  }
+  // Zero-knowledge vault gate (PRD §9.1): local mode with an encrypted vault
+  // at rest stays sealed until the passphrase is entered.
+  if (app.mode === "local" && app.vault === "locked") {
+    return (
+      <AppShell>
+        <VaultUnlock />
+      </AppShell>
     );
   }
 

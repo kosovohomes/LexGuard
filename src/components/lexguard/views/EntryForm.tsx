@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
+import { MicButton } from "@/components/lexguard/MicButton";
 import type { CommunicationData, DeadlineData, PaymentData } from "@/lib/lexguard/types";
 
 function nowLocal(): string {
@@ -115,7 +116,10 @@ function CommunicationForm({ caseId, onDone }: { caseId: string; onDone: () => v
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="cbody">{tr.details}</Label>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="cbody">{tr.details}</Label>
+          <MicButton getText={() => body} setText={(next) => setBody(next)} />
+        </div>
         <Textarea id="cbody" rows={3} value={body} onChange={(e) => setBody(e.target.value)} />
       </div>
       <div className="flex flex-wrap gap-4">
@@ -445,7 +449,10 @@ function NoteForm({ caseId, onDone }: { caseId: string; onDone: () => void }) {
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="nbody">{tr.details}</Label>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="nbody">{tr.details}</Label>
+          <MicButton getText={() => body} setText={(next) => setBody(next)} />
+        </div>
         <Textarea id="nbody" rows={4} value={body} onChange={(e) => setBody(e.target.value)} />
       </div>
       <Button

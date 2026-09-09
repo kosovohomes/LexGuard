@@ -243,6 +243,17 @@ export function RouterView({ caseId }: { caseId?: string }) {
                         <p className="mb-1 text-sm font-semibold">{tr.process}</p>
                         <p className="text-sm">{app.locale === "es" ? ch.process.es : ch.process.en}</p>
                       </div>
+                      {ch.regions?.[app.locale]?.length ? (
+                        <div>
+                          <p className="mb-1 text-sm font-semibold">{tr.routerRegions}</p>
+                          <ul className="list-disc space-y-1 pl-5 text-sm">
+                            {ch.regions[app.locale].map((s, i) => (
+                              <li key={i}>{s}</li>
+                            ))}
+                          </ul>
+                          <p className="mt-1 text-xs text-muted-foreground">{tr.routerRegionsNote}</p>
+                        </div>
+                      ) : null}
                       {ch.warnings[app.locale].length ? (
                         <Alert variant="destructive">
                           <TriangleAlert className="h-4 w-4" />

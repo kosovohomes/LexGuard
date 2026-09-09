@@ -4,7 +4,8 @@
 import { create } from "zustand";
 import type { CaseData, DocumentMeta, EntryData, EntryType, Locale, StorageMode, USState } from "./types";
 import { api, normalizeEntry } from "./api";
-import { localStore } from "./local";
+import { localStore, type VaultStatus } from "./local";
+import { scanFile, type ScanResult } from "./filescan";
 
 export type ViewName =
   | "home"
@@ -72,6 +73,8 @@ interface AppState extends Prefs {
   cases: (CaseData & { _count?: { entries: number; documents: number; dossiers: number } })[];
   active: CaseFull | null;
   activeLoading: boolean;
+  // zero-knowledge vault status for local mode (PRD §9.1) — reactive mirror
+  vault: VaultStatus;
 
   init: () => Promise<void>;
   setLocale: (l: Locale) => void;
@@ -82,6 +85,7 @@ interface AppState extends Prefs {
   clearPin: () => void;
   locked: boolean;
   unlock: (pin: string) => Promise<boolean>;
+  refreshVault: () => void;
 
   view: () => View;
   navigate: (v: View) => void;
@@ -101,7 +105,7 @@ interface AppState extends Prefs {
   addEntry: (caseId: string, e: Partial<EntryData> & { type: EntryType; title: string; occurredAt: string }) => Promise<void>;
   editEntry: (id: string, patch: Partial<EntryData>) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
-  uploadDoc: (caseId: string, file: File, tags: string) => Promise<string | null>;
+  uploadDoc: (caseId: string, file: File, tags: string) => Promise<{ id: string | null; scan: ScanResult }>;
   removeDoc: (id: string) => Promise<void>;
   docDataUrl: (id: string) => string | null;
   extractDocText: (docId: string, onProgress?: (pct: number) => void) => Promise<{ ok: boolean; chars: number }>;
@@ -110,11 +114,17 @@ interface AppState extends Prefs {
 
 const prefs = loadPrefs();
 
+function currentVault(): VaultStatus {
+  if (typeof window === "undefined") return "none";
+  return localStore.vaultStatus();
+}
+
 export const useApp = create<AppState>((set, get) => ({
   ...prefs,
   ready: false,
   user: null,
   locked: !!prefs.pinHash,
+  vault: currentVault(),
   stack: [{ name: "home" }],
   cases: [],
   active: null,
@@ -132,8 +142,10 @@ export const useApp = create<AppState>((set, get) => ({
     } catch {
       /* local mode users simply have no session */
     }
-    set({ ready: true, locked: !!get().pinHash });
+    set({ ready: true, locked: !!get().pinHash, vault: currentVault() });
   },
+
+  refreshVault: () => set({ vault: currentVault() }),
 
   setLocale: (l) => {
     set({ locale: l });
@@ -305,8 +317,13 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   uploadDoc: async (caseId, file, tags) => {
+    // Phase 4 — client-side integrity scan before anything is stored (FR-2.4)
+    const scan = await scanFile(file);
+    if (scan.level === "block") return { id: null, scan };
+    let id: string | null = null;
     if (get().mode === "account") {
       const res = await api.uploadDocument(caseId, file, tags);
+      id = res.document?.id ?? null;
       // index the upload on the timeline as a document entry
       await api.createEntry(caseId, {
         type: "document",
@@ -314,8 +331,6 @@ export const useApp = create<AppState>((set, get) => ({
         occurredAt: new Date().toISOString(),
         body: null,
       });
-      await get().refreshActive();
-      return res.document?.id ?? null;
     } else {
       if (file.size > localStore.fileLimitBytes) throw new Error("too_big_local");
       const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -326,9 +341,10 @@ export const useApp = create<AppState>((set, get) => ({
       });
       const meta = localStore.createDocument({ caseId, filename: file.name, mime: file.type, size: file.size, tags: tags.split(",").map((t) => t.trim()).filter(Boolean), dataUrl });
       localStore.createEntry({ caseId, type: "document", occurredAt: new Date().toISOString(), title: file.name, body: null, data: {}, documentId: null });
-      await get().refreshActive();
-      return meta.id;
+      id = meta.id;
     }
+    await get().refreshActive();
+    return { id, scan };
   },
 
   removeDoc: async (id) => {

@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, Lock, ShieldAlert, FileJson, Trash2 } from "lucide-react";
+import { Eye, Lock, ShieldAlert, FileJson, Trash2, KeyRound, Download, Upload } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { api } from "@/lib/lexguard/api";
 import { localStore } from "@/lib/lexguard/local";
+import { passphraseProblem } from "@/lib/lexguard/zk";
 import { PageTitle } from "@/components/lexguard/AppShell";
 
 export function SettingsView() {
@@ -21,6 +22,70 @@ export function SettingsView() {
   const tr = t(app.locale);
   const [pin, setPin] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
+  // zero-knowledge vault (PRD §9.1) — local mode only
+  const [pass1, setPass1] = useState("");
+  const [pass2, setPass2] = useState("");
+  const [disablePass, setDisablePass] = useState("");
+  const [importPass, setImportPass] = useState("");
+  const [importPayload, setImportPayload] = useState<string | null>(null);
+  const [vaultBusy, setVaultBusy] = useState(false);
+
+  const vaultStatus = app.vault;
+
+  const say = (m: string) => {
+    setMsg(m);
+    setTimeout(() => setMsg(null), 4000);
+  };
+
+  const enableVault = async () => {
+    if (pass1 !== pass2) return say(tr.vaultMismatch);
+    if (passphraseProblem(pass1)) return say(tr.vaultShort);
+    setVaultBusy(true);
+    const ok = await localStore.enableVault(pass1);
+    setVaultBusy(false);
+    setPass1("");
+    setPass2("");
+    if (ok) {
+      app.refreshVault();
+      say(tr.vaultEnabledNote);
+    } else say(tr.vaultError);
+  };
+
+  const disableVault = async () => {
+    setVaultBusy(true);
+    const ok = await localStore.disableVault(disablePass);
+    setVaultBusy(false);
+    setDisablePass("");
+    if (ok) {
+      app.refreshVault();
+      say(tr.vaultDisabledNote);
+    } else say(tr.vaultWrong);
+  };
+
+  const exportVault = () => {
+    const payload = localStore.exportEncrypted();
+    if (!payload) return say(tr.vaultError);
+    const blob = new Blob([payload], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `lexguard-vault-${new Date().toISOString().slice(0, 10)}.lgvault`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importVault = async () => {
+    if (!importPayload) return;
+    setVaultBusy(true);
+    const ok = await localStore.importEncrypted(importPayload, importPass);
+    setVaultBusy(false);
+    setImportPass("");
+    setImportPayload(null);
+    if (ok) {
+      app.refreshVault();
+      say(tr.vaultImported);
+    } else say(tr.vaultWrong);
+  };
 
   const exportAll = () => {
     const data = app.mode === "account" ? null : localStore.exportAll();
@@ -121,6 +186,81 @@ export function SettingsView() {
           )}
         </CardContent>
       </Card>
+
+      {/* Zero-knowledge vault (PRD §9.1) — anonymous local mode only */}
+      {app.mode === "local" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <KeyRound className="h-4 w-4 text-emerald-700" /> {tr.vaultTitle}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">{tr.vaultDesc}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {vaultStatus === "none" ? (
+              <div className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="zk-pass">{tr.vaultPassphrase}</Label>
+                    <Input id="zk-pass" type="password" value={pass1} onChange={(e) => setPass1(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="zk-pass2">{tr.vaultConfirm}</Label>
+                    <Input id="zk-pass2" type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} />
+                  </div>
+                </div>
+                <Button className="bg-emerald-700 hover:bg-emerald-800" disabled={vaultBusy || !pass1} onClick={() => void enableVault()}>
+                  {tr.vaultEnable}
+                </Button>
+              </div>
+            ) : null}
+            {vaultStatus === "unlocked" ? (
+              <div className="space-y-3">
+                <p className="flex items-center gap-2 text-sm font-medium text-emerald-800">
+                  <Lock className="h-4 w-4" /> {tr.vaultOn}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" className="gap-2" onClick={exportVault}>
+                    <Download className="h-4 w-4" /> {tr.vaultBackup}
+                  </Button>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="zk-disable">{tr.vaultDisableLabel}</Label>
+                  <div className="flex flex-wrap gap-2">
+                    <Input id="zk-disable" type="password" value={disablePass} onChange={(e) => setDisablePass(e.target.value)} className="max-w-xs" />
+                    <Button variant="outline" disabled={vaultBusy || !disablePass} onClick={() => void disableVault()}>
+                      {tr.vaultDisable}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+            <div className="space-y-1.5 rounded-lg border p-3">
+              <Label htmlFor="zk-import">{tr.vaultRestore}</Label>
+              <input
+                id="zk-import"
+                type="file"
+                accept=".lgvault,.txt"
+                className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-sm"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (f) setImportPayload(await f.text());
+                  e.currentTarget.value = "";
+                }}
+              />
+              {importPayload ? (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Input type="password" placeholder={tr.vaultPassphrase} value={importPass} onChange={(e) => setImportPass(e.target.value)} className="max-w-xs" />
+                  <Button disabled={vaultBusy || !importPass} onClick={() => void importVault()}>
+                    <Upload className="h-4 w-4" /> {tr.vaultRestoreBtn}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+            <p className="text-xs text-muted-foreground">{tr.vaultLostPass}</p>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>

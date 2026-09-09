@@ -17,6 +17,9 @@ export interface ChannelDef {
   links: { label: string; url: string }[];
   warnings: { en: string[]; es: string[] };
   evidence: { en: string[]; es: string[] };
+  // optional county/region programs (PRD Appendix A: CA fee arbitration must
+  // "list major programs per region") — plain-language list, verify before use
+  regions?: { en: string[]; es: string[] };
 }
 
 export const CHANNELS: Record<USState, Record<ChannelKind, ChannelDef>> = {
@@ -414,6 +417,32 @@ export const CHANNELS: Record<USState, Record<ChannelKind, ChannelDef>> = {
       links: [
         { label: "State Bar — fee arbitration info", url: "https://www.calbar.ca.gov/Access-Justice/State-Bar-Court-and-Discipline/Mandatory-Fee-Arbitration" },
       ],
+      // Major programs per region (PRD Appendix A, CA) — neutral listing;
+      // confirm current contact info and fees with each program before filing.
+      regions: {
+        en: [
+          "Los Angeles County: Los Angeles County Bar Association Attorney-Client Fee Dispute Arbitration (lacba.org).",
+          "San Francisco: The Bar Association of San Francisco Fee Arbitration Program (sfbar.org).",
+          "San Diego County: San Diego County Bar Association fee arbitration (sdcba.org).",
+          "Orange County: Orange County Bar Association fee arbitration (ocbar.org).",
+          "Sacramento County: Sacramento County Bar Association fee arbitration (sacbar.org).",
+          "Alameda County: Alameda County Bar Association fee arbitration (acbar.org).",
+          "Santa Clara County: Santa Clara County Bar Association fee arbitration (sccba.com).",
+          "Fresno County: Fresno County Bar Association fee arbitration (fresnocountybar.org).",
+          "Other counties: the State Bar of California runs a fee arbitration program where no local bar program exists.",
+        ],
+        es: [
+          "Condado de Los Ángeles: arbitraje de disputas abogado-cliente de la Asociación de Abogados del Condado de LA (lacba.org).",
+          "San Francisco: programa de arbitraje de honorarios de la Asociación de Abogados de San Francisco (sfbar.org).",
+          "Condado de San Diego: arbitraje de honorarios de la Asociación de Abogados del Condado de San Diego (sdcba.org).",
+          "Condado de Orange: arbitraje de honorarios de la Asociación de Abogados del Condado de Orange (ocbar.org).",
+          "Condado de Sacramento: arbitraje de honorarios de la Asociación de Abogados del Condado de Sacramento (sacbar.org).",
+          "Condado de Alameda: arbitraje de honorarios de la Asociación de Abogados del Condado de Alameda (acbar.org).",
+          "Condado de Santa Clara: arbitraje de honorarios de la Asociación de Abogados del Condado de Santa Clara (sccba.com).",
+          "Condado de Fresno: arbitraje de honorarios de la Asociación de Abogados del Condado de Fresno (fresnocountybar.org).",
+          "Otros condados: el Colegio de Abogados de California administra el arbitraje donde no existe un programa local.",
+        ],
+      },
       warnings: { en: [], es: [] },
       evidence: {
         en: ["Signed fee agreement", "Invoices with line items", "All payment records", "Communications about fees"],

@@ -1,6 +1,6 @@
 # LexGuard
 
-**Client-side attorney accountability & case documentation platform — Texas & California (Phase 3)**
+**Client-side attorney accountability & case documentation platform — Texas & California (Phase 4)**
 
 LexGuard is a lawyer-free web application that helps individuals dealing with (or who have dealt with) an attorney to:
 
@@ -53,6 +53,19 @@ LexGuard is a lawyer-free web application that helps individuals dealing with (o
 | Quick log (mobile) | Bottom-left FAB → 8 structured templates (calls/emails in & out, money in & out, deadline, note) → ≤3-tap logging with the same payloads the red-flag engine consumes |
 | Outcome tracking | Optional 30/90-day check-ins after a dossier export (PRD §14 action-rate metric): self-reported status + remedy channels, stored privately per user; admin sees anonymous counts only ("N of M exports reported action") |
 
+### Phase 4 (deferred items, now built)
+
+| Area | What's included |
+|---|---|
+| Knowledge-lift quiz (§14) | Optional 5-question rights quiz, pre + a 7-day-later follow-up, with per-question explanations and rule citations. Answers stay on the device; account mode submits only the anonymous score (0–5, no identifier) — admin sees aggregate averages and the lift |
+| Anonymized aggregate reporting (§13 Ph 4) | Admin dashboard reports documented-case pattern counts by category × state (trust/money, diligence, communication, authority/conflicts, fees) computed by the same deterministic engine, with **k-anonymity** — cells under 5 cases are never shown |
+| Complaint-form worksheet (§13 Ph 4) | Maps the client's journal onto the actual state-bar form fields (TX Chief Disciplinary Counsel grievance / CA State Bar complaint): attorney & representation autofill, chronological facts, amounts, document index, and state-specific notices (TX privilege waiver, CA anonymity option) — appended to the dossier PDF and copyable as text. LexGuard never files |
+| Zero-knowledge vault (§9.1) | Local mode can encrypt the entire journal at rest with a passphrase (WebCrypto AES-GCM, PBKDF2-SHA256 310k iterations). Passphrase never leaves the device; a reload seals the app behind an unlock screen; encrypted `.lgvault` backup download/restore included |
+| Upload integrity scan (FR-2.4) | Client-side pre-upload checks: executable signatures masquerading as documents (blocked), EICAR test string (blocked), PDF active content and macro documents (warned), extension/MIME mismatches — all in neutral wording |
+| Voice notes (FR-2.6) | Mic button in the journal and quick-log details fields via the Web Speech API (English/Spanish); hidden gracefully where unsupported |
+| CA fee-arbitration directory (App. A) | County-level program listings (LA, SF, San Diego, Orange, Sacramento, Alameda, Santa Clara, Fresno + State Bar program for other counties) in the Remedy Router |
+| Status page (§9.3) | `/status` public service page + `/api/health` machine-readable liveness endpoint |
+
 ## Screenshots
 
 | Desktop | Mobile |
@@ -98,7 +111,7 @@ src/components/lexguard/     UI views (single-page app at /)
 
 ## Scope & status
 
-Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. **Phase 3 (deepening, PRD §13) adds document text extraction (PDF layer + on-device OCR), global search, mobile quick log, and 30/90-day outcome tracking** — all browser-verified in both storage modes. See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
+Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. **Phase 3 (deepening, PRD §13) adds document text extraction (PDF layer + on-device OCR), global search, mobile quick log, and 30/90-day outcome tracking** — all browser-verified in both storage modes. **Phase 4 implements the PRD's remaining buildable items: the knowledge-lift quiz, anonymized aggregate reporting with k-anonymity, the complaint-form worksheet, the zero-knowledge vault, upload integrity scanning, voice notes, CA county fee-arbitration listings, and the status page** — browser-verified in both storage modes and both languages. Still decision-gated per PRD: additional states (FL/NY/AZ, needs counsel sign-off), email reminder digests (Open Question 4), soft-delete retention (Open Question 5), and rules-as-JSON authoring (Open Question 2 governance). See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
 
 ## Legal disclaimer
 

@@ -421,6 +421,77 @@ const en = {
   svVerifiedNote: "LexGuard does not verify filings and never contacts anyone on your behalf.",
   adminActionRate: "Action rate",
   adminSurveyDetail: "{filed} of {exports} exports self-reported action (count-only, PRD §14)",
+
+  // ---- Fase 4: knowledge-lift quiz (PRD §14) ----
+  quizPreTitle: "Quick knowledge check (5 questions)",
+  quizPostTitle: "Follow-up knowledge check",
+  quizBadge: "Optional · anonymous",
+  quizIntro: "Five quick questions about your rights as a legal client. Your answers stay on this device; only anonymous averages are ever shared.",
+  quizStart: "Start the 5 questions",
+  quizOptional: "Optional — you can skip this anytime.",
+  quizAwaiting: "The follow-up check opens 7 days after your first round.",
+  quizTitle: "Rights knowledge check",
+  quizPre: "First round",
+  quizPost: "Follow-up",
+  quizStep: "Question {n} of {max}",
+  quizScoreLine: "You scored {score} of {max}.",
+  quizAnonNote: "Your answers never leave this device except an anonymous score count in account mode.",
+  quizDoneTitle: "Thanks — check complete",
+
+  // ---- Fase 4: complaint-form worksheet (PRD §13 Phase 4) ----
+  worksheetToggle: "Add the complaint-form worksheet (state bar form fields)",
+  worksheetHint: "A preparation worksheet mapping your journal onto your state's official complaint form. You review it and transfer it yourself — LexGuard never files.",
+  worksheetCopy: "Copy worksheet text",
+  worksheetCopied: "Worksheet copied",
+
+  // ---- Fase 4: zero-knowledge vault (PRD §9.1) ----
+  vaultTitle: "Zero-knowledge vault (local mode)",
+  vaultDesc: "Encrypts your entire local journal with your passphrase (AES-GCM). The passphrase never leaves this device and cannot be recovered — without it the data stays unreadable.",
+  vaultPassphrase: "Passphrase (8+ characters)",
+  vaultConfirm: "Confirm passphrase",
+  vaultEnable: "Encrypt my data",
+  vaultOn: "Vault is on — your journal is encrypted at rest in this browser.",
+  vaultBackup: "Download encrypted backup",
+  vaultDisableLabel: "Turn off encryption (confirm passphrase)",
+  vaultDisable: "Decrypt",
+  vaultRestore: "Restore an encrypted backup (.lgvault)",
+  vaultRestoreBtn: "Restore",
+  vaultMismatch: "The two passphrases do not match.",
+  vaultShort: "Use at least 8 characters for the passphrase.",
+  vaultError: "The vault operation could not be completed.",
+  vaultWrong: "That passphrase does not decrypt this data.",
+  vaultEnabledNote: "Encryption is on. Your journal is now stored encrypted.",
+  vaultDisabledNote: "Encryption is off. Your journal is stored unencrypted again.",
+  vaultImported: "Backup restored. Your journal was replaced with the backup.",
+  vaultLostPass: "If you forget this passphrase there is no recovery — that is the point of zero-knowledge encryption.",
+  vaultUnlockTitle: "Your encrypted vault",
+  vaultUnlockSub: "Enter your passphrase to decrypt the journal stored in this browser.",
+  vaultUnlockBtn: "Unlock",
+
+  // ---- Fase 4: voice notes (FR-2.6) ----
+  micStart: "Voice note",
+  micStop: "Stop",
+
+  // ---- Fase 4: router regions (PRD Appendix A) ----
+  routerRegions: "Programs by region",
+  routerRegionsNote: "Confirm current contact details and fees with each program before filing.",
+
+  // ---- Fase 4: admin metrics (PRD §14 / §13 Phase 4) ----
+  adminQuizTitle: "Knowledge lift (PRD §14)",
+  adminQuizPre: "Average first round",
+  adminQuizPost: "Average follow-up",
+  adminQuizLift: "Lift (points)",
+  adminQuizNote: "Anonymous averages, 0–5 scale. No score can be linked to a person.",
+  adminPatternsTitle: "Anonymized aggregate reporting (PRD §13 Phase 4)",
+  adminPatternsIntro: "Documented cases with observations, by pattern category and state — counts only. Cells below {min} cases are never shown (k-anonymity). Cases considered: {considered}.",
+  adminPatternCat: "Pattern category",
+  adminPatternsNote: "Derived by the same deterministic engine the client sees. This is not evidence and not a count of complaints filed.",
+  pattern_trust_money: "Trust / money handling",
+  pattern_diligence: "Diligence / abandonment",
+  pattern_communication: "Communication",
+  pattern_authority_conflict: "Authority / conflicts",
+  pattern_fees: "Fees",
+  pattern_other: "Other conduct",
 } as const;
 
 // Same key set as `en` (parity enforced at compile time), but values are plain
@@ -847,6 +918,77 @@ const es: Dict = {
   svVerifiedNote: "LexGuard no verifica presentaciones y nunca contacta a nadie en su nombre.",
   adminActionRate: "Tasa de acción",
   adminSurveyDetail: "{filed} de {exports} dossiers reportaron acción (solo conteos, PRD §14)",
+
+  // ---- Fase 4: cuestionario de conocimiento (PRD §14) ----
+  quizPreTitle: "Verificación rápida de conocimiento (5 preguntas)",
+  quizPostTitle: "Verificación de conocimiento de seguimiento",
+  quizBadge: "Opcional · anónimo",
+  quizIntro: "Cinco preguntas rápidas sobre sus derechos como cliente legal. Sus respuestas quedan en este dispositivo; solo se comparten promedios anónimos.",
+  quizStart: "Comenzar las 5 preguntas",
+  quizOptional: "Opcional — puede omitirlo en cualquier momento.",
+  quizAwaiting: "La verificación de seguimiento se abre 7 días después de su primera ronda.",
+  quizTitle: "Verificación de conocimiento de sus derechos",
+  quizPre: "Primera ronda",
+  quizPost: "Seguimiento",
+  quizStep: "Pregunta {n} de {max}",
+  quizScoreLine: "Obtuvo {score} de {max}.",
+  quizAnonNote: "Sus respuestas nunca salen de este dispositivo, excepto un conteo anónimo del puntaje en modo cuenta.",
+  quizDoneTitle: "Gracias — verificación completa",
+
+  // ---- Fase 4: hoja de preparación de queja (PRD §13 Fase 4) ----
+  worksheetToggle: "Agregar la hoja de preparación de queja (campos del formulario del colegio)",
+  worksheetHint: "Una hoja de preparación que mapea su diario a los campos del formulario oficial de queja de su estado. Usted la revisa y la transfiere — LexGuard nunca presenta quejas.",
+  worksheetCopy: "Copiar texto de la hoja",
+  worksheetCopied: "Hoja copiada",
+
+  // ---- Fase 4: bóveda de conocimiento cero (PRD §9.1) ----
+  vaultTitle: "Bóveda de conocimiento cero (modo local)",
+  vaultDesc: "Cifra todo su diario local con su contraseña (AES-GCM). La contraseña nunca sale de este dispositivo y no se puede recuperar — sin ella, los datos quedan ilegibles.",
+  vaultPassphrase: "Contraseña (8+ caracteres)",
+  vaultConfirm: "Confirmar contraseña",
+  vaultEnable: "Cifrar mis datos",
+  vaultOn: "Bóveda activa — su diario está cifrado en reposo en este navegador.",
+  vaultBackup: "Descargar copia cifrada",
+  vaultDisableLabel: "Desactivar cifrado (confirme la contraseña)",
+  vaultDisable: "Descifrar",
+  vaultRestore: "Restaurar una copia cifrada (.lgvault)",
+  vaultRestoreBtn: "Restaurar",
+  vaultMismatch: "Las dos contraseñas no coinciden.",
+  vaultShort: "Use al menos 8 caracteres para la contraseña.",
+  vaultError: "No se pudo completar la operación de la bóveda.",
+  vaultWrong: "Esa contraseña no descifra estos datos.",
+  vaultEnabledNote: "Cifrado activado. Su diario ahora se guarda cifrado.",
+  vaultDisabledNote: "Cifrado desactivado. Su diario vuelve a guardarse sin cifrar.",
+  vaultImported: "Copia restaurada. Su diario fue reemplazado por la copia.",
+  vaultLostPass: "Si olvida esta contraseña no hay recuperación — para eso existe el cifrado de conocimiento cero.",
+  vaultUnlockTitle: "Su bóveda cifrada",
+  vaultUnlockSub: "Ingrese su contraseña para descifrar el diario guardado en este navegador.",
+  vaultUnlockBtn: "Desbloquear",
+
+  // ---- Fase 4: notas de voz (FR-2.6) ----
+  micStart: "Nota de voz",
+  micStop: "Detener",
+
+  // ---- Fase 4: programas por región (PRD Apéndice A) ----
+  routerRegions: "Programas por región",
+  routerRegionsNote: "Confirme los datos de contacto y costos actuales de cada programa antes de presentar.",
+
+  // ---- Fase 4: métricas de admin (PRD §14 / §13 Fase 4) ----
+  adminQuizTitle: "Incremento de conocimiento (PRD §14)",
+  adminQuizPre: "Promedio primera ronda",
+  adminQuizPost: "Promedio seguimiento",
+  adminQuizLift: "Incremento (puntos)",
+  adminQuizNote: "Promedios anónimos, escala 0–5. Ningún puntaje puede vincularse a una persona.",
+  adminPatternsTitle: "Reportes agregados anonimizados (PRD §13 Fase 4)",
+  adminPatternsIntro: "Casos documentados con observaciones, por categoría de patrón y estado — solo conteos. Las celdas con menos de {min} casos nunca se muestran (k-anonimato). Casos considerados: {considered}.",
+  adminPatternCat: "Categoría de patrón",
+  adminPatternsNote: "Derivado por el mismo motor determinista que ve el cliente. Esto no es evidencia ni un conteo de quejas presentadas.",
+  pattern_trust_money: "Fondos / manejo de dinero",
+  pattern_diligence: "Diligencia / abandono",
+  pattern_communication: "Comunicación",
+  pattern_authority_conflict: "Autorización / conflictos",
+  pattern_fees: "Honorarios",
+  pattern_other: "Otra conducta",
 };
 
 export const DICT: Record<Locale, Dict> = { en, es };

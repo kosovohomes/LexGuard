@@ -8,6 +8,7 @@ import autoTable from "jspdf-autotable";
 import type { CaseData, DocumentMeta, EntryData, Locale, Observation } from "./types";
 import { RULE_LIBRARY_VERSION } from "./rules";
 import { CASE_TYPE_LABEL } from "./narrative";
+import { buildWorksheet, worksheetForState } from "./formsheet";
 
 const fmtDate = (d: string | Date, locale: Locale) =>
   new Date(d).toLocaleDateString(locale === "es" ? "es-MX" : "en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -16,6 +17,7 @@ const money = (n: number, locale: Locale) => `$${n.toLocaleString(locale === "es
 export interface DossierOptions {
   includeDocs: boolean;
   unbranded: boolean;
+  includeWorksheet: boolean;
 }
 
 export function buildDossierPdf(
@@ -229,6 +231,42 @@ export function buildDossierPdf(
   y += 8;
   for (const block of narrative.split("\n")) {
     para(block, 10);
+  }
+
+  // ---- 7. Complaint-form worksheet (PRD §13 Phase 4) ----
+  if (opts.includeWorksheet) {
+    doc.addPage();
+    y = M;
+    const ws = buildWorksheet(caseRow, entries, documents, observations, locale);
+    heading(ws.formName[locale]);
+    para(`${es ? "Dónde presentar" : "Where to file"}: ${ws.where[locale]}`, 9);
+    para(
+      es
+        ? "Hoja de preparación generada de su diario: traslade cada campo al formulario oficial después de revisarlo. LexGuard no presenta quejas."
+        : "Preparation worksheet generated from your journal: review each field, then transfer it into the official form. LexGuard does not file complaints.",
+      9,
+    );
+    y += 6;
+    for (const s of ws.sections) {
+      ensure(60);
+      autoTable(doc, {
+        startY: y,
+        head: [[s.heading[locale]]],
+        body: s.fields.map((f) => [f.label[locale], f.value || (es ? "(completar)" : "(fill in)")]),
+        margin: { left: M, right: M },
+        styles: { fontSize: 8.5, cellPadding: 4, minCellHeight: 14 },
+        headStyles: { fillColor: [50, 50, 50] },
+        columnStyles: { 0: { cellWidth: 170, fontStyle: "bold" }, 1: { cellWidth: "auto" } },
+      });
+      y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12;
+    }
+    ensure(80);
+    para(es ? "Notas importantes:" : "Important notes:", 10);
+    for (const n of ws.notices[locale]) {
+      para(`• ${n}`, 8.5, 10);
+    }
+    // also surface the standing form-location note one last time
+    para(worksheetForState(caseRow.state === "CA" ? "CA" : "TX").where[locale], 8.5);
   }
 
   footer();

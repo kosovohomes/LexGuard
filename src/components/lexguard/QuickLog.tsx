@@ -15,6 +15,7 @@ import { Phone, PhoneIncoming, Mail, MailOpen, Landmark, Banknote, CalendarClock
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { QUICK_TEMPLATES, buildQuickPayload, nowLocalInput, templateById, type QuickTemplate } from "@/lib/lexguard/quicklog";
+import { MicButton } from "@/components/lexguard/MicButton";
 import type { DeadlineData, PaymentData } from "@/lib/lexguard/types";
 
 function TemplateIcon({ icon }: { icon: QuickTemplate["icon"] }) {
@@ -302,7 +303,11 @@ export function QuickLog() {
               ) : null}
 
               <div className="space-y-1.5">
-                <Label htmlFor="ql-body">{tr.qlDetails}</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor="ql-body">{tr.qlDetails}</Label>
+                  {/* FR-2.6 voice-note-to-text — appends into the details field */}
+                  <MicButton getText={() => body} setText={(next) => setBody(next)} />
+                </div>
                 <Textarea id="ql-body" rows={2} value={body} onChange={(e) => setBody(e.target.value)} />
               </div>
 

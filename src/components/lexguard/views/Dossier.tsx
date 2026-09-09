@@ -9,12 +9,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FileDown, FileJson, Info, Loader2 } from "lucide-react";
+import { FileDown, FileJson, Info, Loader2, ClipboardCopy } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { evaluateCase } from "@/lib/lexguard/engine";
 import { generateNarrative } from "@/lib/lexguard/narrative";
 import { buildDossierPdf } from "@/lib/lexguard/pdf";
+import { buildWorksheet, worksheetText } from "@/lib/lexguard/formsheet";
 import { localStore } from "@/lib/lexguard/local";
 import { PageTitle } from "@/components/lexguard/AppShell";
 import type { EntryData } from "@/lib/lexguard/types";
@@ -24,6 +25,8 @@ export function DossierView({ caseId }: { caseId: string }) {
   const tr = t(app.locale);
   const [includeDocs, setIncludeDocs] = useState(true);
   const [unbranded, setUnbranded] = useState(false);
+  const [includeWorksheet, setIncludeWorksheet] = useState(true);
+  const [copiedWs, setCopiedWs] = useState(false);
   const [narrative, setNarrative] = useState("");
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -55,7 +58,7 @@ export function DossierView({ caseId }: { caseId: string }) {
     if (!a) return;
     setBusy(true);
     try {
-      const doc = buildDossierPdf(a.case, a.entries, a.documents, observations, narrative, app.locale, { includeDocs, unbranded });
+      const doc = buildDossierPdf(a.case, a.entries, a.documents, observations, narrative, app.locale, { includeDocs, unbranded, includeWorksheet });
       doc.save(`dossier-${a.case.attorneyName.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`);
       await app.recordDossier(caseId, unbranded);
     } finally {
@@ -80,6 +83,19 @@ export function DossierView({ caseId }: { caseId: string }) {
     link.download = `lexguard-case-${new Date().toISOString().slice(0, 10)}.json`;
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const copyWorksheet = async () => {
+    const a2 = app.active;
+    if (!a2) return;
+    const ws = buildWorksheet(a2.case, a2.entries, a2.documents, observations, app.locale);
+    try {
+      await navigator.clipboard.writeText(worksheetText(ws, app.locale));
+      setCopiedWs(true);
+      setTimeout(() => setCopiedWs(false), 2500);
+    } catch {
+      /* clipboard unavailable — the PDF appendix carries the same content */
+    }
   };
 
   const a = app.active;
@@ -123,6 +139,11 @@ export function DossierView({ caseId }: { caseId: string }) {
               <Checkbox checked={unbranded} onCheckedChange={(v) => setUnbranded(!!v)} />
               {tr.unbranded}
             </label>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox checked={includeWorksheet} onCheckedChange={(v) => setIncludeWorksheet(!!v)} />
+              {tr.worksheetToggle}
+            </label>
+            <p className="text-xs text-muted-foreground">{tr.worksheetHint}</p>
             <p className="text-xs text-muted-foreground">{tr.printNote}</p>
           </div>
 
@@ -148,6 +169,9 @@ export function DossierView({ caseId }: { caseId: string }) {
             </Button>
             <Button size="lg" variant="outline" className="gap-2" onClick={downloadJson}>
               <FileJson className="h-4 w-4" /> {tr.downloadJson}
+            </Button>
+            <Button size="lg" variant="outline" className="gap-2" onClick={() => void copyWorksheet()}>
+              <ClipboardCopy className="h-4 w-4" /> {copiedWs ? tr.worksheetCopied : tr.worksheetCopy}
             </Button>
           </div>
         </>

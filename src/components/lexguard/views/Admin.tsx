@@ -21,6 +21,16 @@ interface AdminData {
     rulesLive: number;
     ruleLibraryVersion: string;
     surveys: { total: number; filed: number; actionRate: number | null };
+    quiz: { preCount: number; postCount: number; preAvg: number | null; postAvg: number | null; lift: number | null };
+    patterns: {
+      totalCasesConsidered: number;
+      casesWithObservations: number;
+      minCell: number;
+      cells: {
+        TX: Record<string, number | null>;
+        CA: Record<string, number | null>;
+      };
+    };
   };
   rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
 }
@@ -82,6 +92,60 @@ export function AdminView() {
               {tr.ruleVersion}: v{data.stats.ruleLibraryVersion}
               {data.stats.surveys ? ` · ${tr.adminSurveyDetail.replace("{filed}", String(data.stats.surveys.filed)).replace("{exports}", String(data.stats.dossiers))}` : ""}
             </p>
+          </section>
+
+          {/* PRD §14 knowledge lift — anonymous pre/post averages */}
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">{tr.adminQuizTitle}</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { label: tr.adminQuizPre, v: data.stats.quiz?.preAvg != null ? `${data.stats.quiz.preAvg.toFixed(1)}/5` : "—", sub: `${data.stats.quiz?.preCount ?? 0}` },
+                { label: tr.adminQuizPost, v: data.stats.quiz?.postAvg != null ? `${data.stats.quiz.postAvg.toFixed(1)}/5` : "—", sub: `${data.stats.quiz?.postCount ?? 0}` },
+                {
+                  label: tr.adminQuizLift,
+                  v: data.stats.quiz?.lift != null ? `${data.stats.quiz.lift >= 0 ? "+" : ""}${data.stats.quiz.lift.toFixed(1)}` : "—",
+                  sub: "",
+                },
+              ].map((s) => (
+                <Card key={s.label}>
+                  <CardContent className="p-4 text-center">
+                    <p className="text-2xl font-bold">{s.v}</p>
+                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    {s.sub ? <p className="text-[10px] text-muted-foreground">n={s.sub}</p> : null}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">{tr.adminQuizNote}</p>
+          </section>
+
+          {/* PRD §13 Phase 4 — anonymized aggregate reporting (k-anonymized counts) */}
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">{tr.adminPatternsTitle}</h2>
+            <p className="mb-3 text-sm text-muted-foreground">
+              {tr.adminPatternsIntro.replace("{considered}", String(data.stats.patterns?.totalCasesConsidered ?? 0)).replace("{min}", String(data.stats.patterns?.minCell ?? 5))}
+            </p>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/60 text-left">
+                  <tr>
+                    <th className="p-3">{tr.adminPatternCat}</th>
+                    <th className="p-3">TX</th>
+                    <th className="p-3">CA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(data.stats.patterns?.cells?.TX ?? {}).map(([cat]) => (
+                    <tr key={cat} className="border-t">
+                      <td className="p-3">{tr[`pattern_${cat}` as keyof typeof tr]}</td>
+                      <td className="p-3">{data.stats.patterns.cells.TX[cat] ?? "—"}</td>
+                      <td className="p-3">{data.stats.patterns.cells.CA[cat] ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">{tr.adminPatternsNote}</p>
           </section>
 
           <section>

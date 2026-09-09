@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -260,6 +261,8 @@ function DocumentsTab({ caseId }: { caseId: string }) {
   const [busy, setBusy] = useState(false);
   const [tag, setTag] = useState("other");
   const [q, setQ] = useState("");
+  // Phase 4 — upload integrity scan notices (FR-2.4, neutral wording)
+  const [scanNotice, setScanNotice] = useState<string[] | null>(null);
   // Phase 3 — extraction state per document
   const [extractingId, setExtractingId] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -287,8 +290,15 @@ function DocumentsTab({ caseId }: { caseId: string }) {
   const upload = async (file: File) => {
     setBusy(true);
     let newDocId: string | null = null;
+    let scanWarn: string[] | null = null;
     try {
-      newDocId = await app.uploadDoc(caseId, file, tag);
+      const res = await app.uploadDoc(caseId, file, tag);
+      newDocId = res.id;
+      if (res.scan.level !== "clean") {
+        scanWarn = res.scan.findings.map((f) => app.locale === "es" ? f.text.es : f.text.en);
+        if (res.scan.level === "block") newDocId = null;
+      }
+      if (res.scan.level === "warn" || res.scan.level === "block") setScanNotice(scanWarn);
     } catch (err) {
       const msg = err instanceof Error && err.message === "too_big_local" ? tr.localUploadNote : tr.fileTooBig;
       alert(msg);
@@ -303,6 +313,20 @@ function DocumentsTab({ caseId }: { caseId: string }) {
 
   return (
     <div className="space-y-4">
+      {scanNotice ? (
+        <Alert className="border-amber-300 bg-amber-50 text-amber-900">
+          <AlertDescription>
+            <ul className="list-disc pl-5 space-y-1">
+              {scanNotice.map((s, i) => (
+                <li key={i}>{s}</li>
+              ))}
+            </ul>
+            <button className="mt-1 text-xs underline" onClick={() => setScanNotice(null)}>
+              {tr.cancel}
+            </button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
       <div className="flex flex-wrap items-end gap-3 rounded-lg border p-4">
         <div className="space-y-1.5">
           <Label>{tr.tags}</Label>

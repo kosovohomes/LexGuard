@@ -112,3 +112,12 @@ model Survey {
 
   @@unique([userId, dossierId, milestone])
 }
+
+// Knowledge-lift quiz (PRD §14): anonymous 5-question rights quiz, pre/post.
+// No userId by design — the team can only ever see aggregate averages.
+model QuizResponse {
+  id        String   @id @default(cuid())
+  phase     String // pre | post
+  score     Int // 0..5
+  createdAt DateTime @default(now())
+}
