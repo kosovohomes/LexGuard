@@ -99,3 +99,29 @@ Stage Summary:
 - Extraction is privacy-first: all OCR/PDF parsing client-side; only text stored; account-mode search scoped server-side, local-mode search in-browser
 - Pitfall notes for future agents: GET /api/cases/[id] document select must include ocrText; localStorage LocalDB needs load() merge-over-empty for schema migrations; eslint must ignore bundled worker in public/
 - Pushed to github.com/kosovohomes/LexGuard main
+
+---
+Task ID: 5
+Agent: Super Z (main agent)
+Task: Gap analysis vs PRD + build Phase 4 (remaining buildable items) and push to GitHub
+
+Work Log:
+- Gap audit of PRD §6-§16 + Appendices against code: 10 missing items identified; 8 buildable, 2 decision-gated (FL/NY/AZ states; email digests/soft-delete/rules-JSON)
+- Quiz (§14): quiz.ts (5 EN/ES questions w/ explanations + citations, pre/post phases, 7-day post gate, local storage); QuizResponse Prisma model (no userId — anonymous by design); POST /api/quiz (validation + rate cap); QuizCard on Home; admin aggregate averages + lift
+- Aggregate reporting (§13 Ph4): aggregate.ts (rule→category mapping, k-anonymity MIN_CELL=5); admin/stats route evaluates all cases server-side with the deterministic engine (Prisma Date→ISO normalization, enum casts); Admin patterns table TX/CA × 6 categories
+- Complaint worksheet (§13 Ph4): formsheet.ts (TX grievance + CA State Bar field sections, autofill: attorney/firm/dates/type/total-paid/chronology/doc-index/concern areas; state-specific notices incl. TX privilege waiver, CA anonymity); dossier PDF section 7 (opt-in includeWorksheet); copy-to-clipboard text in Dossier view
+- Zero-knowledge vault (§9.1): zk.ts (AES-GCM 256, PBKDF2-SHA256 310k, lgzk1 payload format, createCipher w/ cached key); local.ts vault layer (memDb authoritative reads, debounced async persistence, enable/unlock/disable/exportEncrypted/importEncrypted); VaultUnlock gate rendered by page.tsx via reactive app.vault; Settings vault card (enable/disable/backup/restore); worklog pitfall honored (merge-over-empty on decrypt)
+- Upload scan (FR-2.4): filescan.ts (MZ/ELF + exec extensions + EICAR → block; PDF /JavaScript//OpenAction, vbaProject macros, ext/MIME mismatch, script-bearing HTML/SVG → warn); uploadDoc scans first, returns {id, scan}; Documents tab amber Alert
+- Voice notes (FR-2.6): speech.ts typed Web Speech wrapper (en-US/es-MX); MicButton (state-based support detection, append semantics); wired into QuickLog + EntryForm communication/note textareas
+- CA arbitration regions (App. A): optional ChannelDef.regions; 8 county programs + State Bar fallback on CA fee channel; Router renders with verify-first note
+- Status (§9.3): /status static page + GET /api/health (rules/version); robots noindex
+- i18n: ~60 new keys, full EN/ES compile-time parity
+- E2E (agent-browser, local mode): pre-quiz 5/5 + awaiting state; scan matrix (MZ exe blocked & not stored, JS-PDF warned & stored, clean stored); worksheet checkbox/copy/PDF (6 pages, CA notices verified by stream parse); vault enable→reload gate→wrong-pass reject→unlock→data intact→.lgvault download→restore round-trip; router regions EN+ES; admin quiz+patterns (cells "—" under k-anonymity); /api/health + /status 200; quiz API validation (bad phase rejected, lift +3 computed)
+- Bugs found & fixed during E2E: (1) load() read stale localStorage behind debounced async persist → race lost rapid mutations; memDb now authoritative + adopted on first read; (2) ch.regions?.[locale].length threw on undefined → ?; added; (3) VaultUnlock missed refreshVault → gate never lifted; (4) QuizCard awaiting-state re-showed pre CTA after remount; (5) react-hooks lint: no direct setState in effect (async boundary), no ref read during render (state instead)
+- Gates: tsc clean, eslint clean, production build clean (new routes /api/quiz, /api/health, /status)
+- Push: rebased onto remote (dup Phase-3 commit 8d7c10d, tree-identical to local 3de1208) via rebase --onto; pushed main @ a6fb724, verified ls-remote
+
+Stage Summary:
+- Phase 4 complete: all PRD items buildable without external decisions are implemented, verified EN/ES in both storage modes
+- Remaining decision-gated (PRD's own language): FL/NY/AZ expansion (needs verified facts + counsel sign-off), email reminder digests (Open Q4), soft-delete window (Open Q5), rules-as-JSON authoring (Open Q2), full admin content-management workflow (FR-8 beyond stats)
+- Pitfalls for future agents: zustand savePrefs persists FULL state via get() (bloat; filter before persist if touched); local.ts persistence is debounced — always keep memDb as single source of truth; optional chaining must be applied at every segment (ch.regions?.[locale]?.length)
