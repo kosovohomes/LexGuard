@@ -169,3 +169,25 @@ Stage Summary:
 - Phase 5 complete: FL/NY/AZ multi-state, .ics calendar export, 30-day trash, anonymous content reports, rules governance — all five PRD decision-gated items now either implemented (Q4 via ICS, Q5 via trash window, Q2 via governance pipeline) or concretely prepared for the external decision (FL/NY/AZ counsel sign-off; facts doc + re-verify checklist in docs/STATE_FACTS_PHASE5.md)
 - Remaining for humans only: licensed-attorney review of expansion-state content; email digests (superseded by ICS unless email is later desired); beta partners (business decision)
 - Pitfall for future agents: lucide Trash2Icon does not exist in this version (use Trash2); i18n batch inserts must use unique anchors per dict or keys collide (TS1117)
+
+---
+Task ID: 8
+Agent: Super Z (main agent)
+Task: Complete CSS + UI/UX redesign ("The Docket" design language); push to GitHub
+
+Work Log:
+- Rewrote globals.css from the default shadcn grayscale scaffold into a purposeful design system: warm paper background (oklch 0.972 hue 90), ink-green foreground, deep evergreen primary (0.40 0.078 168), copper accent token (--copper mapped into @theme as a real color), refined dark theme, radius 0.75rem, layered warm shadows, custom thin scrollbars, selection + focus-visible styling, prefers-reduced-motion kept
+- Added reusable component idioms: .lg-display (Fraunces serif headings), .lg-eyebrow (tracked mono label), .lg-panel (elevated card), .lg-hero (paper-gradient hero with ruled-line texture via repeating-linear-gradient + mask), .lg-link (quiet underline), .lg-step-num (serif step numerals)
+- layout.tsx fonts: Fraunces (display) + Inter (body) via next/font; Geist Mono retained. Pitfall: @theme inline --font-display var indirection did NOT resolve inside a plain CSS class — .lg-display must reference var(--font-fraunces) directly
+- AppShell: h-16 header, serif logotype, ghost nav with bg-primary/10 active state, mobile pill-chip scroll nav, two-column footer (eyebrow + disclaimer | link column), quick-exit restyled destructive pill with TriangleAlert icon, PageTitle uses lg-display text-3xl/2xl-5xl, StateBadge → primary-tinted
+- Swept all views + components to the new language (28 files): Home hero/steps/principles; Onboarding eyebrow step cards; Auth; Guides reader (serif h2, primary-tinted state-notes aside); Legal (copper draft notice); Directory (primary notice, pill filters); Journal (grouped header CTA, dashed empty state, serif case names); CaseDetail (timeline with 7px icon nodes + evergreen circles, lg-hero money stat panel, copper semantic badges); EntryForm (card sub-forms, aria-pressed type selector); Flags (severity tint map via destructive/copper tokens); Router (has-[[data-state=checked]] highlighted choice cards, primary recommended badge, copper possible badge); Dossier (lg-hero summary panel); Deadlines (tone-colored cards); Search (copper <mark> highlights, lg-eyebrow group headers); Settings; Admin (serif stat numerals, secondary theads); QuickLog (primary FAB + template tiles); QuizCard/SurveyCard/ReportIssueButton; LockScreen/VaultUnlock/status page
+- Semantic color migration: all hard-coded emerald/red/amber/slate classes replaced with primary/destructive/copper tokens; destructive reserved for safety-critical (quick-exit, deletion, high severity)
+- Logo: replaced generic placeholder with LexGuard shield mark (evergreen + check) in brand oklch colors
+- Gates: tsc clean, eslint clean, dev.log zero errors, zero browser console/page errors
+- E2E (agent-browser): desktop 1440 + mobile 390 viewports; onboarding 3-step → local mode → journal → create case → payment entry → timeline render → money hero panel → router prefill from case facts + submit → recommended/copper badges → ES toggle (lang=es verified, full Spanish UI) → QuickLog sheet → guides grid → settings; footer sticky on short pages; screenshots: 12 redesign-*.png in docs/screenshots
+- Push: rebased onto remote (dup "Docs: Phase 5" commit 118b9e8 tree-equivalent to 699b296, same replay as Task 5) → main @ f7c6257, verified ls-remote
+
+Stage Summary:
+- Product-wide redesign shipped: one coherent "legal ledger" visual identity across every view, both languages, both storage modes; zero logic changes (all handlers/flows intact)
+- Design tokens are the single source of truth now — future views should use primary/copper/destructive + .lg-display/.lg-eyebrow/.lg-hero instead of raw hues
+- Pitfalls for future agents: (1) plain-CSS classes can't consume @theme inline indirection — use var(--font-fraunces) directly; (2) remote may carry duplicate tree-identical commits after parallel sessions — diff before rebasing, use rebase --onto <remote> <dup-sha> main
