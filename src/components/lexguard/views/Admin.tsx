@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Download, Upload } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { api } from "@/lib/lexguard/api";
 import { t } from "@/lib/lexguard/i18n";
 import { PageTitle } from "@/components/lexguard/AppShell";
+import { downloadRulesLibrary, importRulesLibrary } from "@/lib/lexguard/rulesgov";
 
 interface AdminData {
   stats: {
@@ -43,6 +46,9 @@ export function AdminView() {
   const [code, setCode] = useState("");
   const [data, setData] = useState<AdminData | null>(null);
   const [error, setError] = useState(false);
+  const [govBusy, setGovBusy] = useState(false);
+  const [govHash, setGovHash] = useState<string | null>(null);
+  const [govResult, setGovResult] = useState<{ ok: boolean; count: number; errors: string[]; changed: string[] } | null>(null);
 
   const load = async () => {
     setError(false);
@@ -231,6 +237,79 @@ export function AdminView() {
               </table>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{tr.demoNote}</p>
+          </section>
+
+          {/* Phase 5e — rules-as-JSON governance (PRD Open Question 2 / FR-3.4) */}
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">{tr.govTitle}</h2>
+            <p className="mb-3 text-sm text-muted-foreground">{tr.govIntro}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant="outline"
+                className="gap-2"
+                disabled={govBusy}
+                onClick={async () => {
+                  setGovBusy(true);
+                  try {
+                    setGovHash(await downloadRulesLibrary());
+                    setGovResult(null);
+                  } finally {
+                    setGovBusy(false);
+                  }
+                }}
+              >
+                <Download className="h-4 w-4" /> {tr.govExport}
+              </Button>
+              <Label htmlFor="gov-import" className="cursor-pointer">
+                <span className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted">
+                  <Upload className="h-4 w-4" /> {tr.govImport}
+                </span>
+              </Label>
+              <input
+                id="gov-import"
+                type="file"
+                accept="application/json,.json"
+                className="sr-only"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setGovBusy(true);
+                  try {
+                    const res = await importRulesLibrary(await file.text());
+                    setGovResult({ ok: res.ok, count: res.count, errors: res.errors, changed: res.changedRuleIds ?? [] });
+                    if (res.hash) setGovHash(res.hash);
+                  } finally {
+                    setGovBusy(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+            </div>
+            {govHash ? (
+              <p className="mt-3 break-all rounded-lg border bg-muted/60 p-3 font-mono text-xs">
+                {tr.govHash}: {govHash}
+              </p>
+            ) : null}
+            {govResult ? (
+              <div className="mt-3 rounded-lg border p-3 text-sm">
+                {govResult.ok ? (
+                  <p className="font-medium text-emerald-800">
+                    {tr.govValid.replace("{count}", String(govResult.count))}
+                    {govResult.changed.length > 0 ? ` — ${tr.govChanged.replace("{ids}", govResult.changed.join(", "))}` : ""}
+                  </p>
+                ) : (
+                  <div>
+                    <p className="font-medium text-red-700">{tr.govInvalid}</p>
+                    <ul className="mt-1 list-inside list-disc font-mono text-xs text-muted-foreground">
+                      {govResult.errors.map((e2) => (
+                        <li key={e2}>{e2}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : null}
+            <p className="mt-3 text-xs text-muted-foreground">{tr.govNote}</p>
           </section>
         </div>
       )}
