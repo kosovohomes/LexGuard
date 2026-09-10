@@ -191,3 +191,26 @@ Stage Summary:
 - Product-wide redesign shipped: one coherent "legal ledger" visual identity across every view, both languages, both storage modes; zero logic changes (all handlers/flows intact)
 - Design tokens are the single source of truth now — future views should use primary/copper/destructive + .lg-display/.lg-eyebrow/.lg-hero instead of raw hues
 - Pitfalls for future agents: (1) plain-CSS classes can't consume @theme inline indirection — use var(--font-fraunces) directly; (2) remote may carry duplicate tree-identical commits after parallel sessions — diff before rebasing, use rebase --onto <remote> <dup-sha> main
+
+---
+Task ID: 9
+Agent: Super Z (main agent)
+Task: User rejected "The Docket" redesign ("it is worst now") — build a totally different design ("Nightfall"); push to GitHub
+
+Work Log:
+- Direction: total pivot across every visual dimension — previous warm cream paper + serif + evergreen + copper replaced by dark-first indigo-charcoal surfaces, electric violet primary (oklch 0.72 0.155 287), cyan signal accent (oklch 0.78 0.12 212), amber warnings, Space Grotesk geometric display type
+- globals.css rewritten: dark-first tokens (color-scheme: dark on :root; .dark mirrors it as a safety mirror), ambient fixed viewport glows on body, new idioms — .lg-grad-text (violet→cyan gradient headlines), glass .lg-panel (translucent + inset highlight + deep indigo shadow), .lg-hero rebuilt as radial violet/cyan glows over a fine grid texture, cool scrollbars, violet selection/focus
+- layout.tsx: Fraunces → Space_Grotesk (var --font-space); @theme --font-display + .lg-display/.lg-step-num updated to match (plain-CSS classes must use var(--font-space) directly — same pitfall as Fraunces in Task 8)
+- AppShell: gradient logo mark (violet→cyan + glow shadow), header glass blur-xl, active nav = bg-primary/15 + inset ring, mobile pills matched, footer band deepened via literal oklch bg, PageTitle tracking-tight
+- Swept Home (gradient hero headline, glow CTA, gradient icon tiles + hover glow on step cards, glass principles), Onboarding (gradient progress bars, glow mode cards), Journal (glow create CTA, tinted dashed empty states, hover-glow case cards), CaseDetail (violet-glow timeline nodes on primary/25 line, tinted empty state, glow log CTA)
+- public/logo.svg rebranded to violet→cyan gradient shield (was evergreen)
+- Token-name note: --copper kept its name for warning semantics across 20+ files; visually it is now a vivid amber — semantic meaning preserved, zero view churn
+- All other views (Guides, Router, Directory, Deadlines, Search, Settings, Admin, Dossier, Flags, EntryForm, QuickLog, Quiz/Survey cards, Lock/Vault, status page) re-skin purely via the token system — no logic or handler changes anywhere
+- Gates: tsc clean, eslint clean, production build clean; browser E2E desktop 1440 + mobile 390: home/onboarding/guides/journal/case timeline/router questionnaire/deadlines/settings all verified, EN + ES (lang=es checked), zero console/page errors after clear-reload
+- Screenshots: docs/screenshots/nightfall-{home,mobile,case}.png (+ download/night-*.png working copies)
+- Pushed: main @ 675067e (f7c6257..675067e), verified ls-remote
+
+Stage Summary:
+- "Nightfall" design language shipped product-wide: dark security-tech aesthetic that matches the product's privacy story (vault, PIN lock, quick exit); zero logic changes, all flows intact in both languages and storage modes
+- For future style work: never hardcode hues — use primary/copper/destructive tokens + .lg-* idioms; gradient companion color for cyan is oklch(0.78 0.12 212) (used in logo, step tiles, progress bars, nav logo mark)
+- If the user wants a light variant later, define a separate light token set under a `.light` class (the old warm values are recoverable from commit f7c6257's globals.css)
