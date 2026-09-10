@@ -7,7 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -40,6 +40,11 @@
   --color-card: var(--card);
   --color-copper: var(--copper);
   --color-copper-foreground: var(--copper-foreground);
+  --color-signal: var(--signal);
+  --color-signal-foreground: var(--signal-foreground);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-ink-border: var(--ink-border);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -48,67 +53,86 @@
 }
 
 /*
- * LexGuard design language — "Meridian"
+ * LexGuard design language — "Signal"
  *
- * Both previous directions ("The Docket" warm-paper serif, "Nightfall"
- * dark glass) were novelty themes; this product needs quiet, high-craft
- * professional clarity — the register of Stripe docs / Linear light mode /
- * modern civic tech. One idea carries the system:
+ * Prior directions ("The Docket" warm-paper serif, "Nightfall" dark glass,
+ * "Meridian" quiet single-sans) all played it safe. This pass is
+ * deliberately bolder while staying trustworthy for a stressed, sometimes
+ * unsafe audience — the register of a well-funded civic-tech product, not
+ * a marketing site:
  *
- *   A crisp LIGHT canvas, one confident federal blue, and hierarchy built
- *   entirely from a disciplined Inter type scale — never from decorative
- *   fonts, gradients, glows, or textures. Structure comes from hairline
- *   borders, an 8px spacing rhythm, small radii, and whisper-quiet shadows.
- *   Dense legal text and the case workspace stay scannable and calm.
+ *   A crisp paper-white canvas for dense case content (unchanged — legal
+ *   text must stay calm and scannable) PAIRED with a confident, saturated
+ *   "signal blue" primary, an electric violet accent used sparingly for
+ *   emphasis, and a bold geometric display face (Space Grotesk) that reads
+ *   as authoritative rather than decorative. The homepage marquee gets a
+ *   dedicated dark ink treatment with a ledger-grid texture and a soft
+ *   glow — scale and confidence, not gradients-for-their-own-sake.
  *
  * Token notes:
  * - --copper keeps its historical name (20+ files reference it) as the
- *   semantic "warning / caution" color; visually a calm amber-700 that
- *   passes AA as text on white.
+ *   semantic "warning / caution" color.
+ * - --signal is a NEW decorative accent (violet/magenta) — never used for
+ *   semantic states (destructive stays in the red family) so it can be
+ *   used freely for glows, underlines and highlight chips without
+ *   confusing it with danger or the quick-exit affordance.
+ * - --ink / --ink-foreground / --ink-border are a NEW dark surface trio,
+ *   used only by the homepage marquee (.lg-marquee) — the rest of the app
+ *   (dense case data, forms, admin) stays on the light canvas.
+ * - .lg-hero is left as the existing light "highlight panel" idiom
+ *   (reused outside Home, e.g. the case money-summary card) — untouched
+ *   so nothing outside Home regresses.
  * - Light-only by design: no .dark block, no dark: variant will ever match
  *   (no .dark class is applied), and color-scheme is pinned to light so
  *   native form controls (date pickers) render light.
- * - Plain-CSS classes below reference var(--font-inter) directly — they
- *   cannot consume the @theme inline indirection.
+ * - Plain-CSS classes below reference var(--font-inter) / var(--font-space-grotesk)
+ *   directly — they cannot consume the @theme inline indirection.
  */
 
 :root {
   color-scheme: light;
-  --radius: 0.625rem;
-  --background: oklch(0.988 0.002 248);
-  --foreground: oklch(0.245 0.02 255);
+  --radius: 0.75rem;
+  --background: oklch(0.986 0.004 250);
+  --foreground: oklch(0.16 0.026 262);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.245 0.02 255);
+  --card-foreground: oklch(0.16 0.026 262);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.245 0.02 255);
-  --primary: oklch(0.51 0.17 258);
-  --primary-foreground: oklch(0.995 0.002 248);
-  --secondary: oklch(0.962 0.005 248);
-  --secondary-foreground: oklch(0.35 0.02 254);
-  --muted: oklch(0.962 0.005 248);
-  --muted-foreground: oklch(0.505 0.02 252);
-  --accent: oklch(0.955 0.006 248);
-  --accent-foreground: oklch(0.245 0.02 255);
-  --destructive: oklch(0.577 0.208 27);
-  --destructive-foreground: oklch(0.995 0.002 248);
-  --copper: oklch(0.63 0.13 66);
-  --copper-foreground: oklch(0.995 0.005 95);
-  --border: oklch(0.923 0.006 252);
-  --input: oklch(0.9 0.008 252);
-  --ring: oklch(0.51 0.17 258);
-  --chart-1: oklch(0.51 0.17 258);
-  --chart-2: oklch(0.55 0.02 252);
-  --chart-3: oklch(0.72 0.13 75);
-  --chart-4: oklch(0.6 0.1 195);
-  --chart-5: oklch(0.55 0.12 340);
-  --sidebar: oklch(0.975 0.004 248);
-  --sidebar-foreground: oklch(0.245 0.02 255);
-  --sidebar-primary: oklch(0.51 0.17 258);
-  --sidebar-primary-foreground: oklch(0.995 0.002 248);
-  --sidebar-accent: oklch(0.955 0.006 248);
-  --sidebar-accent-foreground: oklch(0.245 0.02 255);
-  --sidebar-border: oklch(0.923 0.006 252);
-  --sidebar-ring: oklch(0.51 0.17 258);
+  --popover-foreground: oklch(0.16 0.026 262);
+  --primary: oklch(0.48 0.21 264);
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.96 0.006 250);
+  --secondary-foreground: oklch(0.32 0.02 258);
+  --muted: oklch(0.96 0.006 250);
+  --muted-foreground: oklch(0.48 0.02 256);
+  --accent: oklch(0.955 0.014 264);
+  --accent-foreground: oklch(0.16 0.026 262);
+  --destructive: oklch(0.58 0.21 27);
+  --destructive-foreground: oklch(0.99 0.005 90);
+  --copper: oklch(0.64 0.15 61);
+  --copper-foreground: oklch(0.995 0.006 95);
+  --signal: oklch(0.58 0.225 328);
+  --signal-foreground: oklch(0.99 0.01 328);
+  --border: oklch(0.9 0.01 258);
+  --input: oklch(0.87 0.013 258);
+  --ring: oklch(0.48 0.21 264);
+  --chart-1: oklch(0.48 0.21 264);
+  --chart-2: oklch(0.58 0.225 328);
+  --chart-3: oklch(0.64 0.15 61);
+  --chart-4: oklch(0.6 0.11 195);
+  --chart-5: oklch(0.55 0.02 252);
+  --sidebar: oklch(0.975 0.005 250);
+  --sidebar-foreground: oklch(0.16 0.026 262);
+  --sidebar-primary: oklch(0.48 0.21 264);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.955 0.014 264);
+  --sidebar-accent-foreground: oklch(0.16 0.026 262);
+  --sidebar-border: oklch(0.9 0.01 258);
+  --sidebar-ring: oklch(0.48 0.21 264);
+
+  /* Dark ink surface — homepage marquee only */
+  --ink: oklch(0.155 0.03 264);
+  --ink-foreground: oklch(0.97 0.008 250);
+  --ink-border: oklch(1 0 0 / 10%);
 }
 
 @layer base {
@@ -123,55 +147,58 @@
     font-feature-settings: "ss01" on, "cv05" on;
   }
   ::selection {
-    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    background: color-mix(in oklab, var(--signal) 22%, transparent);
   }
   h1, h2, h3 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 }
 
 /* ---------- LexGuard component idioms ---------- */
 
-/* Display heading — Inter, tightened. Hierarchy via weight + tracking,
-   not a decorative face. */
+/* Display heading — Space Grotesk, bold and geometric. Carries the "bold
+   & striking" register site-wide since every view uses this one class. */
 .lg-display {
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.021em;
+  font-family: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 /* Kept for backward compatibility with views that reference it; renders
-   as solid ink — no gradient text in this system. */
+   as a bold two-tone gradient (primary → signal) for standout moments. */
 .lg-grad-text {
-  color: var(--foreground);
+  background: linear-gradient(100deg, var(--primary) 15%, var(--signal) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Small tracked label above sections and cards */
 .lg-eyebrow {
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.13em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in oklab, var(--primary) 62%, var(--muted-foreground));
+  color: color-mix(in oklab, var(--primary) 68%, var(--muted-foreground));
 }
 
-/* Panel — white surface, hairline border, whisper shadow */
-.lg-panel {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 4px);
-  box-shadow:
-    0 1px 2px oklch(0.24 0.02 255 / 4%),
-    0 1px 3px oklch(0.24 0.02 255 / 3%);
+/* Eyebrow variant for use on the dark marquee */
+.lg-eyebrow-inverse {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, white 82%, var(--signal));
 }
 
-/* Hero panel — white with the faintest blue wash at the top; no texture,
-   no glows. Differentiation comes from scale and air. */
+/* Panel — white surface, hairline border, whisper shadow. Reused outside
+   Home (e.g. case money-summary card) — left as the calm light idiom. */
 .lg-hero {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--primary) 4%, var(--card)) 0%,
+    color-mix(in oklab, var(--primary) 5%, var(--card)) 0%,
     var(--card) 58%
   );
   border: 1px solid var(--border);
@@ -179,6 +206,66 @@
   box-shadow:
     0 1px 2px oklch(0.24 0.02 255 / 4%),
     0 8px 24px -12px oklch(0.24 0.02 255 / 8%);
+}
+
+/* Marquee — the bold, dark, oversized homepage hero. NEW, Home-only. */
+.lg-marquee {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--ink-foreground);
+  border: 1px solid var(--ink-border);
+  border-radius: calc(var(--radius) + 12px);
+  box-shadow:
+    0 1px 2px oklch(0.14 0.03 264 / 40%),
+    0 24px 60px -20px oklch(0.14 0.03 264 / 55%);
+}
+
+/* Ledger-grid texture — faint ruled lines evoking a case file, without
+   being a literal paper-texture cliché. Sits on ::before so content stays
+   crisp above it. */
+.lg-marquee::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(color-mix(in oklab, white 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, white 6%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(ellipse 120% 90% at 20% 0%, black 35%, transparent 85%);
+}
+
+/* Glow — soft radial signal-violet + primary bloom behind the marquee's
+   headline. Decorative only; never used to carry meaning. */
+.lg-marquee::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -35%;
+  right: -15%;
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--signal) 55%, transparent), transparent);
+  filter: blur(60px);
+  opacity: 0.55;
+}
+
+.lg-marquee > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Giant ghost numeral — used behind the "how it works" step cards */
+.lg-numeral {
+  font-family: var(--font-space-grotesk), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in oklab, var(--foreground) 12%, transparent);
 }
 
 /* Quiet underline link used in footers and body copy */
@@ -201,6 +288,15 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   line-height: 1;
+}
+
+/* Bold card hover lift — used for the redesigned Home cards */
+.lg-lift {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.lg-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -18px oklch(0.24 0.02 255 / 18%);
 }
 
 /* Custom scrollbar — thin, neutral */
