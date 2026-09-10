@@ -36,8 +36,8 @@ export default function Page() {
   if (!app.ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-700 border-t-transparent" aria-hidden />
+        <div className="flex items-center gap-2.5 text-muted-foreground">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
           LexGuard…
         </div>
       </div>

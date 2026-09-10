@@ -57,13 +57,13 @@ export function DeadlinesView() {
   const toneBadge = (it: DeadlineInsight) => {
     if (it.tone === "overdue")
       return (
-        <Badge className="gap-1 bg-red-700 text-white">
+        <Badge className="gap-1 bg-destructive text-destructive-foreground">
           <AlertTriangle className="h-3 w-3" /> {tr.dlOverdue}
         </Badge>
       );
     if (it.tone === "soon")
       return (
-        <Badge className="gap-1 bg-amber-100 text-amber-900 border border-amber-300">
+        <Badge variant="outline" className="gap-1 border-copper/50 text-copper">
           <Clock className="h-3 w-3" /> {tr.dlSoon}
         </Badge>
       );
@@ -89,7 +89,7 @@ export function DeadlinesView() {
         <Card>
           <CardContent className="p-6 text-sm text-muted-foreground flex flex-wrap items-center gap-3">
             {tr.deadlinesNeedStart}
-            <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800" onClick={() => app.navigate({ name: "onboarding" })}>
+            <Button size="sm" onClick={() => app.navigate({ name: "onboarding" })}>
               {tr.getStarted}
             </Button>
           </CardContent>
@@ -109,14 +109,14 @@ export function DeadlinesView() {
 
   const renderItem = (it: DeadlineInsight) => (
     <li key={it.id}>
-      <Card>
-        <CardContent className="p-4">
+      <Card className={`border-border/80 ${it.tone === "overdue" ? "border-destructive/35" : it.tone === "soon" ? "border-copper/40" : ""}`}>
+        <CardContent className="p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <h3 className="font-semibold leading-snug">{it.title}</h3>
             {toneBadge(it)}
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">{it.detail}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{it.detail}</p>
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <FolderOpen className="h-3.5 w-3.5" /> {it.caseName}
             </span>
@@ -125,7 +125,7 @@ export function DeadlinesView() {
                 {tr.dlWhen}: {fmtWhen(it.when)}
               </span>
             ) : null}
-            <Badge variant="secondary">{it.state}</Badge>
+            <Badge variant="secondary" className="font-mono text-[11px]">{it.state}</Badge>
             {it.when ? exportItem(it) : null}
           </div>
         </CardContent>
@@ -145,9 +145,9 @@ export function DeadlinesView() {
         <div className="space-y-8">
           <section aria-label={tr.deadlinesUser}>
             <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <h2 className="text-xl font-bold">{tr.deadlinesUser}</h2>
+              <h2 className="lg-display text-2xl">{tr.deadlinesUser}</h2>
               {user.length > 0 ? (
-                <Button size="sm" variant="outline" className="gap-1" onClick={() => downloadIcs(user, app.locale)}>
+                <Button size="sm" variant="outline" className="gap-1 bg-card" onClick={() => downloadIcs(user, app.locale)}>
                   <CalendarPlus className="h-3.5 w-3.5" /> {tr.icsExportAll}
                 </Button>
               ) : null}
@@ -161,7 +161,7 @@ export function DeadlinesView() {
           </section>
 
           <section aria-label={tr.deadlinesWindows}>
-            <h2 className="text-xl font-bold mb-3">{tr.deadlinesWindows}</h2>
+            <h2 className="lg-display text-2xl mb-3">{tr.deadlinesWindows}</h2>
             {windows.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tr.deadlinesEmpty}</p>
             ) : (

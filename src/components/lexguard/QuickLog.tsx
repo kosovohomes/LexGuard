@@ -128,7 +128,7 @@ export function QuickLog() {
       {/* Mobile FAB — bottom-left; quick-exit keeps bottom-right */}
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden fixed bottom-4 left-4 z-50 flex items-center gap-1.5 rounded-full bg-emerald-700 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        className="md:hidden fixed bottom-4 left-4 z-50 flex items-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label={tr.qlFab}
       >
         <Plus className="h-4 w-4" aria-hidden /> {tr.qlFab}
@@ -142,14 +142,13 @@ export function QuickLog() {
           </DialogHeader>
 
           {saved ? (
-            <div className="flex items-center gap-2 py-6 text-emerald-700" role="status">
+            <div className="flex items-center gap-2 py-6 text-primary" role="status">
               <CheckCircle2 className="h-5 w-5" /> <span className="font-medium">{tr.qlSaved}</span>
             </div>
           ) : app.cases.length === 0 ? (
             <div className="space-y-3 py-2">
               <p className="text-sm text-muted-foreground">{tr.qlNoCases}</p>
               <Button
-                className="bg-emerald-700 hover:bg-emerald-800"
                 onClick={() => {
                   setOpen(false);
                   app.navigate({ name: "journal" });
@@ -166,9 +165,9 @@ export function QuickLog() {
                   <button
                     key={x.id}
                     onClick={() => pick(x.id)}
-                    className="flex items-center gap-2.5 rounded-lg border p-3.5 text-left text-sm font-medium hover:border-emerald-600 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 min-h-14"
+                    className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-card p-3.5 text-left text-sm font-medium transition hover:border-primary/50 hover:bg-primary/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-14"
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-800">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <TemplateIcon icon={x.icon} />
                     </span>
                     {tr[x.defaultTitleKey as keyof typeof tr]}
@@ -312,7 +311,7 @@ export function QuickLog() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button className="bg-emerald-700 hover:bg-emerald-800" onClick={() => void save()} disabled={saving || !caseId}>
+                <Button onClick={() => void save()} disabled={saving || !caseId}>
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {tr.qlSave}
                 </Button>
                 <Button variant="ghost" onClick={resetToTemplates}>

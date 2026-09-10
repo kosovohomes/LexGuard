@@ -78,7 +78,7 @@ export function QuizCard() {
         <Card>
           <CardContent className="p-5 space-y-2">
             <p className="flex items-center gap-2 font-medium">
-              <GraduationCap className="h-4 w-4 text-emerald-700" /> {tr.quizDoneTitle}
+              <GraduationCap className="h-4 w-4 text-primary" /> {tr.quizDoneTitle}
             </p>
             <p className="text-sm text-muted-foreground">
               {tr.quizScoreLine.replace("{score}", String(done.score)).replace("{max}", String(QUIZ_MAX_SCORE))}
@@ -97,7 +97,7 @@ export function QuizCard() {
         <Card>
           <CardContent className="p-5 space-y-2">
             <p className="flex items-center gap-2 font-medium">
-              <GraduationCap className="h-4 w-4 text-emerald-700" /> {tr.quizDoneTitle}
+              <GraduationCap className="h-4 w-4 text-primary" /> {tr.quizDoneTitle}
             </p>
             <p className="text-sm text-muted-foreground">
               {preRec ? tr.quizScoreLine.replace("{score}", String(preRec.score)).replace("{max}", String(QUIZ_MAX_SCORE)) : ""}
@@ -111,7 +111,7 @@ export function QuizCard() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
-            <GraduationCap className="h-4 w-4 text-emerald-700" /> {invite === "post" ? tr.quizPostTitle : tr.quizPreTitle}
+            <GraduationCap className="h-4 w-4 text-primary" /> {invite === "post" ? tr.quizPostTitle : tr.quizPreTitle}
             <Badge variant="outline" className="ml-auto text-xs">
               {tr.quizBadge}
             </Badge>
@@ -119,7 +119,7 @@ export function QuizCard() {
           <p className="text-sm text-muted-foreground">{tr.quizIntro}</p>
         </CardHeader>
         <CardContent className="flex flex-wrap items-center gap-3">
-          <Button className="bg-emerald-700 hover:bg-emerald-800" onClick={() => start(invite === "post" ? "post" : "pre")}>
+          <Button onClick={() => start(invite === "post" ? "post" : "pre")}>
             {tr.quizStart}
           </Button>
           <p className="text-xs text-muted-foreground">{tr.quizOptional}</p>
@@ -133,7 +133,7 @@ export function QuizCard() {
   const rec = done;
 
   return (
-    <Card className="border-emerald-200">
+    <Card className="border-primary/30 bg-primary/[0.04]">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">{tr.quizTitle}</CardTitle>
         <p className="text-xs text-muted-foreground">
@@ -172,7 +172,7 @@ export function QuizCard() {
                 <button
                   key={i}
                   onClick={() => choose(i)}
-                  className="w-full rounded-lg border p-3 text-left text-sm hover:border-emerald-600 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+                  className="w-full rounded-xl border border-border/80 bg-card p-3 text-left text-sm transition hover:border-primary/50 hover:bg-primary/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {o.text[app.locale]}
                 </button>

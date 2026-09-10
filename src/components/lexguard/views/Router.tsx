@@ -90,7 +90,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
         </CardHeader>
         <CardContent className="grid gap-2 sm:grid-cols-2">
           {HARM_KEYS.map((h) => (
-            <label key={h.key} className="flex items-start gap-2 text-sm rounded-md border p-3 cursor-pointer hover:border-emerald-700">
+            <label key={h.key} className="flex items-start gap-2.5 text-sm rounded-lg border border-border/80 bg-card p-3 cursor-pointer transition hover:border-primary/50 has-[[data-state=checked]]:border-primary/60 has-[[data-state=checked]]:bg-primary/[0.05]">
               <Checkbox className="mt-0.5" checked={a.harm.includes(h.key)} onCheckedChange={(v) => setHarm(h.key, !!v)} />
               <span>{tr[h.labelKey] as string}</span>
             </label>
@@ -105,7 +105,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {(["none", "fees", "settlement"] as const).map((k) => (
-              <Button key={k} size="sm" variant={a.moneyInvolved === k ? "default" : "outline"} className={a.moneyInvolved === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, moneyInvolved: k, discoveredWhen: k === "none" ? "n/a" : a.discoveredWhen === "n/a" ? "within_4y" : a.discoveredWhen, grievanceFiled: k === "none" ? "n/a" : a.grievanceFiled === "n/a" ? "no" : a.grievanceFiled })}>
+              <Button key={k} size="sm" variant={a.moneyInvolved === k ? "default" : "outline"} className={a.moneyInvolved === k ? "" : "justify-start bg-card text-muted-foreground"} onClick={() => setA({ ...a, moneyInvolved: k, discoveredWhen: k === "none" ? "n/a" : a.discoveredWhen === "n/a" ? "within_4y" : a.discoveredWhen, grievanceFiled: k === "none" ? "n/a" : a.grievanceFiled === "n/a" ? "no" : a.grievanceFiled })}>
                 {tr[`money_${k === "none" ? "none" : k === "fees" ? "fees" : "settlement"}` as keyof typeof tr] as string}
               </Button>
             ))}
@@ -117,7 +117,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {(["unknown", "disciplined", "no"] as const).map((k) => (
-              <Button key={k} size="sm" variant={a.lawyerStatus === k ? "default" : "outline"} className={a.lawyerStatus === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, lawyerStatus: k })}>
+              <Button key={k} size="sm" variant={a.lawyerStatus === k ? "default" : "outline"} className={a.lawyerStatus === k ? "" : "justify-start bg-card text-muted-foreground"} onClick={() => setA({ ...a, lawyerStatus: k })}>
                 {tr[`status_${k === "unknown" ? "unknown" : k === "disciplined" ? "disciplined" : "no"}` as keyof typeof tr] as string}
               </Button>
             ))}
@@ -136,7 +136,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
                   ? String(tr[base as keyof typeof tr])
                   : String((tr[`${base}_st` as keyof typeof tr] as string) ?? tr[base as keyof typeof tr]).replace("{years}", String(years ?? ""));
               return (
-                <Button key={k} size="sm" variant={a.discoveredWhen === k ? "default" : "outline"} className={a.discoveredWhen === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, discoveredWhen: k })}>
+                <Button key={k} size="sm" variant={a.discoveredWhen === k ? "default" : "outline"} className={a.discoveredWhen === k ? "" : "justify-start bg-card text-muted-foreground"} onClick={() => setA({ ...a, discoveredWhen: k })}>
                   {label}
                 </Button>
               );
@@ -149,7 +149,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {(["no", "yes", "n/a"] as const).map((k) => (
-              <Button key={k} size="sm" variant={a.grievanceFiled === k ? "default" : "outline"} className={a.grievanceFiled === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, grievanceFiled: k })}>
+              <Button key={k} size="sm" variant={a.grievanceFiled === k ? "default" : "outline"} className={a.grievanceFiled === k ? "" : "justify-start bg-card text-muted-foreground"} onClick={() => setA({ ...a, grievanceFiled: k })}>
                 {tr[`g_${k === "no" ? "no" : k === "yes" ? "yes" : "na"}` as keyof typeof tr] as string}
               </Button>
             ))}
@@ -163,7 +163,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           {(["money_back", "discipline", "resolve_fees", "protect_case"] as const).map((k) => (
-            <Button key={k} size="sm" variant={a.goal === k ? "default" : "outline"} className={a.goal === k ? "bg-emerald-700" : ""} onClick={() => setA({ ...a, goal: k })}>
+            <Button key={k} size="sm" variant={a.goal === k ? "default" : "outline"} className={a.goal === k ? "" : "bg-card text-muted-foreground"} onClick={() => setA({ ...a, goal: k })}>
               {tr[`goal_${k === "money_back" ? "money" : k === "discipline" ? "discipline" : k === "resolve_fees" ? "fees" : "protect"}` as keyof typeof tr] as string}
             </Button>
           ))}
@@ -171,7 +171,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
       </Card>
 
       <div className="mb-8">
-        <Button size="lg" className="w-full bg-emerald-700 hover:bg-emerald-800" onClick={() => setSubmitted(true)}>
+        <Button size="lg" className="w-full shadow-sm" onClick={() => setSubmitted(true)}>
           <Compass className="mr-2 h-4 w-4" /> {tr.seeResults}
         </Button>
       </div>
@@ -183,9 +183,9 @@ export function RouterView({ caseId }: { caseId?: string }) {
             const expanded = openChannel === r.kind;
             const fitBadge =
               r.fit === "recommended" ? (
-                <Badge className="bg-emerald-700">{tr.recommended}</Badge>
+                <Badge className="bg-primary text-primary-foreground">{tr.recommended}</Badge>
               ) : r.fit === "possible" ? (
-                <Badge variant="outline" className="text-amber-800 border-amber-300">
+                <Badge variant="outline" className="border-copper/50 text-copper">
                   {tr.possible}
                 </Badge>
               ) : (
@@ -194,7 +194,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
                 </Badge>
               );
             return (
-              <Card key={r.kind} className={r.fit === "recommended" ? "border-emerald-700" : ""}>
+              <Card key={r.kind} className={r.fit === "recommended" ? "border-primary/50 shadow-md shadow-primary/[0.06]" : "border-border/80"}>
                 <CardHeader>
                   <div className="flex flex-wrap items-center gap-2">
                     {fitBadge}
@@ -207,7 +207,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
                   <ul className="space-y-1.5 text-sm">
                     {(app.locale === "es" && r.reasons.es.length ? r.reasons.es : r.reasons.en).map((s, i) => (
                       <li key={i} className="flex gap-2">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                         <span>{s}</span>
                       </li>
                     ))}
@@ -217,7 +217,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
                     <div className="space-y-4 border-t pt-4">
                       <div>
                         <p className="mb-1 text-sm font-semibold flex items-center gap-1.5">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-700" /> {tr.canDo}
+                          <CheckCircle2 className="h-4 w-4 text-primary" /> {tr.canDo}
                         </p>
                         <ul className="list-disc space-y-1 pl-5 text-sm">
                           {(app.locale === "es" ? ch.canDo.es : ch.canDo.en).map((s, i) => (
@@ -227,7 +227,7 @@ export function RouterView({ caseId }: { caseId?: string }) {
                       </div>
                       <div>
                         <p className="mb-1 text-sm font-semibold flex items-center gap-1.5">
-                          <XCircle className="h-4 w-4 text-red-700" /> {tr.cannotDo}
+                          <XCircle className="h-4 w-4 text-destructive" /> {tr.cannotDo}
                         </p>
                         <ul className="list-disc space-y-1 pl-5 text-sm">
                           {(app.locale === "es" ? ch.cannotDo.es : ch.cannotDo.en).map((s, i) => (

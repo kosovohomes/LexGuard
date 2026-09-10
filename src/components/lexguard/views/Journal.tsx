@@ -58,17 +58,17 @@ export function JournalView() {
 
   return (
     <div>
-      <PageTitle title={tr.navJournal} sub={tr.tagline} />
-      <div className="mb-4 flex justify-end">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <PageTitle title={tr.navJournal} sub={tr.tagline} />
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-1.5 bg-emerald-700 hover:bg-emerald-800">
+            <Button className="gap-1.5 mb-8 shadow-sm">
               <Plus className="h-4 w-4" /> {tr.createCase}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{tr.createCase}</DialogTitle>
+              <DialogTitle className="lg-display text-xl">{tr.createCase}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
@@ -100,7 +100,7 @@ export function JournalView() {
                 </Label>
                 <Input id="start" type="date" value={start} onChange={(e) => setStart(e.target.value)} />
               </div>
-              <Button className="w-full bg-emerald-700 hover:bg-emerald-800" disabled={!attorney || busy} onClick={() => void create()}>
+              <Button className="w-full" disabled={!attorney || busy} onClick={() => void create()}>
                 {tr.save}
               </Button>
             </div>
@@ -109,13 +109,16 @@ export function JournalView() {
       </div>
 
       {app.cases.length === 0 ? (
-        <p className="text-muted-foreground">{tr.noCases}</p>
+        <div className="rounded-xl border border-dashed border-border bg-card/60 p-10 text-center">
+          <FolderOpen className="mx-auto h-8 w-8 text-muted-foreground/50" aria-hidden />
+          <p className="mt-3 text-muted-foreground">{tr.noCases}</p>
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {app.cases.map((c) => (
             <Card
               key={c.id}
-              className="cursor-pointer hover:border-emerald-700 transition-colors"
+              className="group cursor-pointer border-border/80 transition-all hover:border-primary/40 hover:shadow-md"
               onClick={() => {
                 void app.openCase(c.id);
                 app.navigate({ name: "case", caseId: c.id });
@@ -124,16 +127,16 @@ export function JournalView() {
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground">{tr.caseFor}</p>
-                    <h3 className="font-semibold text-lg">{c.attorneyName}</h3>
-                    {c.firm ? <p className="text-sm text-muted-foreground">{c.firm}</p> : null}
+                    <p className="lg-eyebrow">{tr.caseFor}</p>
+                    <h3 className="lg-display text-xl mt-1 leading-snug">{c.attorneyName}</h3>
+                    {c.firm ? <p className="text-sm text-muted-foreground mt-0.5">{c.firm}</p> : null}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <StateBadge state={c.state} />
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-muted-foreground hover:text-red-700"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
                       aria-label={tr.trashMove}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -144,7 +147,7 @@ export function JournalView() {
                     </Button>
                   </div>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
                     <FileText className="h-3 w-3" /> {c._count?.entries ?? 0} {tr.entriesCount}
                   </span>
@@ -154,7 +157,7 @@ export function JournalView() {
                   <span className="inline-flex items-center gap-1 capitalize">
                     <CalendarClock className="h-3 w-3" /> {c.status === "active" ? tr.statusActive : tr.statusEnded}
                   </span>
-                  <ArrowRight className="ml-auto h-4 w-4" />
+                  <ArrowRight className="ml-auto h-4 w-4 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                 </div>
               </CardContent>
             </Card>

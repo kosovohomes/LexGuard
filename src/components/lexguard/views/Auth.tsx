@@ -41,9 +41,10 @@ export function AuthView() {
 
   return (
     <div className="mx-auto max-w-md">
-      <Card>
+      <Card className="py-6">
         <CardHeader>
-          <CardTitle>{mode === "register" ? tr.register : tr.login}</CardTitle>
+          <p className="lg-eyebrow mb-1">LexGuard</p>
+          <CardTitle className="lg-display text-2xl">{mode === "register" ? tr.register : tr.login}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
@@ -69,7 +70,7 @@ export function AuthView() {
                 type="checkbox"
                 checked={ageConfirmed}
                 onChange={(e) => setAgeConfirmed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-700"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--primary)]"
                 required
               />
               <label htmlFor="age-gate" className="text-sm text-muted-foreground">
@@ -77,9 +78,9 @@ export function AuthView() {
               </label>
             </div>
           ) : null}
-          {error ? <p className="text-sm text-red-700">{error}</p> : null}
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button
-            className="w-full bg-emerald-700 hover:bg-emerald-800"
+            className="w-full"
             disabled={busy || !email || password.length < 8 || (mode === "register" && !ageConfirmed)}
             onClick={() => void submit()}
           >

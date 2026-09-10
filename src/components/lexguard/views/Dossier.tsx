@@ -110,27 +110,28 @@ export function DossierView({ caseId }: { caseId: string }) {
         </p>
       ) : (
         <>
-          <Card className="mb-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{a.case.attorneyName}</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
-              <p>
-                {tr.entriesCount}: <span className="font-semibold">{a.entries.length}</span>
-              </p>
-              <p>
-                {tr.documents}: <span className="font-semibold">{a.documents.length}</span>
-              </p>
-              <p>
-                {tr.secFlags}: <span className="font-semibold">{observations.length}</span>
-              </p>
-              <p>
-                {tr.totalPaid}: <span className="font-semibold">${a.entries.filter((e: EntryData) => e.type === "payment").reduce((s, e) => s + ((e.data as { amount?: number }).amount ?? 0), 0).toLocaleString()}</span>
-              </p>
+          <Card className="lg-hero mb-6 border-0">
+            <CardContent className="p-6">
+              <p className="lg-eyebrow mb-3">{tr.dossier}</p>
+              <CardTitle className="lg-display text-2xl">{a.case.attorneyName}</CardTitle>
+              <div className="mt-4 grid gap-2.5 text-sm sm:grid-cols-2">
+                <p>
+                  {tr.entriesCount}: <span className="font-semibold">{a.entries.length}</span>
+                </p>
+                <p>
+                  {tr.documents}: <span className="font-semibold">{a.documents.length}</span>
+                </p>
+                <p>
+                  {tr.secFlags}: <span className="font-semibold">{observations.length}</span>
+                </p>
+                <p>
+                  {tr.totalPaid}: <span className="font-semibold">${a.entries.filter((e: EntryData) => e.type === "payment").reduce((s, e) => s + ((e.data as { amount?: number }).amount ?? 0), 0).toLocaleString()}</span>
+                </p>
+              </div>
             </CardContent>
           </Card>
 
-          <div className="mb-6 space-y-3 rounded-lg border p-4">
+          <div className="mb-6 space-y-3.5 rounded-xl border border-border/80 bg-card p-5">
             <label className="flex items-center gap-2 text-sm">
               <Checkbox checked={includeDocs} onCheckedChange={(v) => setIncludeDocs(!!v)} />
               {tr.includeDocs}
@@ -164,7 +165,7 @@ export function DossierView({ caseId }: { caseId: string }) {
           </Alert>
 
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" className="gap-2 bg-emerald-700 hover:bg-emerald-800" disabled={busy} onClick={() => void downloadPdf()}>
+            <Button size="lg" className="gap-2 shadow-sm" disabled={busy} onClick={() => void downloadPdf()}>
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />} {tr.downloadPdf}
             </Button>
             <Button size="lg" variant="outline" className="gap-2" onClick={downloadJson}>

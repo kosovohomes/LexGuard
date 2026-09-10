@@ -68,9 +68,12 @@ LexGuard is a lawyer-free web application that helps individuals dealing with (o
 
 ## Screenshots
 
+Design language — "The Docket": warm-paper surfaces, deep evergreen primary, copper accent,
+Fraunces serif display headings over an Inter body, ruled-texture hero panels.
+
 | Desktop | Mobile |
 |---|---|
-| ![Desktop](docs/screenshots/desktop.png) | ![Mobile](docs/screenshots/mobile.png) |
+| ![Desktop](docs/screenshots/redesign-home-desktop.png) | ![Mobile](docs/screenshots/redesign-home-mobile.png) |
 
 ## Tech stack
 

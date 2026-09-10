@@ -34,12 +34,12 @@ export function DirectoryView() {
     <div>
       <PageTitle title={tr.directoryTitle} sub={tr.directoryIntro} />
 
-      <p className="mb-4 flex items-start gap-2 rounded-lg border bg-emerald-50 px-4 py-3 text-sm text-emerald-900" role="note">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
-        {tr.dirNoPlacement}
+      <p className="mb-5 flex items-start gap-2.5 rounded-xl border border-primary/25 bg-primary/[0.06] px-4 py-3 text-sm" role="note">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <span className="text-foreground/90">{tr.dirNoPlacement}</span>
       </p>
 
-      <div className="mb-4 space-y-2">
+      <div className="mb-4 space-y-2.5">
         <label htmlFor="dir-search" className="sr-only">
           {tr.dirSearch}
         </label>
@@ -49,18 +49,25 @@ export function DirectoryView() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={tr.dirSearch}
-          className="max-w-md"
+          className="max-w-md h-10 bg-card"
         />
         <div className="flex flex-wrap gap-1.5" role="group" aria-label={tr.dirAll}>
-          <Button size="sm" variant={kind === "all" ? "secondary" : "ghost"} aria-pressed={kind === "all"} onClick={() => setKind("all")}>
+          <Button
+            size="sm"
+            variant="outline"
+            aria-pressed={kind === "all"}
+            className={`h-8 rounded-full ${kind === "all" ? "border-primary/30 bg-primary/10 text-primary font-semibold" : "bg-card text-muted-foreground"}`}
+            onClick={() => setKind("all")}
+          >
             {tr.dirAll}
           </Button>
           {kinds.map((k) => (
             <Button
               key={k}
               size="sm"
-              variant={kind === k ? "secondary" : "ghost"}
+              variant="outline"
               aria-pressed={kind === k}
+              className={`h-8 rounded-full ${kind === k ? "border-primary/30 bg-primary/10 text-primary font-semibold" : "bg-card text-muted-foreground"}`}
               onClick={() => setKind(kind === k ? "all" : k)}
             >
               {KIND_LABELS[k][app.locale]}
@@ -80,39 +87,41 @@ export function DirectoryView() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {list.map((r) => (
-            <Card key={r.name}>
+            <Card key={r.name} className="border-border/80 transition-shadow hover:shadow-md">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <LifeBuoy className="h-5 w-5 shrink-0 text-emerald-700" />
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <LifeBuoy className="h-4 w-4" />
+                    </div>
                     <h3 className="font-semibold leading-snug">{r.name}</h3>
                   </div>
-                  <Badge variant="outline">{KIND_LABELS[r.kind][app.locale]}</Badge>
+                  <Badge variant="outline" className="shrink-0">{KIND_LABELS[r.kind][app.locale]}</Badge>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{app.locale === "es" ? r.note.es : r.note.en}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p className="mt-2.5 text-sm text-muted-foreground leading-relaxed">{app.locale === "es" ? r.note.es : r.note.en}</p>
+                <div className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <a
                     href={r.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-emerald-800 hover:underline"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline underline-offset-2"
                   >
                     {r.url.replace(/^https?:\/\//, "")} <ExternalLink className="h-3 w-3" />
                   </a>
                   {r.phone ? (
-                    <a href={`tel:${r.phone.replace(/-/g, "")}`} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:underline">
+                    <a href={`tel:${r.phone.replace(/-/g, "")}`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
                       <Phone className="h-3 w-3" /> {r.phone}
                     </a>
                   ) : null}
                   <div className="flex gap-1">
                     {r.states.map((s) => (
-                      <Badge key={s} variant="secondary">
+                      <Badge key={s} variant="secondary" className="font-mono text-[11px]">
                         {s}
                       </Badge>
                     ))}
                   </div>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground/80">
+                <p className="mt-2.5 text-xs text-muted-foreground/80">
                   {tr.dirVerified}: {r.verified}
                 </p>
               </CardContent>

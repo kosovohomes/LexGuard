@@ -21,16 +21,17 @@ export function OnboardingView() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground" aria-hidden>
+      <div className="flex items-center gap-2" aria-hidden>
         {[0, 1, 2].map((i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-emerald-700" : "bg-muted"}`} />
+          <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-border"}`} />
         ))}
       </div>
 
       {step === 0 && (
-        <Card>
+        <Card className="py-6">
           <CardHeader>
-            <CardTitle>{tr.chooseState}</CardTitle>
+            <p className="lg-eyebrow mb-1">{app.locale === "es" ? "Paso 1 de 3" : "Step 1 of 3"}</p>
+            <CardTitle className="lg-display text-2xl">{tr.chooseState}</CardTitle>
             <p className="text-sm text-muted-foreground">{tr.stateNote}</p>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -39,13 +40,13 @@ export function OnboardingView() {
                 key={s.code}
                 variant={app.userState === s.code ? "default" : "outline"}
                 size="lg"
-                className="h-24 flex-col gap-1 justify-center bg-emerald-700 data-[state=on]"
+                className="h-auto min-h-20 flex-col gap-1 justify-center py-4"
                 onClick={() => {
                   app.setUserState(s.code as USState);
                   setStep(1);
                 }}
               >
-                {s.name}
+                <span className="text-[15px]">{s.name}</span>
                 {STATES[s.code].expansion ? <span className="text-xs font-normal opacity-80">{tr.stateNew}</span> : null}
               </Button>
             ))}
@@ -54,9 +55,10 @@ export function OnboardingView() {
       )}
 
       {step === 1 && (
-        <Card>
+        <Card className="py-6">
           <CardHeader>
-            <CardTitle>{tr.situation}</CardTitle>
+            <p className="lg-eyebrow mb-1">{app.locale === "es" ? "Paso 2 de 3" : "Step 2 of 3"}</p>
+            <CardTitle className="lg-display text-2xl">{tr.situation}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {[
@@ -68,7 +70,7 @@ export function OnboardingView() {
                 key={o.key}
                 variant={situation === o.key ? "default" : "outline"}
                 size="lg"
-                className="w-full justify-start h-auto py-3"
+                className="w-full justify-start h-auto py-3.5 text-left text-[15px]"
                 onClick={() => {
                   setSituation(o.key);
                   setStep(2);
@@ -82,32 +84,33 @@ export function OnboardingView() {
       )}
 
       {step === 2 && (
-        <Card>
+        <Card className="py-6">
           <CardHeader>
-            <CardTitle>{tr.chooseMode}</CardTitle>
+            <p className="lg-eyebrow mb-1">{app.locale === "es" ? "Paso 3 de 3" : "Step 3 of 3"}</p>
+            <CardTitle className="lg-display text-2xl">{tr.chooseMode}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <button
-              className="w-full text-left rounded-lg border p-4 hover:border-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+              className="w-full text-left rounded-xl border border-border/80 bg-card p-5 transition hover:border-primary/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => {
                 app.setMode("account");
                 app.navigate({ name: "auth" });
               }}
             >
               <div className="font-semibold">{tr.modeAccount}</div>
-              <div className="text-sm text-muted-foreground mt-1">{tr.modeAccountDesc}</div>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{tr.modeAccountDesc}</div>
             </button>
             <button
-              className="w-full text-left rounded-lg border p-4 hover:border-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+              className="w-full text-left rounded-xl border border-border/80 bg-card p-5 transition hover:border-primary/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => {
                 app.setMode("local");
                 app.home();
               }}
             >
               <div className="font-semibold flex items-center gap-2">
-                <Lock className="h-4 w-4" /> {tr.modeLocal}
+                <Lock className="h-4 w-4 text-primary" /> {tr.modeLocal}
               </div>
-              <div className="text-sm text-muted-foreground mt-1">{tr.modeLocalDesc}</div>
+              <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{tr.modeLocalDesc}</div>
             </button>
             <Alert>
               <ShieldAlert className="h-4 w-4" />
@@ -117,7 +120,7 @@ export function OnboardingView() {
         </Card>
       )}
 
-      <Button variant="ghost" size="sm" onClick={() => (step === 0 ? app.home() : setStep(step - 1))}>
+      <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => (step === 0 ? app.home() : setStep(step - 1))}>
         ← {tr.back}
       </Button>
     </div>

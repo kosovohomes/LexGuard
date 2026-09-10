@@ -116,16 +116,16 @@ export function SurveyCard() {
   };
 
   return (
-    <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-background">
+    <Card className="border-primary/25 bg-primary/[0.04]">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <ClipboardCheck className="h-5 w-5 text-emerald-700" /> {tr.svTitle}
+          <ClipboardCheck className="h-5 w-5 text-primary" /> {tr.svTitle}
           {current ? <Badge variant="outline" className="font-normal text-xs">{daysAgo}d</Badge> : null}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {justSaved ? (
-          <p className="text-sm font-medium text-emerald-800" role="status">{tr.svThanks}</p>
+          <p className="text-sm font-medium text-primary" role="status">{tr.svThanks}</p>
         ) : null}
         {!justSaved && showPending && current ? (
           <>
@@ -137,14 +137,14 @@ export function SurveyCard() {
                 { v: "not_yet" as SurveyStatus, label: tr.svNotYet },
                 { v: "declined" as SurveyStatus, label: tr.svDeclined },
               ]).map((o) => (
-                <label key={o.v} className="flex min-h-11 items-center gap-2.5 rounded-lg border p-3 text-sm hover:bg-emerald-50 has-[[data-state=checked]]:border-emerald-600">
+                <label key={o.v} className="flex min-h-11 items-center gap-2.5 rounded-lg border border-border/80 bg-card p-3 text-sm transition hover:border-primary/40 has-[[data-state=checked]]:border-primary/60 has-[[data-state=checked]]:bg-primary/[0.05]">
                   <input
                     type="radio"
                     name="lexguard-sv-status"
                     value={o.v}
                     checked={status === o.v}
                     onChange={() => setStatus(o.v)}
-                    className="h-4 w-4 accent-emerald-700"
+                    className="h-4 w-4 accent-[var(--primary)]"
                   />
                   {o.label}
                 </label>
@@ -155,7 +155,7 @@ export function SurveyCard() {
               <fieldset className="space-y-2">
                 <legend className="text-sm font-medium">{tr.svChannelsQ}</legend>
                 {SURVEY_CHANNELS.map((ch) => (
-                  <label key={ch} className="flex min-h-11 items-center gap-2.5 rounded-lg border p-3 text-sm hover:bg-emerald-50">
+                  <label key={ch} className="flex min-h-11 items-center gap-2.5 rounded-lg border border-border/80 bg-card p-3 text-sm transition hover:border-primary/40">
                     <Checkbox
                       checked={channels.includes(ch)}
                       onCheckedChange={(v) => setChannels(v ? [...channels, ch] : channels.filter((x) => x !== ch))}
@@ -174,7 +174,7 @@ export function SurveyCard() {
             ) : null}
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button className="bg-emerald-700 hover:bg-emerald-800" onClick={() => void submit()} disabled={saving}>
+              <Button onClick={() => void submit()} disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {tr.svSubmit}
               </Button>
               <Button
@@ -194,7 +194,7 @@ export function SurveyCard() {
             <p className="text-sm font-medium">{tr.svHistory}</p>
             <ul className="space-y-1.5">
               {responses.slice(0, 6).map((r) => (
-                <li key={`${r.dossierId}:${r.milestone}`} className="flex flex-wrap items-center gap-2 rounded-lg border p-2.5 text-sm">
+                <li key={`${r.dossierId}:${r.milestone}`} className="flex flex-wrap items-center gap-2 rounded-lg border border-border/80 p-2.5 text-sm">
                   <Badge variant="secondary" className="text-[11px]">{tr.svMilestone.replace("{days}", String(r.milestone))}</Badge>
                   <span>{statusLabel(r.status, tr)}</span>
                   <span className="ml-auto text-[11px] text-muted-foreground">

@@ -35,7 +35,7 @@ export function EntryForm({ caseId, onDone }: { caseId: string; onDone: () => vo
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {typeOptions.map((o) => (
-          <Button key={o.value} size="sm" variant={type === o.value ? "default" : "outline"} className="bg-emerald-700 data-[state=off]" onClick={() => setType(o.value)}>
+          <Button key={o.value} size="sm" variant={type === o.value ? "default" : "outline"} className={type === o.value ? "font-medium" : "bg-card text-muted-foreground"} onClick={() => setType(o.value)} aria-pressed={type === o.value}>
             {o.label}
           </Button>
         ))}
@@ -76,7 +76,7 @@ function CommunicationForm({ caseId, onDone }: { caseId: string; onDone: () => v
   ];
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <div className="space-y-3.5 rounded-xl border border-border/80 bg-card p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>{tr.channel}</Label>
@@ -139,7 +139,7 @@ function CommunicationForm({ caseId, onDone }: { caseId: string; onDone: () => v
           </Select>
         ) : null}
       </div>
-      <fieldset className="rounded-md border p-3">
+      <fieldset className="rounded-lg border border-border/80 bg-secondary/40 p-3.5">
         <legend className="px-1 text-xs font-medium text-muted-foreground">{tr.flagsLegend}</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {flagDefs.map((f) => (
@@ -151,7 +151,6 @@ function CommunicationForm({ caseId, onDone }: { caseId: string; onDone: () => v
         </div>
       </fieldset>
       <Button
-        className="bg-emerald-700 hover:bg-emerald-800"
         disabled={!title || !date}
         onClick={() =>
           void app
@@ -191,7 +190,7 @@ function PaymentForm({ caseId, onDone }: { caseId: string; onDone: () => void })
   const [percentPaid, setPercentPaid] = useState("");
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <div className="space-y-3.5 rounded-xl border border-border/80 bg-card p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>{tr.paymentKind}</Label>
@@ -269,7 +268,6 @@ function PaymentForm({ caseId, onDone }: { caseId: string; onDone: () => void })
         </label>
       </div>
       <Button
-        className="bg-emerald-700 hover:bg-emerald-800"
         disabled={!title || !date || !amount}
         onClick={() =>
           void app
@@ -306,7 +304,7 @@ function DeadlineForm({ caseId, onDone }: { caseId: string; onDone: () => void }
   const [missedAppearance, setMissedAppearance] = useState(false);
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <div className="space-y-3.5 rounded-xl border border-border/80 bg-card p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>{tr.deadlineKind}</Label>
@@ -351,7 +349,6 @@ function DeadlineForm({ caseId, onDone }: { caseId: string; onDone: () => void }
         </label>
       ) : null}
       <Button
-        className="bg-emerald-700 hover:bg-emerald-800"
         disabled={!title || !date}
         onClick={() =>
           void app
@@ -379,7 +376,7 @@ function PromiseForm({ caseId, onDone }: { caseId: string; onDone: () => void })
   const [date, setDate] = useState(nowLocal());
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <div className="space-y-3.5 rounded-xl border border-border/80 bg-card p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="prtitle">{tr.promiseText}</Label>
@@ -410,7 +407,6 @@ function PromiseForm({ caseId, onDone }: { caseId: string; onDone: () => void })
         </div>
       </div>
       <Button
-        className="bg-emerald-700 hover:bg-emerald-800"
         disabled={!title || !date}
         onClick={() =>
           void app
@@ -437,7 +433,7 @@ function NoteForm({ caseId, onDone }: { caseId: string; onDone: () => void }) {
   const [date, setDate] = useState(nowLocal());
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <div className="space-y-3.5 rounded-xl border border-border/80 bg-card p-4 sm:p-5">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="ntitle">{tr.title}</Label>
@@ -456,7 +452,6 @@ function NoteForm({ caseId, onDone }: { caseId: string; onDone: () => void }) {
         <Textarea id="nbody" rows={4} value={body} onChange={(e) => setBody(e.target.value)} />
       </div>
       <Button
-        className="bg-emerald-700 hover:bg-emerald-800"
         disabled={!title || !date}
         onClick={() =>
           void app

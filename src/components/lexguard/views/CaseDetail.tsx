@@ -81,17 +81,17 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
         sub={c.firm ?? undefined}
         back={() => app.back()}
       />
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-5 flex flex-wrap items-center gap-2">
         <StateBadge state={c.state} />
         <Badge variant="outline">{c.status === "active" ? tr.statusActive : tr.statusEnded}</Badge>
         <div className="ml-auto flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => app.navigate({ name: "flags", caseId })}>
+          <Button size="sm" variant="outline" className="gap-1.5 bg-card" onClick={() => app.navigate({ name: "flags", caseId })}>
             <Radar className="h-4 w-4" /> {tr.redFlags}
           </Button>
-          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => app.navigate({ name: "router", caseId })}>
+          <Button size="sm" variant="outline" className="gap-1.5 bg-card" onClick={() => app.navigate({ name: "router", caseId })}>
             <Compass className="h-4 w-4" /> {tr.router}
           </Button>
-          <Button size="sm" className="gap-1.5 bg-emerald-700 hover:bg-emerald-800" onClick={() => app.navigate({ name: "dossier", caseId })}>
+          <Button size="sm" className="gap-1.5 shadow-sm" onClick={() => app.navigate({ name: "dossier", caseId })}>
             <FileText className="h-4 w-4" /> {tr.dossier}
           </Button>
         </div>
@@ -107,15 +107,15 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           <TabsTrigger value="settings">{tr.navSettings}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="timeline" className="mt-4">
-          <div className="mb-4">
+        <TabsContent value="timeline" className="mt-5">
+          <div className="mb-5">
             <Dialog open={logOpen} onOpenChange={setLogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-700 hover:bg-emerald-800">+ {tr.logEntry}</Button>
+                <Button className="shadow-sm">+ {tr.logEntry}</Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{tr.logEntry}</DialogTitle>
+                  <DialogTitle className="lg-display text-xl">{tr.logEntry}</DialogTitle>
                 </DialogHeader>
                 <EntryForm
                   caseId={caseId}
@@ -128,43 +128,46 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           </div>
 
           {entries.length === 0 ? (
-            <p className="text-muted-foreground">{tr.noPromises}</p>
+            <div className="rounded-xl border border-dashed border-border bg-card/60 p-10 text-center">
+              <NotebookPen className="mx-auto h-8 w-8 text-muted-foreground/50" aria-hidden />
+              <p className="mt-3 text-muted-foreground">{tr.noPromises}</p>
+            </div>
           ) : (
-            <ol className="relative border-l ml-3 space-y-5">
+            <ol className="relative border-l-2 border-border/70 ml-3 space-y-5">
               {entries.map((e) => (
                 <li key={e.id} className="ml-6">
-                  <span className="absolute -left-3 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-emerald-700">{typeIcon(e)}</span>
-                  <div className="rounded-lg border p-3">
+                  <span className="absolute -left-[15px] flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-primary shadow-sm">{typeIcon(e)}</span>
+                  <div className="rounded-xl border border-border/80 bg-card p-4">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary" className="text-[11px]">
+                      <Badge variant="secondary" className="text-[11px] font-medium">
                         {tr[`type_${e.type}` as keyof typeof tr]}
                       </Badge>
                       <span className="text-xs text-muted-foreground">{fmt(e.occurredAt, app.locale)}</span>
-                      {e.edited ? <Badge variant="outline" className="text-[11px] text-amber-700">{tr.edited}</Badge> : null}
+                      {e.edited ? <Badge variant="outline" className="text-[11px] border-copper/40 text-copper">{tr.edited}</Badge> : null}
                       <span className="ml-auto text-[11px] text-muted-foreground" title={tr.immutable}>
                         {tr.immutable}: {fmt(e.createdAt, app.locale)}
                       </span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-red-700" aria-label={tr.delete} onClick={() => void app.removeEntry(e.id)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" aria-label={tr.delete} onClick={() => void app.removeEntry(e.id)}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
-                    <p className="mt-1.5 font-medium">{e.title}</p>
-                    {e.body ? <p className="text-sm text-muted-foreground whitespace-pre-wrap">{e.body}</p> : null}
+                    <p className="mt-2 font-medium leading-snug">{e.title}</p>
+                    {e.body ? <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-1 leading-relaxed">{e.body}</p> : null}
                     {e.type === "payment" ? (
-                      <p className="mt-1 text-sm">
+                      <p className="mt-1.5 text-sm">
                         <span className="font-semibold">${((e.data as PaymentData).amount ?? 0).toLocaleString()}</span> · {tr.method}: {(e.data as PaymentData).method} · {tr.payee}: {(e.data as PaymentData).payee}
                       </p>
                     ) : null}
                     {e.type === "promise" && (e.data as PromiseData).promisedBy ? (
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1.5 text-sm text-muted-foreground">
                         {tr.promisedBy}: {fmt((e.data as PromiseData).promisedBy, app.locale)}
-                        {(e.data as PromiseData).fulfilled === false ? <span className="ml-2 text-red-700">{tr.fulfilledNo}</span> : null}
+                        {(e.data as PromiseData).fulfilled === false ? <span className="ml-2 text-destructive font-medium">{tr.fulfilledNo}</span> : null}
                       </p>
                     ) : null}
                     {e.type === "deadline" ? (
-                      <p className="mt-1 text-sm text-muted-foreground">
+                      <p className="mt-1.5 text-sm text-muted-foreground">
                         {tr.deadlineStatus}: {(e.data as DeadlineData).status}
-                        {(e.data as DeadlineData).missedAppearance ? <span className="ml-2 text-red-700">{tr.missedAppearance}</span> : null}
+                        {(e.data as DeadlineData).missedAppearance ? <span className="ml-2 text-destructive font-medium">{tr.missedAppearance}</span> : null}
                       </p>
                     ) : null}
                   </div>
@@ -174,16 +177,14 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           )}
         </TabsContent>
 
-        <TabsContent value="money" className="mt-4">
-          <Card className="mb-4">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{tr.moneySummary}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
+        <TabsContent value="money" className="mt-5">
+          <Card className="lg-hero mb-5 border-0">
+            <CardContent className="p-6">
+              <p className="lg-eyebrow">{tr.moneySummary}</p>
+              <p className="lg-display text-4xl mt-2">
                 ${totalPaid.toLocaleString(app.locale === "es" ? "es-MX" : "en-US")}
               </p>
-              <p className="text-sm text-muted-foreground">{tr.totalPaid}</p>
+              <p className="text-sm text-muted-foreground mt-1">{tr.totalPaid}</p>
             </CardContent>
           </Card>
           {payments.length === 0 ? (
@@ -191,13 +192,13 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           ) : (
             <div className="space-y-2">
               {payments.map((e) => (
-                <div key={e.id} className="flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm">
+                <div key={e.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-border/80 bg-card p-3.5 text-sm">
                   <span className="text-muted-foreground w-28 shrink-0">{fmt(e.occurredAt, app.locale)}</span>
                   <span className="font-medium">{e.title}</span>
                   <span className="font-semibold">${((e.data as PaymentData).amount ?? 0).toLocaleString()}</span>
-                  {(e.data as PaymentData).notInAgreement ? <Badge variant="outline" className="text-amber-700">{tr.notInAgreement}</Badge> : null}
+                  {(e.data as PaymentData).notInAgreement ? <Badge variant="outline" className="border-copper/40 text-copper">{tr.notInAgreement}</Badge> : null}
                   {(e.data as PaymentData).receipt ? <Badge variant="outline">{tr.tag_receipt}</Badge> : null}
-                  {(e.data as PaymentData).payee === "attorney_personally" ? <Badge variant="outline" className="text-red-700">{tr.pay_personal}</Badge> : null}
+                  {(e.data as PaymentData).payee === "attorney_personally" ? <Badge variant="outline" className="border-destructive/40 text-destructive">{tr.pay_personal}</Badge> : null}
                 </div>
               ))}
             </div>
@@ -208,32 +209,32 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           <DocumentsTab caseId={caseId} />
         </TabsContent>
 
-        <TabsContent value="promises" className="mt-4">
+        <TabsContent value="promises" className="mt-5">
           {promises.length === 0 ? (
             <p className="text-muted-foreground">{tr.noPromises}</p>
           ) : (
             <div className="space-y-2">
               {promises.map((e) => (
-                <div key={e.id} className="rounded-lg border p-3">
+                <div key={e.id} className="rounded-xl border border-border/80 bg-card p-4">
                   <p className="font-medium">{e.title}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {fmt(e.occurredAt, app.locale)}
                     {(e.data as PromiseData).promisedBy ? ` · ${tr.promisedBy}: ${fmt((e.data as PromiseData).promisedBy, app.locale)}` : ""}
                   </p>
-                  {(e.data as PromiseData).fulfilled === false ? <Badge variant="outline" className="mt-2 text-red-700">{tr.fulfilledNo}</Badge> : null}
+                  {(e.data as PromiseData).fulfilled === false ? <Badge variant="outline" className="mt-2 border-destructive/40 text-destructive">{tr.fulfilledNo}</Badge> : null}
                 </div>
               ))}
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="deadlines" className="mt-4">
+        <TabsContent value="deadlines" className="mt-5">
           {deadlines.length === 0 ? (
             <p className="text-muted-foreground">{tr.noDeadlines}</p>
           ) : (
             <div className="space-y-2">
               {deadlines.map((e) => (
-                <div key={e.id} className="flex flex-wrap items-center gap-2 rounded-lg border p-3 text-sm">
+                <div key={e.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-border/80 bg-card p-3.5 text-sm">
                   <span className="text-muted-foreground w-28 shrink-0">{fmt(e.occurredAt, app.locale)}</span>
                   <span className="font-medium">{e.title}</span>
                   <Badge variant="outline">{(e.data as DeadlineData).kind}</Badge>
@@ -314,20 +315,20 @@ function DocumentsTab({ caseId }: { caseId: string }) {
   return (
     <div className="space-y-4">
       {scanNotice ? (
-        <Alert className="border-amber-300 bg-amber-50 text-amber-900">
+        <Alert className="border-copper/40 bg-copper/10 text-foreground">
           <AlertDescription>
             <ul className="list-disc pl-5 space-y-1">
               {scanNotice.map((s, i) => (
                 <li key={i}>{s}</li>
               ))}
             </ul>
-            <button className="mt-1 text-xs underline" onClick={() => setScanNotice(null)}>
+            <button className="mt-1 text-xs underline underline-offset-2" onClick={() => setScanNotice(null)}>
               {tr.cancel}
             </button>
           </AlertDescription>
         </Alert>
       ) : null}
-      <div className="flex flex-wrap items-end gap-3 rounded-lg border p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border/80 bg-card p-4">
         <div className="space-y-1.5">
           <Label>{tr.tags}</Label>
           <Select value={tag} onValueChange={setTag}>
@@ -353,7 +354,7 @@ function DocumentsTab({ caseId }: { caseId: string }) {
               e.currentTarget.value = "";
             }}
           />
-          <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-emerald-700 px-3 text-sm font-medium text-white hover:bg-emerald-800">
+          <span className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {tr.upload}
           </span>
         </label>
@@ -372,9 +373,9 @@ function DocumentsTab({ caseId }: { caseId: string }) {
             const extracting = extractingId === d.id;
             const searchable = !!d.ocrText;
             return (
-              <div key={d.id} className="rounded-lg border p-3 text-sm">
+              <div key={d.id} className="rounded-xl border border-border/80 bg-card p-4 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
-                  <FileText className="h-4 w-4 text-emerald-700" />
+                  <FileText className="h-4 w-4 text-primary shrink-0" />
                   <span className="font-medium">{d.filename}</span>
                   <span className="text-muted-foreground">{Math.max(1, Math.round(d.size / 1024))} KB</span>
                   <div className="flex gap-1">
@@ -385,7 +386,7 @@ function DocumentsTab({ caseId }: { caseId: string }) {
                     ))}
                   </div>
                   {searchable ? (
-                    <Badge variant="secondary" className="text-[11px] bg-emerald-100 text-emerald-900">{tr.docSearchable}</Badge>
+                    <Badge variant="secondary" className="text-[11px] bg-primary/10 text-primary">{tr.docSearchable}</Badge>
                   ) : null}
                   <div className="ml-auto flex items-center gap-1">
                     {supported && !searchable ? (
@@ -425,14 +426,14 @@ function DocumentsTab({ caseId }: { caseId: string }) {
                     >
                       <Download className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-700" aria-label={tr.delete} onClick={() => void app.removeDoc(d.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" aria-label={tr.delete} onClick={() => void app.removeDoc(d.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-                {failedIds.has(d.id) ? <p className="mt-2 text-xs text-amber-700">{tr.docExtractFail}</p> : null}
+                {failedIds.has(d.id) ? <p className="mt-2 text-xs text-copper">{tr.docExtractFail}</p> : null}
                 {searchable && openTextId === d.id ? (
-                  <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs text-foreground">{d.ocrText}</pre>
+                  <pre className="mt-2.5 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-secondary/70 p-3.5 text-xs font-mono text-foreground/90">{d.ocrText}</pre>
                 ) : null}
               </div>
             );
@@ -457,10 +458,10 @@ function CaseSettings({ caseId }: { caseId: string }) {
   const iso = (v: string) => (v ? new Date(`${v}T12:00:00`).toISOString() : null);
 
   return (
-    <Card>
+    <Card className="border-border/80">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Building2 className="h-4 w-4" /> {tr.caseStatus} · {tr.feeType}
+          <Building2 className="h-4 w-4 text-primary" /> {tr.caseStatus} · {tr.feeType}
         </CardTitle>
         <p className="text-sm text-muted-foreground">{tr.caseEndedHelp}</p>
       </CardHeader>
@@ -508,7 +509,6 @@ function CaseSettings({ caseId }: { caseId: string }) {
         )}
         <div className="sm:col-span-2">
           <Button
-            className="bg-emerald-700 hover:bg-emerald-800"
             onClick={() =>
               void app.updateCase(caseId, {
                 status,

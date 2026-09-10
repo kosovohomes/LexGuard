@@ -88,13 +88,13 @@ export function ReportIssueButton({ slug, label }: { slug?: string; label?: stri
               <p className="text-sm font-medium">{tr.reportCategory}</p>
               <div className="grid gap-2">
                 {CATEGORIES.map((c) => (
-                  <label key={c} className="flex cursor-pointer items-center gap-2 rounded-lg border p-2.5 text-sm">
+                  <label key={c} className="flex cursor-pointer items-center gap-2 rounded-lg border border-border/80 p-2.5 text-sm transition hover:border-primary/40">
                     <input
                       type="radio"
                       name="report-category"
                       checked={category === c}
                       onChange={() => setCategory(c)}
-                      className="accent-emerald-700"
+                      className="accent-[var(--primary)]"
                     />
                     {tr[`reportCat_${c}` as keyof typeof tr]}
                   </label>
@@ -112,9 +112,9 @@ export function ReportIssueButton({ slug, label }: { slug?: string; label?: stri
                 placeholder={tr.reportPlaceholder}
               />
             </div>
-            {failed ? <p className="text-sm text-red-700">{tr.reportFailed}</p> : null}
+            {failed ? <p className="text-sm text-destructive">{tr.reportFailed}</p> : null}
             <div className="flex items-center gap-2">
-              <Button onClick={() => void submit()} disabled={busy} className="bg-emerald-700 hover:bg-emerald-800 gap-1.5">
+              <Button onClick={() => void submit()} disabled={busy} className="gap-1.5">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {tr.reportSend}
               </Button>
               <Button variant="ghost" onClick={() => reset(false)}>

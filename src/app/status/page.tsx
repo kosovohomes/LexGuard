@@ -24,28 +24,29 @@ export default function StatusPage() {
   const now = new Date();
   return (
     <main className="mx-auto max-w-3xl px-4 py-14">
-      <h1 className="text-2xl font-bold tracking-tight">LexGuard service status</h1>
+      <p className="lg-eyebrow">LexGuard</p>
+      <h1 className="lg-display mt-2 text-3xl">Service status</h1>
       <p className="mt-2 text-muted-foreground">
         Operational target 99.5% monthly uptime. This page is static and contains no user data.
       </p>
 
-      <section className="mt-8 rounded-lg border p-5">
+      <section className="lg-panel mt-8 p-5">
         <p className="flex items-center gap-2 font-medium">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-600" aria-hidden />
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" aria-hidden />
           All systems operational
         </p>
         <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-muted-foreground">Machine-readable liveness</dt>
             <dd>
-              <a className="text-emerald-700 underline" href="/api/health">
+              <a className="text-primary underline underline-offset-2" href="/api/health">
                 GET /api/health
               </a>
             </dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Rule library version</dt>
-            <dd>
+            <dd className="font-mono text-[13px]">
               v{RULE_LIBRARY_VERSION} · {RULES.length} rules live
             </dd>
           </div>
@@ -55,13 +56,13 @@ export default function StatusPage() {
           </div>
           <div>
             <dt className="text-muted-foreground">Page generated</dt>
-            <dd>{now.toISOString().slice(0, 16).replace("T", " ")} UTC</dd>
+            <dd className="font-mono text-[13px]">{now.toISOString().slice(0, 16).replace("T", " ")} UTC</dd>
           </div>
         </dl>
       </section>
 
       <section className="mt-8">
-        <h2 className="text-lg font-semibold">Current release — Phase 4</h2>
+        <h2 className="lg-display text-xl">Current release — Phase 4</h2>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
           {PHASE4_FEATURES.map(([en]) => (
             <li key={en}>{en}</li>

@@ -130,12 +130,12 @@ export function SettingsView() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <ShieldAlert className="h-4 w-4 text-emerald-700" /> {tr.safetyTitle}
+            <ShieldAlert className="h-4 w-4 text-primary" /> {tr.safetyTitle}
           </CardTitle>
           <p className="text-sm text-muted-foreground">{tr.safetyDesc}</p>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-border/80 bg-secondary/40 p-4">
             <div>
               <p className="flex items-center gap-2 font-medium">
                 <Eye className="h-4 w-4" /> {tr.discreetMode}
@@ -150,7 +150,7 @@ export function SettingsView() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Lock className="h-4 w-4 text-emerald-700" /> {tr.pinLock}
+            <Lock className="h-4 w-4 text-primary" /> {tr.pinLock}
           </CardTitle>
           <p className="text-sm text-muted-foreground">{tr.pinDesc}</p>
         </CardHeader>
@@ -173,7 +173,6 @@ export function SettingsView() {
                 />
               </div>
               <Button
-                className="bg-emerald-700 hover:bg-emerald-800"
                 disabled={pin.length < 4}
                 onClick={() => {
                   void app.setPin(pin);
@@ -192,7 +191,7 @@ export function SettingsView() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <KeyRound className="h-4 w-4 text-emerald-700" /> {tr.vaultTitle}
+              <KeyRound className="h-4 w-4 text-primary" /> {tr.vaultTitle}
             </CardTitle>
             <p className="text-sm text-muted-foreground">{tr.vaultDesc}</p>
           </CardHeader>
@@ -209,14 +208,14 @@ export function SettingsView() {
                     <Input id="zk-pass2" type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} />
                   </div>
                 </div>
-                <Button className="bg-emerald-700 hover:bg-emerald-800" disabled={vaultBusy || !pass1} onClick={() => void enableVault()}>
+                <Button disabled={vaultBusy || !pass1} onClick={() => void enableVault()}>
                   {tr.vaultEnable}
                 </Button>
               </div>
             ) : null}
             {vaultStatus === "unlocked" ? (
               <div className="space-y-3">
-                <p className="flex items-center gap-2 text-sm font-medium text-emerald-800">
+                <p className="flex items-center gap-2 text-sm font-medium text-primary">
                   <Lock className="h-4 w-4" /> {tr.vaultOn}
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -235,7 +234,7 @@ export function SettingsView() {
                 </div>
               </div>
             ) : null}
-            <div className="space-y-1.5 rounded-lg border p-3">
+            <div className="space-y-1.5 rounded-xl border border-border/80 bg-secondary/40 p-3.5">
               <Label htmlFor="zk-import">{tr.vaultRestore}</Label>
               <input
                 id="zk-import"
@@ -275,7 +274,7 @@ export function SettingsView() {
               {app.trashedCases.map((c) => {
                 const daysLeft = c.deletedAt ? Math.max(0, 30 - Math.floor((Date.now() - new Date(c.deletedAt).getTime()) / 86400000)) : 0;
                 return (
-                  <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
+                  <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/80 p-3.5">
                     <div>
                       <p className="font-medium text-sm">{c.attorneyName}{c.firm ? ` — ${c.firm}` : ""}</p>
                       <p className="text-xs text-muted-foreground">{tr.trashDaysLeft.replace("{days}", String(daysLeft))}</p>

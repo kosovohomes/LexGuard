@@ -23,7 +23,7 @@ function Parts({ parts }: { parts: SnippetPart[] }) {
     <>
       {parts.map((p, i) =>
         p.hit ? (
-          <mark key={i} className="rounded bg-amber-100 px-0.5 font-semibold text-foreground">
+          <mark key={i} className="rounded bg-copper/20 px-0.5 font-semibold text-foreground">
             {p.text}
           </mark>
         ) : (
@@ -183,23 +183,23 @@ export function SearchView() {
       <p className="mb-6 text-xs text-muted-foreground">{tr.searchPrivate}</p>
 
       {!searched ? (
-        <p className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">{tr.searchEmpty}</p>
+        <p className="rounded-xl border border-dashed border-border bg-card/60 p-6 text-sm text-muted-foreground">{tr.searchEmpty}</p>
       ) : grouped.length === 0 && !busy ? (
-        <p className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">{tr.searchNoResults}</p>
+        <p className="rounded-xl border border-dashed border-border bg-card/60 p-6 text-sm text-muted-foreground">{tr.searchNoResults}</p>
       ) : (
         <div className="space-y-8">
           {grouped.map((g) => (
             <section key={g.kind} aria-label={g.label}>
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 className="lg-eyebrow mb-3">
                 {g.label} <span className="font-normal">({g.items.length})</span>
               </h2>
               <div className="space-y-2">
                 {g.items.map((h) => (
-                  <Card key={h.id} className="transition-colors hover:border-emerald-600">
+                  <Card key={h.id} className="border-border/80 transition-all hover:border-primary/40 hover:shadow-sm">
                     <CardContent className="p-4">
                       <button className="w-full text-left" onClick={() => void openHit(h)}>
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-emerald-700">{entryIcon(h.kind, h.type)}</span>
+                          <span className="text-primary">{entryIcon(h.kind, h.type)}</span>
                           <span className="font-medium">
                             <Parts parts={h.title} />
                           </span>

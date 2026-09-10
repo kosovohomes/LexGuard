@@ -69,7 +69,7 @@ export function AdminView() {
           </CardHeader>
           <CardContent className="flex gap-2">
             <Input type="password" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void load()} aria-label={tr.adminGate} />
-            <Button className="bg-emerald-700 hover:bg-emerald-800" onClick={() => void load()}>
+            <Button onClick={() => void load()}>
               →
             </Button>
           </CardContent>
@@ -77,7 +77,7 @@ export function AdminView() {
       ) : (
         <div className="space-y-8">
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.aggregate}</h2>
+            <h2 className="lg-display text-xl mb-3">{tr.aggregate}</h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {[
                 { label: tr.totalUsers, v: data.stats.users },
@@ -88,10 +88,10 @@ export function AdminView() {
                 { label: tr.rulesCount, v: data.stats.rulesLive },
                 { label: tr.adminActionRate, v: data.stats.surveys?.actionRate != null ? `${Math.round(data.stats.surveys.actionRate * 100)}%` : "—" },
               ].map((s) => (
-                <Card key={s.label}>
+                <Card key={s.label} className="border-border/80">
                   <CardContent className="p-4 text-center">
-                    <p className="text-2xl font-bold">{s.v}</p>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    <p className="lg-display text-3xl">{s.v}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -104,7 +104,7 @@ export function AdminView() {
 
           {/* PRD §14 knowledge lift — anonymous pre/post averages */}
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.adminQuizTitle}</h2>
+            <h2 className="lg-display text-xl mb-3">{tr.adminQuizTitle}</h2>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { label: tr.adminQuizPre, v: data.stats.quiz?.preAvg != null ? `${data.stats.quiz.preAvg.toFixed(1)}/5` : "—", sub: `${data.stats.quiz?.preCount ?? 0}` },
@@ -115,10 +115,10 @@ export function AdminView() {
                   sub: "",
                 },
               ].map((s) => (
-                <Card key={s.label}>
+                <Card key={s.label} className="border-border/80">
                   <CardContent className="p-4 text-center">
-                    <p className="text-2xl font-bold">{s.v}</p>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    <p className="lg-display text-3xl">{s.v}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
                     {s.sub ? <p className="text-[10px] text-muted-foreground">n={s.sub}</p> : null}
                   </CardContent>
                 </Card>
@@ -129,13 +129,13 @@ export function AdminView() {
 
           {/* PRD §13 Phase 4 — anonymized aggregate reporting (k-anonymized counts) */}
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.adminPatternsTitle}</h2>
+            <h2 className="lg-display text-xl mb-3">{tr.adminPatternsTitle}</h2>
             <p className="mb-3 text-sm text-muted-foreground">
               {tr.adminPatternsIntro.replace("{considered}", String(data.stats.patterns?.totalCasesConsidered ?? 0)).replace("{min}", String(data.stats.patterns?.minCell ?? 5))}
             </p>
-            <div className="overflow-x-auto rounded-lg border">
+            <div className="overflow-x-auto rounded-xl border border-border/80">
               <table className="w-full text-sm">
-                <thead className="bg-muted/60 text-left">
+                <thead className="bg-secondary/70 text-left">
                   <tr>
                     <th className="p-3">{tr.adminPatternCat}</th>
                     <th className="p-3">TX</th>
@@ -162,26 +162,26 @@ export function AdminView() {
 
           {/* PRD §14 trust metric — anonymous content-correction requests */}
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.adminReportsTitle}</h2>
+            <h2 className="lg-display text-xl mb-3">{tr.adminReportsTitle}</h2>
             <p className="mb-3 text-sm text-muted-foreground">{tr.adminReportsIntro}</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-              <Card>
+              <Card className="border-border/80">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold">{data.stats.reports?.last30d ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">{tr.adminReports30d}</p>
+                  <p className="lg-display text-3xl">{data.stats.reports?.last30d ?? 0}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{tr.adminReports30d}</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="border-border/80">
                 <CardContent className="p-4 text-center">
-                  <p className="text-2xl font-bold">{data.stats.reports?.total ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">{tr.adminReportsTotal}</p>
+                  <p className="lg-display text-3xl">{data.stats.reports?.total ?? 0}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{tr.adminReportsTotal}</p>
                 </CardContent>
               </Card>
             </div>
             {(data.stats.reports?.recent?.length ?? 0) > 0 ? (
               <ul className="mt-3 space-y-2">
                 {data.stats.reports.recent.map((r) => (
-                  <li key={r.id} className="rounded-lg border p-3 text-sm">
+                  <li key={r.id} className="rounded-xl border border-border/80 p-3.5 text-sm">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline" className="capitalize">{r.category}</Badge>
                       {r.slug ? <code className="text-xs">{r.slug}</code> : null}
@@ -199,10 +199,10 @@ export function AdminView() {
           </section>
 
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.ruleLibrary}</h2>
-            <div className="overflow-x-auto rounded-lg border">
+            <h2 className="lg-display text-xl mb-3">{tr.ruleLibrary}</h2>
+            <div className="overflow-x-auto rounded-xl border border-border/80">
               <table className="w-full text-sm">
-                <thead className="bg-muted/60 text-left">
+                <thead className="bg-secondary/70 text-left">
                   <tr>
                     <th className="p-3">ID</th>
                     <th className="p-3">Trigger</th>
@@ -221,11 +221,11 @@ export function AdminView() {
                       <td className="p-3 capitalize">{r.severity}</td>
                       <td className="p-3">
                         {r.reviewer ? (
-                          <Badge className="bg-emerald-700">
+                          <Badge className="bg-primary text-primary-foreground">
                             {r.reviewer} · {r.reviewedAt}
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-amber-700">
+                          <Badge variant="outline" className="border-copper/50 text-copper">
                             {tr.pending}
                           </Badge>
                         )}
@@ -241,7 +241,7 @@ export function AdminView() {
 
           {/* Phase 5e — rules-as-JSON governance (PRD Open Question 2 / FR-3.4) */}
           <section>
-            <h2 className="mb-3 text-lg font-semibold">{tr.govTitle}</h2>
+            <h2 className="lg-display text-xl mb-3">{tr.govTitle}</h2>
             <p className="mb-3 text-sm text-muted-foreground">{tr.govIntro}</p>
             <div className="flex flex-wrap items-center gap-3">
               <Button
@@ -286,20 +286,20 @@ export function AdminView() {
               />
             </div>
             {govHash ? (
-              <p className="mt-3 break-all rounded-lg border bg-muted/60 p-3 font-mono text-xs">
+              <p className="mt-3 break-all rounded-lg border border-border/80 bg-secondary/60 p-3 font-mono text-xs">
                 {tr.govHash}: {govHash}
               </p>
             ) : null}
             {govResult ? (
-              <div className="mt-3 rounded-lg border p-3 text-sm">
+              <div className="mt-3 rounded-xl border border-border/80 p-3.5 text-sm">
                 {govResult.ok ? (
-                  <p className="font-medium text-emerald-800">
+                  <p className="font-medium text-primary">
                     {tr.govValid.replace("{count}", String(govResult.count))}
                     {govResult.changed.length > 0 ? ` — ${tr.govChanged.replace("{ids}", govResult.changed.join(", "))}` : ""}
                   </p>
                 ) : (
                   <div>
-                    <p className="font-medium text-red-700">{tr.govInvalid}</p>
+                    <p className="font-medium text-destructive">{tr.govInvalid}</p>
                     <ul className="mt-1 list-inside list-disc font-mono text-xs text-muted-foreground">
                       {govResult.errors.map((e2) => (
                         <li key={e2}>{e2}</li>
@@ -313,7 +313,7 @@ export function AdminView() {
           </section>
         </div>
       )}
-      {error ? <p className="mt-2 text-sm text-red-700">{tr.wrongPin}</p> : null}
+      {error ? <p className="mt-2 text-sm text-destructive">{tr.wrongPin}</p> : null}
       <p className="mt-4 text-xs text-muted-foreground">{app.locale === "es" ? "Código de demostración: lexguard-admin" : "Demo passcode: lexguard-admin"}</p>
     </div>
   );

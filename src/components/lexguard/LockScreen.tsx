@@ -25,10 +25,10 @@ export function LockScreen() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
       <div className="w-full max-w-xs space-y-4 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-700 text-white">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <Lock className="h-6 w-6" />
         </div>
-        <h1 className="text-xl font-bold">{tr.enterPin}</h1>
+        <h1 className="lg-display text-2xl">{tr.enterPin}</h1>
         <Input
           type="password"
           inputMode="numeric"
@@ -40,11 +40,11 @@ export function LockScreen() {
           onKeyDown={(e) => e.key === "Enter" && void submit()}
           aria-label={tr.enterPin}
         />
-        {wrong ? <p className="text-sm text-red-700">{tr.wrongPin}</p> : null}
-        <Button className="w-full bg-emerald-700 hover:bg-emerald-800" onClick={() => void submit()}>
+        {wrong ? <p className="text-sm text-destructive">{tr.wrongPin}</p> : null}
+        <Button className="w-full" onClick={() => void submit()}>
           →
         </Button>
-        <button className="text-sm text-red-700 hover:underline" onClick={() => window.location.replace("https://weather.com")}>
+        <button className="lg-link text-sm text-destructive" onClick={() => window.location.replace("https://weather.com")}>
           {tr.quickExit}
         </button>
       </div>

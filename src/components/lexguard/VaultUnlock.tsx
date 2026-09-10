@@ -39,10 +39,10 @@ export function VaultUnlock() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-xs space-y-4 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-700 text-white">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <KeyRound className="h-6 w-6" />
         </div>
-        <h1 className="text-xl font-bold">{tr.vaultUnlockTitle}</h1>
+        <h1 className="lg-display text-2xl">{tr.vaultUnlockTitle}</h1>
         <p className="text-sm text-muted-foreground">{tr.vaultUnlockSub}</p>
         <Input
           type="password"
@@ -54,12 +54,12 @@ export function VaultUnlock() {
           aria-label={tr.vaultPassphrase}
           disabled={busy}
         />
-        {wrong ? <p className="text-sm text-red-700">{tr.vaultWrong}</p> : null}
-        <Button className="w-full bg-emerald-700 hover:bg-emerald-800" onClick={() => void submit()} disabled={busy || !pass}>
+        {wrong ? <p className="text-sm text-destructive">{tr.vaultWrong}</p> : null}
+        <Button className="w-full" onClick={() => void submit()} disabled={busy || !pass}>
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {tr.vaultUnlockBtn}
         </Button>
         <p className="text-xs text-muted-foreground">{tr.vaultLostPass}</p>
-        <button className="text-sm text-red-700 hover:underline" onClick={() => window.location.replace("https://weather.com")}>
+        <button className="lg-link text-sm text-destructive" onClick={() => window.location.replace("https://weather.com")}>
           {tr.quickExit}
         </button>
       </div>
