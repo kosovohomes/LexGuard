@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ShieldAlert, Lock } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
+import { STATE_CODES, STATES } from "@/lib/lexguard/types";
 import type { USState } from "@/lib/lexguard/types";
 
 export function OnboardingView() {
@@ -16,10 +17,7 @@ export function OnboardingView() {
   const [step, setStep] = useState(0);
   const [situation, setSituation] = useState<string | null>(null);
 
-  const states: { code: USState; name: string }[] = [
-    { code: "TX", name: app.locale === "es" ? "Texas" : "Texas" },
-    { code: "CA", name: app.locale === "es" ? "California" : "California" },
-  ];
+  const states = STATE_CODES.map((code) => ({ code, name: app.locale === "es" ? STATES[code].nameEs : STATES[code].name }));
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -41,13 +39,14 @@ export function OnboardingView() {
                 key={s.code}
                 variant={app.userState === s.code ? "default" : "outline"}
                 size="lg"
-                className="h-24 text-lg justify-center bg-emerald-700 data-[state=on]"
+                className="h-24 flex-col gap-1 justify-center bg-emerald-700 data-[state=on]"
                 onClick={() => {
-                  app.setUserState(s.code);
+                  app.setUserState(s.code as USState);
                   setStep(1);
                 }}
               >
                 {s.name}
+                {STATES[s.code].expansion ? <span className="text-xs font-normal opacity-80">{tr.stateNew}</span> : null}
               </Button>
             ))}
           </CardContent>

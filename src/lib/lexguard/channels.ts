@@ -4,25 +4,13 @@
 // can and cannot do before routing. All facts from PRD Appendix A.
 
 import type { ChannelKind, Locale, USState } from "./types";
+import { CHANNELS_EXPANSION } from "./channels-expansion";
 
-export interface ChannelDef {
-  kind: ChannelKind;
-  name: { en: string; es: string };
-  tagline: { en: string; es: string };
-  canDo: { en: string[]; es: string[] };
-  cannotDo: { en: string[]; es: string[] };
-  prerequisites: { en: string[]; es: string[] };
-  windows: { en: string; es: string };
-  process: { en: string; es: string };
-  links: { label: string; url: string }[];
-  warnings: { en: string[]; es: string[] };
-  evidence: { en: string[]; es: string[] };
-  // optional county/region programs (PRD Appendix A: CA fee arbitration must
-  // "list major programs per region") — plain-language list, verify before use
-  regions?: { en: string[]; es: string[] };
-}
+export type { ChannelDef } from "./channels-shared";
+import type { ChannelDef } from "./channels-shared";
 
 export const CHANNELS: Record<USState, Record<ChannelKind, ChannelDef>> = {
+  ...CHANNELS_EXPANSION,
   TX: {
     discipline: {
       kind: "discipline",
@@ -515,6 +503,123 @@ export interface Recommendation {
 
 const MISCONDUCT_HARMS = ["abandonment", "missed_deadline", "settled_without_permission", "dishonesty", "file_not_returned"];
 
+// ---- Per-state CSF routing facts (discovery-window states) ------------------
+// TX keeps its special after-discipline flow below. Facts per PRD Appendix A
+// (CA) and docs/STATE_FACTS_PHASE5.md (FL/NY/AZ); verified 2026-09-10.
+interface CsfRouteFacts {
+  years: number;
+  cap: { en: string; es: string };
+  statusOk: { en: string; es: string };
+  statusAsk: { en: string; es: string };
+  late: { en: string; es: string };
+  feeOk: { en: string; es: string };
+  malDeadline: { en: string; es: string };
+}
+
+const CSF_ROUTE: Record<"CA" | "FL" | "NY" | "AZ", CsfRouteFacts> = {
+  CA: {
+    years: 4,
+    cap: { en: "max $100,000 per claim", es: "máximo $100,000 por reclamo" },
+    statusOk: {
+      en: "The lawyer has disciplinary status, which normally satisfies the Fund's attorney-status condition.",
+      es: "El abogado tiene estado disciplinario, lo que normalmente satisface la condición de estado del Fondo.",
+    },
+    statusAsk: {
+      en: "The Fund normally requires the lawyer to be disbarred/disciplined/resigned/deceased/adjudicated incompetent/judgment debtor/convicted — waivers are possible; ask the Fund directly (213-765-1140).",
+      es: "El Fondo normalmente exige que el abogado esté expulsado/disciplinado/renunciado/fallecido/incompetente/deudor de sentencia/condenado; hay excepciones posibles, pregunte al Fondo (213-765-1140).",
+    },
+    late: {
+      en: "The 4-year window from discovery appears to have passed. Confirm with the Fund (213-765-1140) — partial or later-discovery facts sometimes change the analysis.",
+      es: "La ventana de 4 años desde el descubrimiento parece vencida. Confirme con el Fondo (213-765-1140); hechos de descubrimiento posterior a veces cambian el análisis.",
+    },
+    feeOk: {
+      en: "Fee disagreements fit California's mandatory fee arbitration through local bar associations (e.g., LA County Bar, SF Bar) — often free or low-cost.",
+      es: "Los desacuerdos de honorarios encajan en el arbitraje obligatorio de California vía colegios locales (p. ej., LA County Bar, SF Bar), a menudo gratis o de bajo costo.",
+    },
+    malDeadline: {
+      en: "deadlines are strict (CA: generally 1 year from discovery)",
+      es: "los plazos son estrictos (CA: generalmente 1 año desde el descubrimiento)",
+    },
+  },
+  FL: {
+    years: 2,
+    cap: { en: "up to $50,000 per claim", es: "hasta $50,000 por reclamo" },
+    statusOk: {
+      en: "Florida's Fund reimburses the lawyer's misappropriation directly — a disciplinary outcome is not required first, but early filing helps.",
+      es: "El Fondo de Florida reembolsa directamente la apropiación indebida del abogado — no se exige primero un resultado disciplinario, pero presentar pronto ayuda.",
+    },
+    statusAsk: {
+      en: "Contact the Fund to confirm your facts qualify before relying on timing or eligibility assumptions.",
+      es: "Contacte al Fondo para confirmar que sus hechos califican antes de suponer plazos o elegibilidad.",
+    },
+    late: {
+      en: "The 2-year window from discovery appears to have passed. Confirm with the Fund — later-discovery facts sometimes change the analysis.",
+      es: "La ventana de 2 años desde el descubrimiento parece vencida. Confirme con el Fondo; hechos de descubrimiento posterior a veces cambian el análisis.",
+    },
+    feeOk: {
+      en: "Fee disagreements fit the Florida Bar's Legal Fee Arbitration Program — free and voluntary, either side can start it.",
+      es: "Los desacuerdos de honorarios encajan en el Programa de Arbitraje de Honorarios de The Florida Bar — gratuito y voluntario, cualquiera de las partes puede iniciarlo.",
+    },
+    malDeadline: {
+      en: "deadlines are strict (FL: generally 2 years from discovery, with a 4-year outer limit)",
+      es: "los plazos son estrictos (FL: generalmente 2 años desde el descubrimiento, con un límite exterior de 4 años)",
+    },
+  },
+  NY: {
+    years: 2,
+    cap: { en: "up to $450,000 per client loss", es: "hasta $450,000 por pérdida de un cliente" },
+    statusOk: {
+      en: "The Fund covers the lawyer's dishonest conduct directly — a disciplinary outcome is not required to apply.",
+      es: "El Fondo cubre directamente la conducta deshonesta del abogado — no se exige un resultado disciplinario para solicitar.",
+    },
+    statusAsk: {
+      en: "Contact the Fund to confirm your facts qualify before relying on timing or eligibility assumptions.",
+      es: "Contacte al Fondo para confirmar que sus hechos califican antes de suponer plazos o elegibilidad.",
+    },
+    late: {
+      en: "The 2-year window from the loss or its discovery appears to have passed. Confirm with the Fund (518-285-8350) — later-discovery facts sometimes change the analysis.",
+      es: "La ventana de 2 años desde la pérdida o su descubrimiento parece vencida. Confirme con el Fondo (518-285-8350); hechos de descubrimiento posterior a veces cambian el análisis.",
+    },
+    feeOk: {
+      en: "Fee disputes of $1,000–$50,000 fit the court system's Part 137 arbitration program — when the client starts it, the lawyer must participate.",
+      es: "Las disputas de honorarios de $1,000–$50,000 encajan en el programa de arbitraje de la Parte 137 — cuando el cliente lo inicia, el abogado debe participar.",
+    },
+    malDeadline: {
+      en: "deadlines are strict (NY: generally 3 years)",
+      es: "los plazos son estrictos (NY: generalmente 3 años)",
+    },
+  },
+  AZ: {
+    years: 5,
+    cap: { en: "up to $100,000 per claimant", es: "hasta $100,000 por reclamante" },
+    statusOk: {
+      en: "The Fund covers the lawyer's dishonest conduct directly — you do not need a disciplinary outcome to apply.",
+      es: "El Fondo cubre directamente la conducta deshonesta del abogado — no necesita un resultado disciplinario para solicitar.",
+    },
+    statusAsk: {
+      en: "Contact the Fund to confirm your facts qualify before relying on timing or eligibility assumptions.",
+      es: "Contacte al Fondo para confirmar que sus hechos califican antes de suponer plazos o elegibilidad.",
+    },
+    late: {
+      en: "The 5-year window from discovery appears to have passed. Confirm with the Fund — later-discovery facts sometimes change the analysis.",
+      es: "La ventana de 5 años desde el descubrimiento parece vencida. Confirme con el Fondo; hechos de descubrimiento posterior a veces cambian el análisis.",
+    },
+    feeOk: {
+      en: "Fee disputes over $1,000 fit the State Bar of Arizona's free, voluntary Fee Arbitration Program — including contingent fees.",
+      es: "Las disputas de honorarios mayores a $1,000 encajan en el Programa de Arbitraje gratuito y voluntario del State Bar of Arizona — incluidos honorarios contingentes.",
+    },
+    malDeadline: {
+      en: "deadlines are strict (AZ: generally 2 years)",
+      es: "los plazos son estrictos (AZ: generalmente 2 años)",
+    },
+  },
+};
+
+/** Discovery-window years for the router question label (TX uses a neutral phrasing). */
+export function csfWindowYears(state: USState): number | null {
+  return state === "TX" ? null : CSF_ROUTE[state].years;
+}
+
 export function route(state: USState, a: RouterAnswers): Recommendation[] {
   const rec: Recommendation[] = [];
   const en = (s: string) => ({ en: [s], es: [] }); // helper placeholders replaced below
@@ -551,6 +656,7 @@ export function route(state: USState, a: RouterAnswers): Recommendation[] {
       rec.push({ kind: "csf", fit: "not_now", reasons: { en: ["The Texas Fund covers stolen money and unearned fees only — it does not address malpractice, fee-amount disputes, or dissatisfaction with outcomes."], es: [] } });
     }
   } else {
+    const cf = CSF_ROUTE[state];
     if (moneyHarm) {
       if (a.discoveredWhen === "within_4y") {
         rec.push({
@@ -558,60 +664,87 @@ export function route(state: USState, a: RouterAnswers): Recommendation[] {
           fit: a.lawyerStatus === "disciplined" ? "recommended" : "possible",
           reasons: {
             en: [
-              `Your loss appears within the 4-year discovery window (max $100,000 per claim).`,
-              a.lawyerStatus === "disciplined"
-                ? "The lawyer has disciplinary status, which normally satisfies the Fund's attorney-status condition."
-                : "The Fund normally requires the lawyer to be disbarred/disciplined/resigned/deceased/adjudicated incompetent/judgment debtor/convicted — waivers are possible; ask the Fund directly (213-765-1140).",
+              `Your loss appears within the ${cf.years}-year discovery window (${cf.cap.en}).`,
+              a.lawyerStatus === "disciplined" ? cf.statusOk.en : cf.statusAsk.en,
             ],
-            es: [],
+            es: [
+              `Su pérdida parece estar dentro de la ventana de ${cf.years} años desde el descubrimiento (${cf.cap.es}).`,
+              a.lawyerStatus === "disciplined" ? cf.statusOk.es : cf.statusAsk.es,
+            ],
           },
         });
       } else {
-        rec.push({ kind: "csf", fit: "not_now", reasons: { en: ["The 4-year window from discovery appears to have passed. Confirm with the Fund (213-765-1140) — partial or later-discovery facts sometimes change the analysis."], es: [] } });
+        rec.push({ kind: "csf", fit: "not_now", reasons: { en: [cf.late.en], es: [cf.late.es] } });
       }
     } else if (a.moneyInvolved === "settlement") {
-      rec.push({ kind: "csf", fit: "possible", reasons: { en: ["Settlement funds held by a lawyer are exactly what the Fund covers when they are not paid out — log the amounts and dates, then check eligibility."], es: [] } });
+      rec.push({
+        kind: "csf",
+        fit: "possible",
+        reasons: {
+          en: ["Settlement funds held by a lawyer are exactly what the Fund covers when they are not paid out — log the amounts and dates, then check eligibility."],
+          es: ["Los fondos de acuerdo retenidos por un abogado son justo lo que cubre el Fondo cuando no se pagan; registre montos y fechas y verifique elegibilidad."],
+        },
+      });
     } else {
-      rec.push({ kind: "csf", fit: "not_now", reasons: { en: ["No money loss is involved. The Fund does not cover malpractice, fee disputes, or non-monetary harm."], es: [] } });
+      rec.push({
+        kind: "csf",
+        fit: "not_now",
+        reasons: {
+          en: ["No money loss is involved. The Fund does not cover malpractice, fee disputes, or non-monetary harm."],
+          es: ["No hay pérdida de dinero. El Fondo no cubre mala praxis, disputas de honorarios ni daños no monetarios."],
+        },
+      });
     }
   }
   void csn;
 
   // Fee channel fit
   if (a.harm.includes("fee_dispute") || a.goal === "resolve_fees") {
+    const feeReason =
+      state === "TX"
+        ? {
+            en: "Fee disagreements (what was charged vs. what was agreed) fit CAAP mediation; it is free and commonly used after a grievance is dismissed, but you can ask about it directly.",
+            es: "Los desacuerdos de honorarios (cobrado vs. acordado) encajan en la mediación CAAP; es gratuita y común tras desestimar una queja, pero puede consultar directamente.",
+          }
+        : CSF_ROUTE[state].feeOk;
+    rec.push({ kind: "fee", fit: "recommended", reasons: { en: [feeReason.en], es: [feeReason.es] } });
+  } else if (a.moneyInvolved === "fees") {
     rec.push({
       kind: "fee",
-      fit: "recommended",
+      fit: "possible",
       reasons: {
-        en: [
-          state === "TX"
-            ? "Fee disagreements (what was charged vs. what was agreed) fit CAAP mediation; it is free and commonly used after a grievance is dismissed, but you can ask about it directly."
-            : "Fee disagreements fit California's mandatory fee arbitration through local bar associations (e.g., LA County Bar, SF Bar) — often free or low-cost.",
-        ],
-        es: [],
+        en: ["Because you paid fees, the fee channel may still help if billing disagreements emerge alongside the other problems."],
+        es: ["Como pagó honorarios, el canal de honorarios puede ayudar si aparecen desacuerdos de cobro junto con los otros problemas."],
       },
     });
-  } else if (a.moneyInvolved === "fees") {
-    rec.push({ kind: "fee", fit: "possible", reasons: { en: ["Because you paid fees, the fee channel may still help if billing disagreements emerge alongside the other problems."], es: [] } });
   }
 
   // Malpractice — always informational (PRD: statute-of-limitations warning + referral)
   if (a.harm.includes("missed_deadline") || a.goal === "protect_case") {
+    const mal =
+      state === "TX"
+        ? { en: "deadlines are strict (TX: generally 2 years)", es: "los plazos son estrictos (TX: generalmente 2 años)" }
+        : CSF_ROUTE[state].malDeadline;
     rec.push({
       kind: "malpractice",
       fit: "possible",
       reasons: {
         en: [
-          "A missed deadline that damaged your case MAY be a malpractice question. This is a separate civil claim — deadlines are strict (TX: generally 2 years; CA: generally 1 year from discovery) — get a referral and check your deadline now.",
+          `A missed deadline that damaged your case MAY be a malpractice question. This is a separate civil claim — ${mal.en} — get a referral and check your deadline now.`,
         ],
-        es: [],
+        es: [
+          `Una fecha vencida que dañó su caso PUEDE ser una cuestión de mala praxis. Es una demanda civil separada — ${mal.es} — pida una referencia y verifique su plazo ahora.`,
+        ],
       },
     });
   } else {
     rec.push({
       kind: "malpractice",
       fit: "not_now",
-      reasons: { en: ["Nothing in your answers points to professional negligence yet. Keep the channel in mind if your case itself was harmed."], es: [] },
+      reasons: {
+        en: ["Nothing in your answers points to professional negligence yet. Keep the channel in mind if your case itself was harmed."],
+        es: ["Nada en sus respuestas apunta aún a negligencia profesional. Tenga presente este canal si su caso de fondo fue dañado."],
+      },
     });
   }
 

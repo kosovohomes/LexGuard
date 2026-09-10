@@ -2,6 +2,7 @@
 // Dual storage mode: 'account' (API + Prisma) and 'local' (browser-only, Mode B).
 // The red-flag engine, router, and dossier builder run on the same shapes in both.
 import { create } from "zustand";
+import { isUSState } from "./types";
 import type { CaseData, DocumentMeta, EntryData, EntryType, Locale, StorageMode, USState } from "./types";
 import { api, normalizeEntry } from "./api";
 import { localStore, type VaultStatus } from "./local";
@@ -136,7 +137,7 @@ export const useApp = create<AppState>((set, get) => ({
       const u = res.user;
       if (u) {
         set({ user: u, mode: "account" });
-        if (u.state === "TX" || u.state === "CA") set({ userState: u.state });
+        if (isUSState(u.state)) set({ userState: u.state });
         if (u.locale === "es" || u.locale === "en") set({ locale: u.locale });
       }
     } catch {

@@ -87,11 +87,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2 ml-auto">
             <Select value={app.userState ?? ""} onValueChange={(s) => app.setUserState(s as USState)} aria-label={tr.chooseState}>
               <SelectTrigger className="w-[74px] h-9" size="sm">
-                <SelectValue placeholder="TX/CA" />
+                <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="TX">Texas</SelectItem>
                 <SelectItem value="CA">California</SelectItem>
+                <SelectItem value="FL">Florida</SelectItem>
+                <SelectItem value="NY">New York</SelectItem>
+                <SelectItem value="AZ">Arizona</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="ghost" size="sm" className="gap-1" onClick={() => app.setLocale(app.locale === "en" ? "es" : "en")} aria-label="Language">

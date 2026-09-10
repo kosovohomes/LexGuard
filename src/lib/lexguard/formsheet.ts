@@ -6,7 +6,7 @@
 // worksheet the client reviews and transfers into the official form themselves;
 // LexGuard never files anything and never contacts anyone (PRD §3.3, §6.4).
 
-import type { CaseData, DocumentMeta, EntryData, Locale, Observation } from "./types";
+import type { CaseData, DocumentMeta, EntryData, Locale, Observation, USState } from "./types";
 import { CASE_TYPE_LABEL } from "./narrative";
 
 export interface WorksheetField {
@@ -75,25 +75,207 @@ function docIndex(documents: DocumentMeta[], locale: Locale): string {
   return documents.map((d) => `${d.filename} (${d.tags.join(", ")})`).join("\n");
 }
 
-export function worksheetForState(state: "TX" | "CA"): Worksheet {
-  const tx = state === "TX";
-  return {
+// ---- Per-state form configuration (Phase-5: FL/NY/AZ added) -----------------
+// TX/CA wording is unchanged from the Phase-4 build; the new states follow the
+// same education-first structure with facts verified on 2026-09-10.
+
+interface StateForm {
+  formName: { en: string; es: string };
+  where: { en: string; es: string };
+  lookup: { en: string; es: string };
+  fundRef: { en: string; es: string };
+  contactHeading: { en: string; es: string };
+  notices: { en: string[]; es: string[] };
+}
+
+const STATE_FORMS: Record<USState, StateForm> = {
+  TX: {
     formName: {
-      en: tx ? "Texas attorney grievance — field preparation worksheet" : "California State Bar attorney complaint — field preparation worksheet",
-      es: tx ? "Queja contra un abogado en Texas — hoja de preparación de campos" : "Queja ante el Colegio de Abogados de California — hoja de preparación de campos",
+      en: "Texas attorney grievance — field preparation worksheet",
+      es: "Queja contra un abogado en Texas — hoja de preparación de campos",
     },
-    where: tx
-      ? {
-          en: "File online at cdc.texasbar.com or mail to: State Bar of Texas, Chief Disciplinary Counsel's Office, P.O. Box 12487, Austin, TX 78711. Phone (866) 224-5999.",
-          es: "Presente en línea en cdc.texasbar.com o envíe por correo a: State Bar of Texas, Chief Disciplinary Counsel's Office, P.O. Box 12487, Austin, TX 78711. Teléfono (866) 224-5999.",
-        }
-      : {
-          en: "File online at calbar.ca.gov (Office of Chief Trial Counsel intake) or call 800-843-9053. The complaint form is available in English, Spanish, Vietnamese, Korean, Russian, Chinese, and Tagalog.",
-          es: "Presente en línea en calbar.ca.gov (intake de la Office of Chief Trial Counsel) o llame al 800-843-9053. El formulario está disponible en inglés, español, vietnamita, coreano, ruso, chino y tagalo.",
-        },
+    where: {
+      en: "File online at cdc.texasbar.com or mail to: State Bar of Texas, Chief Disciplinary Counsel's Office, P.O. Box 12487, Austin, TX 78711. Phone (866) 224-5999.",
+      es: "Presente en línea en cdc.texasbar.com o envíe por correo a: State Bar of Texas, Chief Disciplinary Counsel's Office, P.O. Box 12487, Austin, TX 78711. Teléfono (866) 224-5999.",
+    },
+    lookup: {
+      en: "Look it up in the public attorney search at texasbar.com",
+      es: "Búscalo en la búsqueda pública de abogados de texasbar.com",
+    },
+    fundRef: {
+      en: "for stolen or unearned funds see the Client Security Fund",
+      es: "para fondos robados o no devueltos vea el Fondo de Seguridad del Cliente",
+    },
+    contactHeading: { en: "A. About you (complainant)", es: "A. Sobre usted (querellante)" },
+    notices: {
+      en: [
+        "Signing the grievance form waives attorney-client privilege for the subject matter of the complaint — the bar and the lawyer will both see what you disclose about that subject.",
+        "Send copies only — never originals, never staples.",
+        "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
+        "The bar cannot give you legal advice. Free/low-cost help: TexasLawHelp.org, local legal aid, or the State Bar's Lawyer Referral & Information Service.",
+      ],
+      es: [
+        "Firmar el formulario de queja renuncia a la confidencialidad abogado-cliente sobre el tema de la queja — el colegio y el abogado verán lo que usted divulgue sobre ese tema.",
+        "Envíe solo copias — nunca originales, nunca grapas.",
+        "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
+        "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: TexasLawHelp.org, asistencia legal local o el Lawyer Referral & Information Service del colegio.",
+      ],
+    },
+  },
+  CA: {
+    formName: {
+      en: "California State Bar attorney complaint — field preparation worksheet",
+      es: "Queja ante el Colegio de Abogados de California — hoja de preparación de campos",
+    },
+    where: {
+      en: "File online at calbar.ca.gov (Office of Chief Trial Counsel intake) or call 800-843-9053. The complaint form is available in English, Spanish, Vietnamese, Korean, Russian, Chinese, and Tagalog.",
+      es: "Presente en línea en calbar.ca.gov (intake de la Office of Chief Trial Counsel) o llame al 800-843-9053. El formulario está disponible en inglés, español, vietnamita, coreano, ruso, chino y tagalo.",
+    },
+    lookup: {
+      en: "Look it up in the public attorney search at calbar.ca.gov",
+      es: "Búscalo en el directorio público de abogados de calbar.ca.gov",
+    },
+    fundRef: {
+      en: "for stolen or unearned funds see the Client Security Fund",
+      es: "para fondos robados o no devueltos vea el Fondo de Seguridad del Cliente",
+    },
+    contactHeading: {
+      en: "A. Your contact information (providing it is optional but helps the bar follow up)",
+      es: "A. Su información de contacto (es opcional pero ayuda al colegio a darle seguimiento)",
+    },
+    notices: {
+      en: [
+        "You may file a complaint without giving your name, but providing contact information lets the bar ask you follow-up questions.",
+        "Discipline cannot order the lawyer to return money — for stolen funds or unearned fees, see the Client Security Fund (4-year window from discovery).",
+        "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
+        "The bar cannot give you legal advice. Free/low-cost help: local legal aid, law school clinics, or the State Bar's Lawyer Referral Service Directory.",
+      ],
+      es: [
+        "Puede presentar una queja sin dar su nombre, pero dar datos de contacto permite al colegio hacerle preguntas de seguimiento.",
+        "La disciplina no puede ordenar al abogado devolver dinero — para fondos robados u honorarios no devueltos, vea el Fondo de Seguridad del Cliente (ventana de 4 años desde el descubrimiento).",
+        "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
+        "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: asistencia legal local, clínicas legales universitarias o el directorio de referidos del Colegio de Abogados.",
+      ],
+    },
+  },
+  FL: {
+    formName: {
+      en: "The Florida Bar attorney complaint — field preparation worksheet",
+      es: "Queja ante The Florida Bar — hoja de preparación de campos",
+    },
+    where: {
+      en: "Start with the Attorney Consumer Assistance Program (ACAP): toll-free 1-866-352-0707, or submit the Inquiry/Complaint form via floridabar.org. ACAP is the central intake for complaints against all Florida lawyers.",
+      es: "Comience con el Programa de Asistencia al Consumidor (ACAP): gratis al 1-866-352-0707, o presente el formulario de consulta/queja en floridabar.org. ACAP es la recepción central de quejas contra todos los abogados de Florida.",
+    },
+    lookup: {
+      en: "Look it up in the public attorney search at floridabar.org",
+      es: "Búscalo en el directorio público de abogados de floridabar.org",
+    },
+    fundRef: {
+      en: "for stolen or unearned funds see the Clients' Security Fund (2-year window from discovery)",
+      es: "para fondos robados o no devueltos vea el Fondo de Seguridad del Cliente (ventana de 2 años desde el descubrimiento)",
+    },
+    contactHeading: {
+      en: "A. Your contact information (providing it helps ACAP follow up)",
+      es: "A. Su información de contacto (darla ayuda a ACAP a darle seguimiento)",
+    },
+    notices: {
+      en: [
+        "ACAP reviews every complaint first; matters that may involve a rule violation move to Disciplinary Counsel.",
+        "Discipline cannot order the lawyer to return money — for stolen funds, see the Clients' Security Fund (2-year window from discovery).",
+        "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
+        "The bar cannot give you legal advice. Free/low-cost help: FloridaLawHelp.org, local legal aid, or the Florida Bar's Lawyer Referral Service.",
+      ],
+      es: [
+        "ACAP revisa primero toda queja; los asuntos que puedan implicar violación de reglas pasan a los abogados disciplinarios.",
+        "La disciplina no puede ordenar al abogado devolver dinero — para fondos robados, vea el Fondo de Seguridad del Cliente (ventana de 2 años desde el descubrimiento).",
+        "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
+        "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: FloridaLawHelp.org, asistencia legal local o el servicio de referidos de The Florida Bar.",
+      ],
+    },
+  },
+  NY: {
+    formName: {
+      en: "New York attorney grievance — field preparation worksheet",
+      es: "Queja contra un abogado en Nueva York — hoja de preparación de campos",
+    },
+    where: {
+      en: "File with the Attorney Grievance Committee for the Appellate Division department where the lawyer's office is located — forms and committee addresses at nycourts.gov/attorney-grievance-committees.",
+      es: "Presente ante el Comité de Agravios del departamento de la Appellate Division donde está la oficina del abogado — formularios y direcciones en nycourts.gov/attorney-grievance-committees.",
+    },
+    lookup: {
+      en: "Look it up in the unified court system's attorney search",
+      es: "Búscalo en la búsqueda de abogados del sistema unificado de tribunales",
+    },
+    fundRef: {
+      en: "for stolen funds see the Lawyers' Fund for Client Protection (2-year window from the loss or discovery)",
+      es: "para fondos robados vea el Fondo de Protección del Cliente (ventana de 2 años desde la pérdida o su descubrimiento)",
+    },
+    contactHeading: {
+      en: "A. Your contact information (providing it helps the committee follow up)",
+      es: "A. Su información de contacto (darla ayuda al comité a darle seguimiento)",
+    },
+    notices: {
+      en: [
+        "File in the judicial department where the lawyer's office is located — the committee directory shows which office covers your county.",
+        "Discipline cannot order the lawyer to return money — for stolen funds, see the Lawyers' Fund for Client Protection (2-year window).",
+        "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
+        "The committee cannot give you legal advice. Free/low-cost help: LawHelpNY.org, local legal aid, or a bar association referral service.",
+      ],
+      es: [
+        "Presente en el departamento judicial donde está la oficina del abogado — el directorio de comités muestra qué oficina cubre su condado.",
+        "La disciplina no puede ordenar al abogado devolver dinero — para fondos robados, vea el Fondo de Protección del Cliente (ventana de 2 años).",
+        "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
+        "El comité no puede darle asesoría legal. Ayuda gratuita o de bajo costo: LawHelpNY.org, asistencia legal local o un servicio de referidos de colegios de abogados.",
+      ],
+    },
+  },
+  AZ: {
+    formName: {
+      en: "State Bar of Arizona charge of misconduct — field preparation worksheet",
+      es: "Carga de mala conducta ante el State Bar of Arizona — hoja de preparación de campos",
+    },
+    where: {
+      en: "Call the Attorney/Consumer Assistance Program (ACAP) at 602-340-7280 first, then submit the online charge of misconduct (tools.azbar.org) or a written complaint to the Lawyer Regulation Office.",
+      es: "Llame primero al Programa de Asistencia al Consumidor (ACAP) al 602-340-7280, luego presente la carga de mala conducta en línea (tools.azbar.org) o una queja escrita a la Oficina de Regulación de Abogados.",
+    },
+    lookup: {
+      en: "Look it up in the public attorney search at azbar.org",
+      es: "Búscalo en la búsqueda pública de abogados de azbar.org",
+    },
+    fundRef: {
+      en: "for stolen or unearned funds see the Client Protection Fund (5-year window from discovery)",
+      es: "para fondos robados o no devueltos vea el Fondo de Protección del Cliente (ventana de 5 años desde el descubrimiento)",
+    },
+    contactHeading: {
+      en: "A. Your contact information (providing it helps the bar follow up)",
+      es: "A. Su información de contacto (darla ayuda al colegio a darle seguimiento)",
+    },
+    notices: {
+      en: [
+        "Calling ACAP before filing is encouraged — staff can explain the process and whether your concern is a discipline matter.",
+        "Discipline cannot order the lawyer to return money — for stolen funds, see the Client Protection Fund (5-year window from discovery).",
+        "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
+        "The bar cannot give you legal advice. Free/low-cost help: AZLawHelp.org, Community Legal Services, or the State Bar's lawyer referral service.",
+      ],
+      es: [
+        "Se recomienda llamar a ACAP antes de presentar — el personal puede explicar el proceso y si su preocupación es un asunto disciplinario.",
+        "La disciplina no puede ordenar al abogado devolver dinero — para fondos robados, vea el Fondo de Protección del Cliente (ventana de 5 años desde el descubrimiento).",
+        "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
+        "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: AZLawHelp.org, Community Legal Services o el servicio de referidos del colegio.",
+      ],
+    },
+  },
+};
+
+export function worksheetForState(state: USState): Worksheet {
+  const f = STATE_FORMS[state];
+  return {
+    formName: f.formName,
+    where: f.where,
     sections: [
       {
-        heading: tx ? { en: "A. About you (complainant)", es: "A. Sobre usted (querellante)" } : { en: "A. Your contact information (providing it is optional but helps the bar follow up)", es: "A. Su información de contacto (es opcional pero ayuda al colegio a darle seguimiento)" },
+        heading: f.contactHeading,
         fields: [
           { label: { en: "Full name", es: "Nombre completo" }, value: "" },
           { label: { en: "Phone", es: "Teléfono" }, value: "" },
@@ -144,10 +326,8 @@ export function worksheetForState(state: "TX" | "CA"): Worksheet {
         fields: [
           {
             label: {
-              en: tx
-                ? "What do you want the State Bar to look into? (Discipline can sanction the lawyer; it cannot order money back — for stolen or unearned funds see the Client Security Fund)"
-                : "What do you want the State Bar to look into? (Discipline can sanction the lawyer; it cannot order money back — for stolen or unearned funds see the Client Security Fund)",
-              es: "¿Qué quiere que el Colegio investigue? (La disciplina puede sancionar al abogado; no puede ordenar la devolución del dinero — para fondos robados o no devueltos vea el Fondo de Seguridad del Cliente)",
+              en: `What do you want the bar to look into? (Discipline can sanction the lawyer; it cannot order money back — ${f.fundRef.en})`,
+              es: `¿Qué quiere que el colegio investigue? (La disciplina puede sancionar al abogado; no puede ordenar la devolución del dinero — ${f.fundRef.es})`,
             },
             value: "",
             multiline: true,
@@ -155,35 +335,7 @@ export function worksheetForState(state: "TX" | "CA"): Worksheet {
         ],
       },
     ],
-    notices: tx
-      ? {
-          en: [
-            "Signing the grievance form waives attorney-client privilege for the subject matter of the complaint — the bar and the lawyer will both see what you disclose about that subject.",
-            "Send copies only — never originals, never staples.",
-            "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
-            "The bar cannot give you legal advice. Free/low-cost help: TexasLawHelp.org, local legal aid, or the State Bar's Lawyer Referral & Information Service.",
-          ],
-          es: [
-            "Firmar el formulario de queja renuncia a la confidencialidad abogado-cliente sobre el tema de la queja — el colegio y el abogado verán lo que usted divulgue sobre ese tema.",
-            "Envíe solo copias — nunca originales, nunca grapas.",
-            "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
-            "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: TexasLawHelp.org, asistencia legal local o el Lawyer Referral & Information Service del colegio.",
-          ],
-        }
-      : {
-          en: [
-            "You may file a complaint without giving your name, but providing contact information lets the bar ask you follow-up questions.",
-            "Discipline cannot order the lawyer to return money — for stolen funds or unearned fees, see the Client Security Fund (4-year window from discovery).",
-            "This worksheet was generated from your own journal. Review every field and edit freely before transferring it to the official form. LexGuard does not file complaints.",
-            "The bar cannot give you legal advice. Free/low-cost help: local legal aid, law school clinics, or the State Bar's Lawyer Referral Service Directory.",
-          ],
-          es: [
-            "Puede presentar una queja sin dar su nombre, pero dar datos de contacto permite al colegio hacerle preguntas de seguimiento.",
-            "La disciplina no puede ordenar al abogado devolver dinero — para fondos robados u honorarios no devueltos, vea el Fondo de Seguridad del Cliente (ventana de 4 años desde el descubrimiento).",
-            "Esta hoja se generó a partir de su propio diario. Revise cada campo y edítelo libremente antes de pasarlo al formulario oficial. LexGuard no presenta quejas.",
-            "El colegio no puede darle asesoría legal. Ayuda gratuita o de bajo costo: asistencia legal local, clínicas legales universitarias o el directorio de referidos del Colegio de Abogados.",
-          ],
-        },
+    notices: f.notices,
   };
 }
 
@@ -196,7 +348,7 @@ export function buildWorksheet(
   observations: Observation[],
   locale: Locale,
 ): Worksheet {
-  const ws = worksheetForState(caseRow.state === "CA" ? "CA" : "TX");
+  const ws = worksheetForState(caseRow.state);
   const es = locale === "es";
   const typeLabel = CASE_TYPE_LABEL[caseRow.caseType]?.[locale] ?? caseRow.caseType;
   const totalPaid = entries.filter((e) => e.type === "payment").reduce((s, e) => s + (((e.data as { amount?: number }).amount ?? 0) as number), 0);
@@ -214,13 +366,7 @@ export function buildWorksheet(
   set(
     1,
     3,
-    caseRow.state === "CA"
-      ? es
-        ? "Búscalo en el directorio público de abogados de calbar.ca.gov"
-        : "Look it up in the public attorney search at calbar.ca.gov"
-      : es
-        ? "Búscalo en la búsqueda pública de abogados de texasbar.com"
-        : "Look it up in the public attorney search at texasbar.com",
+    STATE_FORMS[caseRow.state].lookup[es ? "es" : "en"],
   );
   // C. representation facts — derived from the case record
   set(2, 0, typeLabel);

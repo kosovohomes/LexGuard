@@ -125,3 +125,29 @@ Stage Summary:
 - Phase 4 complete: all PRD items buildable without external decisions are implemented, verified EN/ES in both storage modes
 - Remaining decision-gated (PRD's own language): FL/NY/AZ expansion (needs verified facts + counsel sign-off), email reminder digests (Open Q4), soft-delete window (Open Q5), rules-as-JSON authoring (Open Q2), full admin content-management workflow (FR-8 beyond stats)
 - Pitfalls for future agents: zustand savePrefs persists FULL state via get() (bloat; filter before persist if touched); local.ts persistence is debounced — always keep memDb as single source of truth; optional chaining must be applied at every segment (ch.regions?.[locale]?.length)
+
+---
+Task ID: 6
+Agent: Super Z (main agent)
+Task: Phase 5a — multi-state expansion (FL/NY/AZ) per PRD §13 Phase-4 deferred item; push to GitHub
+
+Work Log:
+- Fact research: verified FL/NY/AZ remedy facts from official public sources (floridabar.org ACAP/CSF/fee arbitration, nycourts.gov grievance committees + Part 137, nylawfund.org, azbar.org LRO/CPF/fee arbitration); direct site access blocked by bot protection — cross-checked via multiple search captures + Fund claim packets; recorded in docs/STATE_FACTS_PHASE5.md with re-verify checklist
+- types.ts: USState widened to 5 states; STATES registry (name/bar/factsVerified/expansion flag) + STATE_CODES + isUSState guard
+- rules.ts: v1.1.0; CORE_RULES (TX/CA citations) + EXPANSION_CITATIONS map (equivalent RPC/ER citations per rule per state) merged into exported RULES; states now ["TX","CA","FL","NY","AZ"] (engine fire() picks up automatically)
+- channels: new channels-shared.ts (ChannelDef) + channels-expansion.ts (~850 lines: full bilingual 4-channel sets for FL/NY/AZ — ACAP intake, Clients' Security Fund/CFP caps+windows, fee arbitration programs, malpractice info); CHANNELS = { ...EXPANSION, TX, CA }
+- deadlines.ts: statutory windows refactored to config tables — FUND_WINDOWS (TX after-discipline mode; CA 4y/FL 2y/NY 2y/AZ 5y discovery modes with caps) + MALPRACTICE_SOL (TX 2y, CA 1y, FL 2y+4y repose, NY 3y CPLR 214, AZ 2y A.R.S. 12-542); TX/CA wording preserved verbatim
+- formsheet.ts: STATE_FORMS per-state config (formName/where/lookup/fundRef/contactHeading/notices) — TX/CA unchanged, FL/NY/AZ added; buildWorksheet + pdf.ts now pass the real state
+- channels.ts route(): CSF_ROUTE per-state routing facts (years/cap/status/late/fee/malpractice) replace the CA-only else-branch; fee + malpractice reasons now per-state with inline ES; new csfWindowYears() helper
+- Router.tsx: discovery-question labels now state-aware ("Within the last {years} years" via disc_within_st/disc_over_st i18n keys; TX keeps neutral phrasing)
+- guides: stateNotes type widened to USState; guides-expansion.ts adds FL/NY/AZ notes for all 10 guides; merged merge-over-write in guides.ts
+- directory.ts: 9 new entries (3 per state: LSC legal aid / bar referral / self-help portals) with EXPANSION_VERIFIED date
+- UI: Onboarding 5-state picker with "New — attorney review pending" caption; AppShell Select 5 states; store.ts validates via isUSState; aggregate.ts patterns table covers 5 states; engine RF-20 state note per state (NY $3,000 engagement letter / FL+AZ contingency-writing / CA $1,000 / TX reasonableness)
+- i18n: stateNew, expansionNote, disc_within_st, disc_over_st (EN/ES parity, compile-enforced)
+- E2E (agent-browser, local mode): onboarding shows 5 states with pending captions → FL local mode → remedy router: money-stolen+fees+within-2y+money-back → ACAP discipline recommended, FL CSF "2-year discovery window (up to $50,000 per claim)", FL fee arbitration; ES toggle verified (ventana de 2 años, Fondo de Seguridad del Cliente); directory shows FL entries
+- Gates: tsc clean, eslint clean, production build clean; prisma client regenerated (quizResponse was stale after env refresh)
+
+Stage Summary:
+- Phase 5a complete: product now covers 5 states; expansion states honestly labeled "attorney review pending" per PRD content-review gate
+- All TX/CA wording preserved verbatim (no regression risk); new-state facts isolated in expansion files for the future counsel sign-off pass
+- Pitfall: when widening a Record key union (USState), Record<USState, X> fields on authored data break — split into CoreRule/EXPANSION map pattern; Partial<Record> spreads need non-partial source types

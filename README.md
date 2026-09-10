@@ -1,12 +1,12 @@
 # LexGuard
 
-**Client-side attorney accountability & case documentation platform — Texas & California (Phase 4)**
+**Client-side attorney accountability & case documentation platform — Texas, California, Florida, New York & Arizona (Phase 5)**
 
 LexGuard is a lawyer-free web application that helps individuals dealing with (or who have dealt with) an attorney to:
 
-1. **Understand their rights** as legal clients — in plain language, specific to their state (TX/CA), bilingual EN/ES.
+1. **Understand their rights** as legal clients — in plain language, specific to their state (TX/CA launch; FL/NY/AZ expansion), bilingual EN/ES.
 2. **Document everything** — communications, payments, promises, documents, deadlines — in a structured, timestamped case journal.
-3. **Detect potential misconduct patterns** through a neutral, rules-based red-flag engine that compares the client's facts against the Rules of Professional Conduct (20 rules, TX/CA citations).
+3. **Detect potential misconduct patterns** through a neutral, rules-based red-flag engine that compares the client's facts against the Rules of Professional Conduct (20 rules with per-state citations across TX/CA/FL/NY/AZ).
 4. **Act** — by generating a complaint-ready evidence dossier (PDF) and routing the user to the correct remedy channel: state bar discipline, Client Security Fund, fee arbitration/mediation, or malpractice referral.
 
 > **Core thesis:** the machinery to hold attorneys accountable already exists (state bar discipline, Client Security Funds, fee arbitration). It fails mainly because victims don't know it exists and file vague, undocumented complaints. LexGuard fixes the information and documentation gap.
@@ -25,9 +25,9 @@ LexGuard is a lawyer-free web application that helps individuals dealing with (o
 | Area | What's included |
 |---|---|
 | Case journal | Structured entries (communications, payments, promises, documents, deadlines); entries are immutable with visible edit markers |
-| Red-flag engine | 20 deterministic, versioned rules (v1.0.0) mapped to TX/CA Rules of Professional Conduct; neutral bilingual templates; attorney sign-off status tracked honestly ("pending") |
-| Remedy router | 4 channels × TX/CA with can/cannot-do lists, deadlines, exclusions, process steps, evidence checklists; TX privilege-waiver warning at the decision point |
-| Rights guides | 10 guides × TX/CA state notes × EN/ES with last-reviewed dates |
+| Red-flag engine | 20 deterministic, versioned rules (v1.1.0) with per-state citations (TX/CA verified per PRD Appendix A; FL/NY/AZ verified from official sources 2026-09-10, attorney review pending); neutral bilingual templates; attorney sign-off status tracked honestly ("pending") |
+| Remedy router | 4 channels × 5 states with can/cannot-do lists, deadlines, exclusions, process steps, evidence checklists; TX privilege-waiver warning at the decision point |
+| Rights guides | 10 guides × 5-state notes × EN/ES with last-reviewed dates |
 | Dossier | Deterministic first-person narrative + print-ready PDF (7 sections, unbranded toggle, timeline/money/documents tables) |
 | Storage modes | Account mode (server) **and** anonymous local Mode B (localStorage, 1 MB file cap with warning) |
 | Safety | Quick exit (replaces history → weather site), discreet mode (tab title → "My Notes"), PIN lock with 10-min auto-lock |
@@ -111,7 +111,7 @@ src/components/lexguard/     UI views (single-page app at /)
 
 ## Scope & status
 
-Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. **Phase 3 (deepening, PRD §13) adds document text extraction (PDF layer + on-device OCR), global search, mobile quick log, and 30/90-day outcome tracking** — all browser-verified in both storage modes. **Phase 4 implements the PRD's remaining buildable items: the knowledge-lift quiz, anonymized aggregate reporting with k-anonymity, the complaint-form worksheet, the zero-knowledge vault, upload integrity scanning, voice notes, CA county fee-arbitration listings, and the status page** — browser-verified in both storage modes and both languages. Still decision-gated per PRD: additional states (FL/NY/AZ, needs counsel sign-off), email reminder digests (Open Question 4), soft-delete retention (Open Question 5), and rules-as-JSON authoring (Open Question 2 governance). See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
+Phase 1 (TX + CA) MVP is implemented and browser-verified end to end (onboarding → journal → red flags → remedy routing → PDF dossier → bilingual toggle → safety features). **Phase 2 (public launch) adds the referral directory, deadline intelligence, legal/trust pages, the age gate, and the accessibility pass** — also browser-verified. **Phase 3 (deepening, PRD §13) adds document text extraction (PDF layer + on-device OCR), global search, mobile quick log, and 30/90-day outcome tracking** — all browser-verified in both storage modes. **Phase 4 implements the PRD's remaining buildable items: the knowledge-lift quiz, anonymized aggregate reporting with k-anonymity, the complaint-form worksheet, the zero-knowledge vault, upload integrity scanning, voice notes, CA county fee-arbitration listings, and the status page** — browser-verified in both storage modes and both languages. **Phase 5 adds the PRD's deferred expansion states — Florida, New York, and Arizona — with remedy channels, complaint worksheets, fund windows, guide notes, referral-directory listings, and rule citations verified from official public sources (see `docs/STATE_FACTS_PHASE5.md`); these states are clearly labeled "attorney review pending" in the product.** Still decision-gated per PRD: formal counsel sign-off for FL/NY/AZ content, email reminder digests (Open Question 4), soft-delete retention (Open Question 5), and rules-as-JSON authoring (Open Question 2 governance). See `docs/LexGuard_PRD_TX_CA_v1.0.md` for the full product requirements, including explicit non-goals (no lawyer-facing features, no public ratings, no outcome promises).
 
 ## Legal disclaimer
 

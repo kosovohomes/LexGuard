@@ -1,7 +1,35 @@
 // LexGuard shared domain types (PRD §6, §7, §8, §10)
 
-export type USState = "TX" | "CA";
+export type USState = "TX" | "CA" | "FL" | "NY" | "AZ";
 export type Locale = "en" | "es";
+
+// ---- State registry (PRD §13 Phase-4 deferred item: additional states) ----
+// TX/CA are the launch states whose facts were verified per PRD Appendix A.
+// FL/NY/AZ are the Phase-5 expansion states: their remedy facts were verified
+// from official public sources on 2026-09-10 (see docs/STATE_FACTS_PHASE5.md)
+// and formal licensed-attorney review is still pending — surfaced in the UI.
+
+export interface StateInfo {
+  name: string;
+  nameEs: string;
+  bar: string; // the body that licenses & disciplines attorneys
+  factsVerified: string; // ISO date of the latest public-source verification
+  expansion: boolean; // true = Phase-5 state, formal attorney review pending
+}
+
+export const STATES: Record<USState, StateInfo> = {
+  TX: { name: "Texas", nameEs: "Texas", bar: "State Bar of Texas", factsVerified: "2026-09-09", expansion: false },
+  CA: { name: "California", nameEs: "California", bar: "State Bar of California", factsVerified: "2026-09-09", expansion: false },
+  FL: { name: "Florida", nameEs: "Florida", bar: "The Florida Bar", factsVerified: "2026-09-10", expansion: true },
+  NY: { name: "New York", nameEs: "Nueva York", bar: "New York State Unified Court System (Appellate Divisions)", factsVerified: "2026-09-10", expansion: true },
+  AZ: { name: "Arizona", nameEs: "Arizona", bar: "State Bar of Arizona", factsVerified: "2026-09-10", expansion: true },
+};
+
+export const STATE_CODES = ["TX", "CA", "FL", "NY", "AZ"] as const;
+
+export const isUSState = (v: unknown): v is USState =>
+  typeof v === "string" && (STATE_CODES as readonly string[]).includes(v);
+
 export type StorageMode = "local" | "account";
 
 export type CaseType =

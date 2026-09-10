@@ -14,6 +14,7 @@ export interface ReferralEntry {
 }
 
 export const DIRECTORY_VERIFIED = "2026-09-09";
+export const EXPANSION_VERIFIED = "2026-09-10"; // FL/NY/AZ fact-verification date (Phase 5)
 
 export const REFERRALS: ReferralEntry[] = [
   {
@@ -183,6 +184,108 @@ export const REFERRALS: ReferralEntry[] = [
     note: {
       en: "Free/low-cost clinics list maintained by the State Bar.",
       es: "Lista de clínicas gratuitas/de bajo costo mantenida por el Colegio.",
+    },
+  },
+  // ---- Phase-5 expansion states (FL / NY / AZ) ------------------------------
+  // Public, official or LSC-funded resources only — same vetting bar as the
+  // launch states. Verified 2026-09-10; re-verify at publication.
+  {
+    name: "FloridaLawHelp.org",
+    kind: "legal_aid",
+    url: "https://www.floridalawhelp.org",
+    states: ["FL"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "Free civil legal information and legal-aid directory for Floridians (LSC network).",
+      es: "Información legal civil gratuita y directorio de asistencia legal para floridanos (red LSC).",
+    },
+  },
+  {
+    name: "The Florida Bar Lawyer Referral Service",
+    kind: "referral_service",
+    url: "https://www.floridabar.org/public/lrs/",
+    states: ["FL"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "The Bar's official referral service — connects you to a screened attorney for a consultation.",
+      es: "El servicio oficial de referidos del Colegio — lo conecta con un abogado evaluado para una consulta.",
+    },
+  },
+  {
+    name: "The Florida Bar — Consumer & ACAP",
+    kind: "self_help",
+    url: "https://www.floridabar.org/public/acap/",
+    states: ["FL"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "Attorney Consumer Assistance Program — the central intake for complaints and consumer guidance.",
+      es: "Programa de Asistencia al Consumidor — la recepción central de quejas y orientación al consumidor.",
+    },
+  },
+  {
+    name: "LawHelpNY.org",
+    kind: "legal_aid",
+    url: "https://www.lawhelpny.org",
+    states: ["NY"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "Free civil legal information and legal-aid directory for New Yorkers (LSC network).",
+      es: "Información legal civil gratuita y directorio de asistencia legal para neoyorquinos (red LSC).",
+    },
+  },
+  {
+    name: "NY Courts Help Center (CourtHelp)",
+    kind: "self_help",
+    url: "https://www.nycourts.gov/courthelp/",
+    states: ["NY"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "The Unified Court System's plain-language guide to courts, forms, and representing yourself.",
+      es: "La guía en lenguaje sencillo del Sistema Unificado de Tribunales sobre tribunales, formularios y representarse a sí mismo.",
+    },
+  },
+  {
+    name: "NYS Bar Association Lawyer Referral & Information Service",
+    kind: "referral_service",
+    url: "https://nysba.org/for-the-public/lawyer-referral-service/",
+    states: ["NY"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "Statewide referral service — matches you with a lawyer for an initial consultation.",
+      es: "Servicio de referidos estatal — lo empareja con un abogado para una consulta inicial.",
+    },
+  },
+  {
+    name: "Community Legal Services of Arizona",
+    kind: "legal_aid",
+    url: "https://www.clsaz.org",
+    states: ["AZ"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "LSC-funded legal aid serving low-income Arizonans (Maricopa, Pima and nearby counties).",
+      es: "Asistencia legal con fondos LSC para arizonenses de bajos ingresos (condados Maricopa, Pima y cercanos).",
+    },
+  },
+  {
+    name: "AZLawHelp.org",
+    kind: "self_help",
+    url: "https://www.azlawhelp.org",
+    states: ["AZ"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "Arizona's legal-information portal with articles and referrals for common civil problems.",
+      es: "Portal de información legal de Arizona con artículos y referidos para problemas civiles comunes.",
+    },
+  },
+  {
+    name: "State Bar of Arizona Lawyer Referral Service",
+    kind: "referral_service",
+    url: "https://www.azbar.org/for-the-public/lawyer-referral-service/",
+    states: ["AZ"],
+    verified: EXPANSION_VERIFIED,
+    note: {
+      en: "The Bar's referral service — an initial consultation with a participating attorney at reduced cost.",
+      es: "El servicio de referidos del colegio — una consulta inicial con un abogado participante a costo reducido.",
     },
   },
 ];

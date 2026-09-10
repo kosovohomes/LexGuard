@@ -10,7 +10,7 @@
 
 import type { ChannelKind, Locale, Severity, USState } from "./types";
 
-export const RULE_LIBRARY_VERSION = "1.0.0";
+export const RULE_LIBRARY_VERSION = "1.1.0";
 
 export type TriggerType =
   | "settlement_no_disbursement"
@@ -49,9 +49,15 @@ export interface RedFlagRule {
   effectiveFrom: string; // ISO date
 }
 
+// Core (authored) rules carry launch-state citations only; expansion-state
+// citations are merged programmatically in RULES below.
+interface CoreRule extends Omit<RedFlagRule, "citations"> {
+  citations: Record<"TX" | "CA", string[]>;
+}
+
 const D = "2026-09-09"; // library effective date (PRD date)
 
-export const RULES: RedFlagRule[] = [
+export const CORE_RULES: CoreRule[] = [
   {
     id: "RF-01",
     trigger: "settlement_no_disbursement",
@@ -530,6 +536,103 @@ export function interpolate(
 export function ruleCitationString(rule: RedFlagRule, state: USState): string {
   return rule.citations[state].join("; ");
 }
+
+// ---- Phase-5 expansion states (FL / NY / AZ) -------------------------------
+// The 20 misconduct patterns are jurisdiction-agnostic behaviors; what changes
+// per state is the citation of the equivalent professional-conduct rule. All
+// five states' ethics numbering follows the ABA Model Rules structure, so the
+// expansion citations below are the direct equivalents of the TX/CA ones
+// (verified against public rule texts on 2026-09-10; see docs/STATE_FACTS_PHASE5.md).
+
+type ExpansionState = "FL" | "NY" | "AZ";
+
+const EXPANSION_CITATIONS: Record<ExpansionState, Record<string, string[]>> = {
+  FL: {
+    "RF-01": ["FL Rule of Professional Conduct 4-1.15"],
+    "RF-02": ["FL Rules 4-1.15, 4-1.16(d)"],
+    "RF-03": ["FL Rule 4-1.15"],
+    "RF-04": ["FL Rule 4-1.5"],
+    "RF-05": ["FL Rule 4-1.4"],
+    "RF-06": ["FL Rule 4-1.3"],
+    "RF-07": ["FL Rules 4-1.3, 4-3.2"],
+    "RF-08": ["FL Rules 4-1.3, 4-1.4"],
+    "RF-09": ["FL Rule 4-1.4"],
+    "RF-10": ["FL Rules 4-1.4, 4-5.3"],
+    "RF-11": ["FL Rule 4-1.2"],
+    "RF-12": ["FL Rule 4-1.16(d)"],
+    "RF-13": ["FL Rule 4-1.7"],
+    "RF-14": ["FL Rule 4-1.5"],
+    "RF-15": ["FL Rule 4-1.5(c)"],
+    "RF-16": ["FL Rule 4-1.5"],
+    "RF-17": ["FL Rule 4-1.5"],
+    "RF-18": ["FL Rules 4-3.3, 4-8.4(c)"],
+    "RF-19": ["FL Rule 4-7.1"],
+    "RF-20": ["FL Rule 4-1.5(c)"],
+  },
+  NY: {
+    "RF-01": ["NY Rule of Professional Conduct 1.15"],
+    "RF-02": ["NY Rules 1.15, 1.16(d)"],
+    "RF-03": ["NY Rule 1.15"],
+    "RF-04": ["NY Rule 1.5"],
+    "RF-05": ["NY Rule 1.4"],
+    "RF-06": ["NY Rule 1.3"],
+    "RF-07": ["NY Rules 1.3, 3.2"],
+    "RF-08": ["NY Rules 1.3, 1.4"],
+    "RF-09": ["NY Rule 1.4"],
+    "RF-10": ["NY Rules 1.4, 5.3"],
+    "RF-11": ["NY Rule 1.2"],
+    "RF-12": ["NY Rule 1.16(d)"],
+    "RF-13": ["NY Rule 1.7"],
+    "RF-14": ["NY Rule 1.5"],
+    "RF-15": ["NY Rule 1.5(c)"],
+    "RF-16": ["NY Rule 1.5"],
+    "RF-17": ["NY Rule 1.5"],
+    "RF-18": ["NY Rules 3.3, 8.4(c)"],
+    "RF-19": ["NY Rule 7.1"],
+    "RF-20": ["NY Rule 1.5(c)", "22 NYCRR Part 1215"],
+  },
+  AZ: {
+    "RF-01": ["Arizona ER 1.15"],
+    "RF-02": ["Arizona ERs 1.15, 1.16(d)"],
+    "RF-03": ["Arizona ER 1.15"],
+    "RF-04": ["Arizona ER 1.5"],
+    "RF-05": ["Arizona ER 1.4"],
+    "RF-06": ["Arizona ER 1.3"],
+    "RF-07": ["Arizona ERs 1.3, 3.2"],
+    "RF-08": ["Arizona ERs 1.3, 1.4"],
+    "RF-09": ["Arizona ER 1.4"],
+    "RF-10": ["Arizona ERs 1.4, 5.3"],
+    "RF-11": ["Arizona ER 1.2"],
+    "RF-12": ["Arizona ER 1.16(d)"],
+    "RF-13": ["Arizona ER 1.7"],
+    "RF-14": ["Arizona ER 1.5"],
+    "RF-15": ["Arizona ER 1.5(c)"],
+    "RF-16": ["Arizona ER 1.5"],
+    "RF-17": ["Arizona ER 1.5"],
+    "RF-18": ["Arizona ERs 3.3, 8.4(c)"],
+    "RF-19": ["Arizona ER 7.1"],
+    "RF-20": ["Arizona ER 1.5(c)"],
+  },
+};
+
+const EXPANSION_FALLBACK: Record<ExpansionState, string[]> = {
+  FL: ["FL Rule of Professional Conduct 4-1.5"],
+  NY: ["NY Rule of Professional Conduct 1.5"],
+  AZ: ["Arizona ER 1.5"],
+};
+
+/** Full rule set with expansion-state applicability and equivalent citations. */
+export const RULES: RedFlagRule[] = CORE_RULES.map((r): RedFlagRule => ({
+  ...r,
+  states: ["TX", "CA", "FL", "NY", "AZ"],
+  citations: {
+    TX: r.citations.TX,
+    CA: r.citations.CA,
+    FL: EXPANSION_CITATIONS.FL[r.id] ?? EXPANSION_FALLBACK.FL,
+    NY: EXPANSION_CITATIONS.NY[r.id] ?? EXPANSION_FALLBACK.NY,
+    AZ: EXPANSION_CITATIONS.AZ[r.id] ?? EXPANSION_FALLBACK.AZ,
+  },
+}));
 
 export function localizedSeverity(sev: Severity, locale: Locale): string {
   if (locale === "es") return sev === "high" ? "Alta" : sev === "medium" ? "Media" : "Informativa";

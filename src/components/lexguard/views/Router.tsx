@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Compass, ExternalLink, CheckCircle2, XCircle, TriangleAlert, Loader2 } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
-import { CHANNELS, route, type RouterAnswers } from "@/lib/lexguard/channels";
+import { CHANNELS, csfWindowYears, route, type RouterAnswers } from "@/lib/lexguard/channels";
 import { PageTitle } from "@/components/lexguard/AppShell";
 import type { ChannelKind } from "@/lib/lexguard/types";
 
@@ -128,11 +128,19 @@ export function RouterView({ caseId }: { caseId?: string }) {
             <CardTitle className="text-sm">{tr.q_discovered}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            {(["within_4y", "over_4y", "n/a"] as const).map((k) => (
-              <Button key={k} size="sm" variant={a.discoveredWhen === k ? "default" : "outline"} className={a.discoveredWhen === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, discoveredWhen: k })}>
-                {tr[`disc_${k === "within_4y" ? "within" : k === "over_4y" ? "over" : "na"}` as keyof typeof tr] as string}
-              </Button>
-            ))}
+            {(["within_4y", "over_4y", "n/a"] as const).map((k) => {
+              const years = csfWindowYears(state);
+              const base = `disc_${k === "within_4y" ? "within" : k === "over_4y" ? "over" : "na"}`;
+              const label =
+                k === "n/a" || state === "TX"
+                  ? String(tr[base as keyof typeof tr])
+                  : String((tr[`${base}_st` as keyof typeof tr] as string) ?? tr[base as keyof typeof tr]).replace("{years}", String(years ?? ""));
+              return (
+                <Button key={k} size="sm" variant={a.discoveredWhen === k ? "default" : "outline"} className={a.discoveredWhen === k ? "bg-emerald-700" : "justify-start"} onClick={() => setA({ ...a, discoveredWhen: k })}>
+                  {label}
+                </Button>
+              );
+            })}
           </CardContent>
         </Card>
         <Card>

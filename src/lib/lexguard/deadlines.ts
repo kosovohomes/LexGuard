@@ -95,32 +95,134 @@ function hasSettlementNeedingWindow(entries: EntryData[]): { receivedAt: Date } 
   return received ? { receivedAt: received } : null;
 }
 
+// ---- Client-protection fund windows (Phase-5: all five states) --------------
+// "discovery" mode = a computable countdown from the logged receipt date.
+// "after_discipline" mode (Texas) = no countdown until a disciplinary judgment
+// is final — surfaced as informational text only.
+// Facts per PRD Appendix A (TX/CA) and docs/STATE_FACTS_PHASE5.md (FL/NY/AZ).
+// All wording is informational and points to the official page — LexGuard does
+// not compute the user's actual legal deadlines (PRD §3 principle 5).
+
+type FundWindow =
+  | { mode: "discovery"; years: number; fund: { en: string; es: string }; cap: { en: string; es: string }; note: { en: string; es: string } }
+  | { mode: "after_discipline"; fund: { en: string; es: string }; note: { en: string; es: string } };
+
+const FUND_WINDOWS: Record<USState, FundWindow> = {
+  TX: {
+    mode: "after_discipline",
+    fund: { en: "Texas Client Security Fund", es: "Fondo de Seguridad del Cliente de Texas" },
+    note: {
+      en: "requires a grievance first and an application within 18 months after the disciplinary judgment is final",
+      es: "exige primero una queja disciplinaria y la solicitud dentro de los 18 meses tras la sentencia disciplinaria firme",
+    },
+  },
+  CA: {
+    mode: "discovery",
+    years: 4,
+    fund: { en: "California's Client Security Fund", es: "El Fondo de Seguridad del Cliente de California" },
+    cap: { en: "up to $100,000 per claim", es: "hasta $100,000 por reclamo" },
+    note: {
+      en: "The Fund excludes malpractice and fee disputes and requires attorney-status conditions. Verify on the official page.",
+      es: "El Fondo excluye mala praxis y disputas de honorarios, y exige condiciones sobre la situación del abogado. Verifique en la página oficial.",
+    },
+  },
+  FL: {
+    mode: "discovery",
+    years: 2,
+    fund: { en: "Florida's Clients' Security Fund", es: "El Fondo de Seguridad del Cliente de Florida" },
+    cap: { en: "up to $50,000 per claim", es: "hasta $50,000 por reclamo" },
+    note: {
+      en: "The Fund covers a lawyer's misappropriation or wrongful taking of funds, not negligence or fee disagreements, and generally requires assignment of recovery rights if it pays. Verify on the official page.",
+      es: "El Fondo cubre la apropiación indebida o toma ilegítima de fondos por el abogado, no negligencia ni desacuerdos de honorarios, y generalmente exige ceder los derechos de recuperación si paga. Verifique en la página oficial.",
+    },
+  },
+  NY: {
+    mode: "discovery",
+    years: 2,
+    fund: { en: "New York's Lawyers' Fund for Client Protection", es: "El Fondo de Protección del Cliente de Nueva York" },
+    cap: { en: "up to $450,000 per client loss", es: "hasta $450,000 por pérdida de un cliente" },
+    note: {
+      en: "The Fund covers a lawyer's dishonest conduct only — it has no jurisdiction over neglect, malpractice, or fee disputes. Verify on the official page.",
+      es: "El Fondo cubre solo la conducta deshonesta del abogado — no tiene jurisdicción sobre negligencia, mala praxis ni disputas de honorarios. Verifique en la página oficial.",
+    },
+  },
+  AZ: {
+    mode: "discovery",
+    years: 5,
+    fund: { en: "Arizona's Client Protection Fund", es: "El Fondo de Protección del Cliente de Arizona" },
+    cap: { en: "up to $100,000 per claimant", es: "hasta $100,000 por reclamante" },
+    note: {
+      en: "The Fund covers losses from a lawyer's dishonest conduct, not negligence or fee disagreements. Verify on the official page.",
+      es: "El Fondo cubre pérdidas por conducta deshonesta del abogado, no negligencia ni desacuerdos de honorarios. Verifique en la página oficial.",
+    },
+  },
+};
+
+// ---- Malpractice limitations information (informational only) ---------------
+const MALPRACTICE_SOL: Record<USState, { years: number; text: { en: string; es: string } }> = {
+  TX: {
+    years: 2,
+    text: {
+      en: "Texas generally applies a two-year limitations period with a ten-year repose cap.",
+      es: "Texas generalmente aplica un plazo de dos años con tope de diez años.",
+    },
+  },
+  CA: {
+    years: 1,
+    text: {
+      en: "California generally applies one year from discovery, with a four-year maximum (Code Civ. Proc. 340.6).",
+      es: "California generalmente aplica un año desde el descubrimiento, con máximo de cuatro años (Cód. Proc. Civil 340.6).",
+    },
+  },
+  FL: {
+    years: 2,
+    text: {
+      en: "Florida generally applies two years from discovery, with a four-year outer limit (Fla. Stat. ch. 95).",
+      es: "Florida generalmente aplica dos años desde el descubrimiento, con un límite exterior de cuatro años (Fla. Stat. cap. 95).",
+    },
+  },
+  NY: {
+    years: 3,
+    text: {
+      en: "New York generally applies three years for attorney malpractice (CPLR 214).",
+      es: "Nueva York generalmente aplica tres años para la mala praxis de abogados (CPLR 214).",
+    },
+  },
+  AZ: {
+    years: 2,
+    text: {
+      en: "Arizona generally applies two years for attorney malpractice (A.R.S. 12-542).",
+      es: "Arizona generalmente aplica dos años para la mala praxis de abogados (A.R.S. 12-542).",
+    },
+  },
+};
+
 /** Statutory/informational windows derived from journal facts. */
 function statutoryItems(cf: { case: CaseData; entries: EntryData[] }, now: Date, locale: Locale): DeadlineInsight[] {
   const out: DeadlineInsight[] = [];
   const name = caseLabel(cf.case);
   const state = cf.case.state;
   const settlement = hasSettlementNeedingWindow(cf.entries);
+  const es = locale === "es";
 
   if (settlement) {
-    if (state === "CA") {
-      const end = new Date(settlement.receivedAt.getTime() + 4 * YEAR);
+    const fw = FUND_WINDOWS[state];
+    if (fw.mode === "discovery") {
+      const end = new Date(settlement.receivedAt.getTime() + fw.years * YEAR);
       const daysLeft = Math.round((end.getTime() - now.getTime()) / DAY);
       out.push({
-        id: `win_csf_ca_${cf.case.id}`,
+        id: `win_csf_${state.toLowerCase()}_${cf.case.id}`,
         caseId: cf.case.id,
         caseName: name,
         state,
         kind: "statutory_window",
         tone: daysLeft <= 90 ? "soon" : "info",
-        title:
-          locale === "es"
-            ? "Posible ventana del Fondo de Seguridad del Cliente (fondos de acuerdo registrados como recibidos)"
-            : "Possible Client Security Fund window (settlement funds logged as received)",
-        detail:
-          locale === "es"
-            ? `El Fondo de Seguridad del Cliente de California puede reembolsar el robo de fondos en custodia (hasta $100,000 por reclamo); en general se presenta dentro de los 4 años desde que la pérdida se descubrió o debió descubrirse. Esta fecha se calcula desde su registro de recepción del acuerdo (${fmt(settlement.receivedAt, locale)}); la fecha de descubrimiento puede ser distinta. El Fondo excluye mala praxis y disputas de honorarios, y exige condiciones sobre la situación del abogado. Verifique en la página oficial.`
-            : `California's Client Security Fund can reimburse theft of entrusted funds (up to $100,000 per claim); a claim is generally filed within 4 years after the loss was or should have been discovered. This date is computed from your settlement-receipt entry (${fmt(settlement.receivedAt, locale)}) — the discovery date may differ. The Fund excludes malpractice and fee disputes and requires attorney-status conditions. Verify on the official page.`,
+        title: es
+          ? `Posible ventana del fondo de protección del cliente (fondos de acuerdo registrados como recibidos)`
+          : `Possible client protection fund window (settlement funds logged as received)`,
+        detail: es
+          ? `${fw.fund.es} puede reembolsar el robo de fondos en custodia (${fw.cap.es}); en general se presenta dentro de los ${fw.years} años desde que la pérdida se descubrió o debió descubrirse. Esta fecha se calcula desde su registro de recepción del acuerdo (${fmt(settlement.receivedAt, locale)}); la fecha de descubrimiento puede ser distinta. ${fw.note.es}`
+          : `${fw.fund.en} can reimburse theft of entrusted funds (${fw.cap.en}); a claim is generally filed within ${fw.years} year${fw.years === 1 ? "" : "s"} after the loss was or should have been discovered. This date is computed from your settlement-receipt entry (${fmt(settlement.receivedAt, locale)}) — the discovery date may differ. ${fw.note.en}`,
         when: end.toISOString(),
         daysLeft,
       });
@@ -132,55 +234,32 @@ function statutoryItems(cf: { case: CaseData; entries: EntryData[] }, now: Date,
         state,
         kind: "statutory_window",
         tone: "info",
-        title:
-          locale === "es"
-            ? "Fondo de Seguridad del Cliente de Texas — condiciones aplicables"
-            : "Texas Client Security Fund — applicable conditions",
-        detail:
-          locale === "es"
-            ? `Registró fondos de acuerdo recibidos por el abogado sin desembolso posterior. El Fondo de Texas puede reembolsar robo de fondos o honorarios no reembolsados, pero exige primero una queja disciplinaria y la solicitud dentro de los 18 meses tras la sentencia disciplinaria firme. Aún no existe cuenta regresiva: la ventana comienza cuando concluye la disciplina. Documentar ahora protege esa futura solicitud.`
-            : `You logged settlement funds received by the attorney with no later disbursement. Texas's Client Security Fund may reimburse stolen funds or unearned fees, but it requires a grievance first and an application within 18 months after the disciplinary judgment is final. No countdown exists yet — the window starts when discipline concludes. Documenting now protects that future application.`,
+        title: es ? `${fw.fund.es} — condiciones aplicables` : `${fw.fund.en} — applicable conditions`,
+        detail: es
+          ? `Registró fondos de acuerdo recibidos por el abogado sin desembolso posterior. El Fondo de Texas puede reembolsar robo de fondos o honorarios no reembolsados, pero ${fw.note.es}. Aún no existe cuenta regresiva: la ventana comienza cuando concluye la disciplina. Documentar ahora protege esa futura solicitud.`
+          : `You logged settlement funds received by the attorney with no later disbursement. Texas's Client Security Fund may reimburse stolen funds or unearned fees, but it ${fw.note.en}. No countdown exists yet — the window starts when discipline concludes. Documenting now protects that future application.`,
       });
     }
   }
 
   const end = cf.case.engagementEnd ? new Date(cf.case.engagementEnd) : null;
   if (end && !Number.isNaN(end.getTime())) {
-    if (state === "TX") {
-      const outside = new Date(end.getTime() + 2 * YEAR);
-      out.push({
-        id: `win_sol_tx_${cf.case.id}`,
-        caseId: cf.case.id,
-        caseName: name,
-        state,
-        kind: "statutory_window",
-        tone: "info",
-        title: locale === "es" ? "Información de prescripción (mala praxis)" : "Limitations information (malpractice)",
-        detail:
-          locale === "es"
-            ? `Texas generalmente aplica un plazo de dos años con tope de diez años. Esta fecha se calcula desde el fin de la relación registrada (${fmt(end, locale)}); el reloj puede iniciar más tarde (al descubrir el daño) y los plazos exactos dependen de sus hechos. LexGuard no evalúa reclamos; verifique con un abogado con licencia o asistencia legal.`
-            : `Texas generally applies a two-year limitations period with a ten-year repose cap. This date is computed from the logged end of the engagement (${fmt(end, locale)}); the clock may start later (at discovery) and exact deadlines depend on your facts. LexGuard does not evaluate claims — verify with a licensed attorney or legal aid.`,
-        when: outside.toISOString(),
-        daysLeft: Math.round((outside.getTime() - now.getTime()) / DAY),
-      });
-    } else {
-      const outside = new Date(end.getTime() + YEAR);
-      out.push({
-        id: `win_sol_ca_${cf.case.id}`,
-        caseId: cf.case.id,
-        caseName: name,
-        state,
-        kind: "statutory_window",
-        tone: "info",
-        title: locale === "es" ? "Información de prescripción (mala praxis)" : "Limitations information (malpractice)",
-        detail:
-          locale === "es"
-            ? `California generalmente aplica un año desde el descubrimiento, con máximo de cuatro años (Cód. Proc. Civil 340.6). Esta fecha se calcula desde el fin de la relación registrada (${fmt(end, locale)}); el descubrimiento puede ser posterior y los plazos exactos dependen de sus hechos. LexGuard no evalúa reclamos; verifique con un abogado con licencia o asistencia legal.`
-            : `California generally applies one year from discovery, with a four-year maximum (Code Civ. Proc. 340.6). This date is computed from the logged end of the engagement (${fmt(end, locale)}); discovery may occur later and exact deadlines depend on your facts. LexGuard does not evaluate claims — verify with a licensed attorney or legal aid.`,
-        when: outside.toISOString(),
-        daysLeft: Math.round((outside.getTime() - now.getTime()) / DAY),
-      });
-    }
+    const sol = MALPRACTICE_SOL[state];
+    const outside = new Date(end.getTime() + sol.years * YEAR);
+    out.push({
+      id: `win_sol_${state.toLowerCase()}_${cf.case.id}`,
+      caseId: cf.case.id,
+      caseName: name,
+      state,
+      kind: "statutory_window",
+      tone: "info",
+      title: es ? "Información de prescripción (mala praxis)" : "Limitations information (malpractice)",
+      detail: es
+        ? `${sol.text.es} Esta fecha se calcula desde el fin de la relación registrada (${fmt(end, locale)}); el reloj puede iniciar más tarde (al descubrir el daño) y los plazos exactos dependen de sus hechos. LexGuard no evalúa reclamos; verifique con un abogado con licencia o asistencia legal.`
+        : `${sol.text.en} This date is computed from the logged end of the engagement (${fmt(end, locale)}); the clock may start later (at discovery) and exact deadlines depend on your facts. LexGuard does not evaluate claims — verify with a licensed attorney or legal aid.`,
+      when: outside.toISOString(),
+      daysLeft: Math.round((outside.getTime() - now.getTime()) / DAY),
+    });
   }
 
   return out;

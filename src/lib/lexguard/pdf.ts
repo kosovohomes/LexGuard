@@ -266,7 +266,7 @@ export function buildDossierPdf(
       para(`• ${n}`, 8.5, 10);
     }
     // also surface the standing form-location note one last time
-    para(worksheetForState(caseRow.state === "CA" ? "CA" : "TX").where[locale], 8.5);
+    para(worksheetForState(caseRow.state).where[locale], 8.5);
   }
 
   footer();

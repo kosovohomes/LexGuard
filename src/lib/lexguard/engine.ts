@@ -318,9 +318,21 @@ export function evaluateCase(
       ? locale === "es"
         ? "En California, un acuerdo por escrito generalmente se exige cuando los honorarios superan $1,000."
         : "In California, a written agreement is generally required when fees exceed $1,000."
-      : locale === "es"
-        ? "En Texas, las reglas exigen que las cuotas no razonables puedan evaluarse frente a lo acordado."
-        : "In Texas, rules require fees to be evaluated against what was agreed.";
+      : state === "NY"
+        ? locale === "es"
+          ? "En Nueva York, generalmente se exige una carta de compromiso por escrito cuando los honorarios se esperan mayores a $3,000."
+          : "In New York, a written engagement letter is generally required when fees are expected to exceed $3,000."
+        : state === "FL"
+          ? locale === "es"
+            ? "En Florida, los honorarios deben ser razonables y los acuerdos de honorarios contingentes deben ser por escrito."
+            : "In Florida, fees must be reasonable and contingency-fee agreements must be in writing."
+          : state === "AZ"
+            ? locale === "es"
+              ? "En Arizona, los honorarios deben ser razonables y los acuerdos de honorarios contingentes deben ser por escrito."
+              : "In Arizona, fees must be reasonable and contingency-fee agreements must be in writing."
+            : locale === "es"
+              ? "En Texas, las reglas exigen que las cuotas no razonables puedan evaluarse frente a lo acordado."
+              : "In Texas, rules require fees to be evaluated against what was agreed.";
   if (f.totalPaid > 1000 && !f.hasFeeAgreementDoc) {
     fire("RF-20", { paid: money(f.totalPaid), stateNote });
   }

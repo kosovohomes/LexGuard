@@ -4,6 +4,7 @@
 // (cells under MIN_CELL are never released), no narrative, no free text, no
 // identifiers. Runs the same deterministic rules engine used in the product.
 
+import { STATE_CODES } from "./types";
 import type { CaseData, ChannelKind, EntryData, USState } from "./types";
 import { evaluateCase } from "./engine";
 
@@ -62,11 +63,11 @@ export function aggregatePatterns(inputs: AggregateInputCase[], now: Date = new 
     fees: 0,
     other: 0,
   } as Record<PatternCategory, number>;
-  const counts: PatternCounts = { TX: { ...base }, CA: { ...base } };
+  const counts: PatternCounts = Object.fromEntries(STATE_CODES.map((st) => [st, { ...base }])) as PatternCounts;
 
   let casesWithObservations = 0;
   for (const input of inputs) {
-    const state = input.case.state === "CA" ? "CA" : "TX";
+    const state: USState = input.case.state;
     // locale only affects wording, not triggering — use "en" for determinism
     const observations = evaluateCase(input.case, input.entries, input.hasFeeAgreement, "en", now);
     if (observations.length === 0) continue;
@@ -82,7 +83,7 @@ export function aggregatePatterns(inputs: AggregateInputCase[], now: Date = new 
   }
 
   // suppress small cells (k-anonymity)
-  for (const st of ["TX", "CA"] as USState[]) {
+  for (const st of STATE_CODES) {
     for (const cat of PATTERN_CATEGORIES) {
       const v = counts[st][cat];
       if (v != null && v < MIN_CELL) counts[st][cat] = null;

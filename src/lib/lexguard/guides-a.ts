@@ -2,6 +2,8 @@
 // reading level ≤ grade 8, state-scoped notes per PRD FR-1.1.
 // Reviewer status is shown honestly per FR-1.5 (pending attorney sign-off in MVP).
 
+import type { USState } from "./types";
+
 export interface BiText {
   en: string;
   es: string;
@@ -25,7 +27,7 @@ export interface Guide {
   lastReviewed: string;
   reviewer: BiText;
   sections: GuideSection[];
-  stateNotes: Partial<Record<"TX" | "CA", StateNote[]>>;
+  stateNotes: Partial<Record<USState, StateNote[]>>;
 }
 
 export const GUIDES_A: Guide[] = [
