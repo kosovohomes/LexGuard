@@ -151,3 +151,21 @@ Stage Summary:
 - Phase 5a complete: product now covers 5 states; expansion states honestly labeled "attorney review pending" per PRD content-review gate
 - All TX/CA wording preserved verbatim (no regression risk); new-state facts isolated in expansion files for the future counsel sign-off pass
 - Pitfall: when widening a Record key union (USState), Record<USState, X> fields on authored data break — split into CoreRule/EXPANSION map pattern; Partial<Record> spreads need non-partial source types
+
+---
+Task ID: 7
+Agent: Super Z (main agent)
+Task: Phase 5b/5c/5d/5e — calendar export, trash recovery, content reports, rules governance; push each increment to GitHub
+
+Work Log:
+- 5b (585cc35): ics.ts RFC 5545 builder (text escaping, 75-octet folding, DTEND, VALARM -P1D on timed events, all-day statutory windows); Deadlines view per-item + "add all" export buttons; fully client-side blob download, no server; i18n icsExport/icsExportAll/icsNote; unit-tested output shape; DTEND added for strict calendar apps
+- 5c (d865323): Prisma Case.deletedAt; DELETE /api/cases/[id] ?purge=1 semantics + POST /api/cases/[id]/restore; GET /api/cases auto-purges >30d trashed; local.ts trashCase/restoreCase/purgeExpiredTrashed with TRASH_WINDOW_DAYS=30; store trashCase/restoreCase/purgeCase + trashedCases state; Journal case-card trash button (stopPropagation + confirm); Settings trash panel (days-left, restore, delete-forever); E2E local mode: trash→hidden+journal+deletedAt persisted→Settings panel→restore→purge→cases []
+- 5d (4171ac0): ContentReport Prisma model (no userId — anonymous by design); POST /api/reports (category enum, slug/locale/state/message capping, 50/min abuse cap, bogus category 400 verified live); admin/stats reports aggregate (total/last30d/recent 10); Admin trust-queue section + patterns table extended to 5 states; ReportIssueButton dialog wired into GuideView footer + Legal view; i18n ~26 keys ×2 (pitfall: two same-anchor string replaces collided into duplicate keys in the EN dict — fixed by line surgery; lesson: use distinct anchors)
+- 5e (a516806): rulesgov.ts (canonical export with SHA-256 Web Crypto hash, structural validator — 20+ checks per rule incl. per-state citations — import diff vs live); Admin governance card (export→hash shown, import→valid/invalid + changed-rule diff); unit test: garbage/bad-rule rejected, live round-trip ok (20 rules, hash 7ccc138d…); browser: export renders hash, bad candidate rejected in UI ("Validation failed")
+- Gates per increment: tsc clean → eslint clean → production build clean
+- Pushed individually: 585cc35, d865323, 4171ac0, a516806
+
+Stage Summary:
+- Phase 5 complete: FL/NY/AZ multi-state, .ics calendar export, 30-day trash, anonymous content reports, rules governance — all five PRD decision-gated items now either implemented (Q4 via ICS, Q5 via trash window, Q2 via governance pipeline) or concretely prepared for the external decision (FL/NY/AZ counsel sign-off; facts doc + re-verify checklist in docs/STATE_FACTS_PHASE5.md)
+- Remaining for humans only: licensed-attorney review of expansion-state content; email digests (superseded by ICS unless email is later desired); beta partners (business decision)
+- Pitfall for future agents: lucide Trash2Icon does not exist in this version (use Trash2); i18n batch inserts must use unique anchors per dict or keys collide (TS1117)
