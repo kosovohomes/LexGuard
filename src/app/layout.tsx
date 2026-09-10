@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
-// "Meridian" — a single sans (Inter) carries the whole product. Hierarchy
-// comes from size/weight/tracking, not a second display face.
+// "Signal" — Inter carries body text/UI; Space Grotesk is the bold
+// geometric display face used everywhere .lg-display appears (headings
+// across every view). Two faces, clear roles: body reads quietly, display
+// carries the confident, bigger register requested for this pass.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
@@ -32,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${geistMono.variable} antialiased bg-background text-foreground font-sans`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable} antialiased bg-background text-foreground font-sans`}
       >
         {children}
         <Toaster />
