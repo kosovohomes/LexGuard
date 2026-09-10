@@ -7,7 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -48,92 +48,67 @@
 }
 
 /*
- * LexGuard design language — "Nightfall"
- * A total break from the previous warm-paper look: deep indigo-charcoal
- * surfaces, electric violet primary, cyan signal color, geometric grotesk
- * display type, glass panels and glow accents. Dark-first by design — the
- * product is a private vault, and it should feel like one.
+ * LexGuard design language — "Meridian"
  *
- * Token note: --copper keeps its historical name for warning/amber
- * semantics across the codebase; visually it is now a vivid signal amber.
+ * Both previous directions ("The Docket" warm-paper serif, "Nightfall"
+ * dark glass) were novelty themes; this product needs quiet, high-craft
+ * professional clarity — the register of Stripe docs / Linear light mode /
+ * modern civic tech. One idea carries the system:
+ *
+ *   A crisp LIGHT canvas, one confident federal blue, and hierarchy built
+ *   entirely from a disciplined Inter type scale — never from decorative
+ *   fonts, gradients, glows, or textures. Structure comes from hairline
+ *   borders, an 8px spacing rhythm, small radii, and whisper-quiet shadows.
+ *   Dense legal text and the case workspace stay scannable and calm.
+ *
+ * Token notes:
+ * - --copper keeps its historical name (20+ files reference it) as the
+ *   semantic "warning / caution" color; visually a calm amber-700 that
+ *   passes AA as text on white.
+ * - Light-only by design: no .dark block, no dark: variant will ever match
+ *   (no .dark class is applied), and color-scheme is pinned to light so
+ *   native form controls (date pickers) render light.
+ * - Plain-CSS classes below reference var(--font-inter) directly — they
+ *   cannot consume the @theme inline indirection.
  */
 
 :root {
-  color-scheme: dark;
-  --radius: 0.875rem;
-  --background: oklch(0.152 0.021 278);
-  --foreground: oklch(0.945 0.012 270);
-  --card: oklch(0.196 0.026 278);
-  --card-foreground: oklch(0.945 0.012 270);
-  --popover: oklch(0.21 0.028 278);
-  --popover-foreground: oklch(0.945 0.012 270);
-  --primary: oklch(0.72 0.155 287);
-  --primary-foreground: oklch(0.145 0.045 287);
-  --secondary: oklch(0.25 0.03 278);
-  --secondary-foreground: oklch(0.93 0.014 270);
-  --muted: oklch(0.24 0.028 278);
-  --muted-foreground: oklch(0.70 0.028 268);
-  --accent: oklch(0.27 0.038 282);
-  --accent-foreground: oklch(0.95 0.012 270);
-  --destructive: oklch(0.66 0.2 22);
-  --destructive-foreground: oklch(0.98 0.005 22);
-  --copper: oklch(0.82 0.135 84);
-  --copper-foreground: oklch(0.2 0.05 84);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.155 287);
-  --chart-1: oklch(0.72 0.155 287);
-  --chart-2: oklch(0.78 0.12 212);
-  --chart-3: oklch(0.82 0.135 84);
-  --chart-4: oklch(0.75 0.11 172);
-  --chart-5: oklch(0.68 0.15 350);
-  --sidebar: oklch(0.18 0.024 278);
-  --sidebar-foreground: oklch(0.945 0.012 270);
-  --sidebar-primary: oklch(0.72 0.155 287);
-  --sidebar-primary-foreground: oklch(0.145 0.045 287);
-  --sidebar-accent: oklch(0.27 0.038 282);
-  --sidebar-accent-foreground: oklch(0.95 0.012 270);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.155 287);
-}
-
-/* Safety mirror: the app ships dark-first; if a .dark class ever gets
-   toggled (e.g. by a future theme switch), the look stays identical. */
-.dark {
-  --background: oklch(0.152 0.021 278);
-  --foreground: oklch(0.945 0.012 270);
-  --card: oklch(0.196 0.026 278);
-  --card-foreground: oklch(0.945 0.012 270);
-  --popover: oklch(0.21 0.028 278);
-  --popover-foreground: oklch(0.945 0.012 270);
-  --primary: oklch(0.72 0.155 287);
-  --primary-foreground: oklch(0.145 0.045 287);
-  --secondary: oklch(0.25 0.03 278);
-  --secondary-foreground: oklch(0.93 0.014 270);
-  --muted: oklch(0.24 0.028 278);
-  --muted-foreground: oklch(0.70 0.028 268);
-  --accent: oklch(0.27 0.038 282);
-  --accent-foreground: oklch(0.95 0.012 270);
-  --destructive: oklch(0.66 0.2 22);
-  --destructive-foreground: oklch(0.98 0.005 22);
-  --copper: oklch(0.82 0.135 84);
-  --copper-foreground: oklch(0.2 0.05 84);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.155 287);
-  --chart-1: oklch(0.72 0.155 287);
-  --chart-2: oklch(0.78 0.12 212);
-  --chart-3: oklch(0.82 0.135 84);
-  --chart-4: oklch(0.75 0.11 172);
-  --chart-5: oklch(0.68 0.15 350);
-  --sidebar: oklch(0.18 0.024 278);
-  --sidebar-foreground: oklch(0.945 0.012 270);
-  --sidebar-primary: oklch(0.72 0.155 287);
-  --sidebar-primary-foreground: oklch(0.145 0.045 287);
-  --sidebar-accent: oklch(0.27 0.038 282);
-  --sidebar-accent-foreground: oklch(0.95 0.012 270);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.72 0.155 287);
+  color-scheme: light;
+  --radius: 0.625rem;
+  --background: oklch(0.988 0.002 248);
+  --foreground: oklch(0.245 0.02 255);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.245 0.02 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.245 0.02 255);
+  --primary: oklch(0.51 0.17 258);
+  --primary-foreground: oklch(0.995 0.002 248);
+  --secondary: oklch(0.962 0.005 248);
+  --secondary-foreground: oklch(0.35 0.02 254);
+  --muted: oklch(0.962 0.005 248);
+  --muted-foreground: oklch(0.505 0.02 252);
+  --accent: oklch(0.955 0.006 248);
+  --accent-foreground: oklch(0.245 0.02 255);
+  --destructive: oklch(0.577 0.208 27);
+  --destructive-foreground: oklch(0.995 0.002 248);
+  --copper: oklch(0.63 0.13 66);
+  --copper-foreground: oklch(0.995 0.005 95);
+  --border: oklch(0.923 0.006 252);
+  --input: oklch(0.9 0.008 252);
+  --ring: oklch(0.51 0.17 258);
+  --chart-1: oklch(0.51 0.17 258);
+  --chart-2: oklch(0.55 0.02 252);
+  --chart-3: oklch(0.72 0.13 75);
+  --chart-4: oklch(0.6 0.1 195);
+  --chart-5: oklch(0.55 0.12 340);
+  --sidebar: oklch(0.975 0.004 248);
+  --sidebar-foreground: oklch(0.245 0.02 255);
+  --sidebar-primary: oklch(0.51 0.17 258);
+  --sidebar-primary-foreground: oklch(0.995 0.002 248);
+  --sidebar-accent: oklch(0.955 0.006 248);
+  --sidebar-accent-foreground: oklch(0.245 0.02 255);
+  --sidebar-border: oklch(0.923 0.006 252);
+  --sidebar-ring: oklch(0.51 0.17 258);
 }
 
 @layer base {
@@ -146,14 +121,9 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01" on, "cv05" on;
-    /* Ambient depth: faint violet/cyan glows pinned to the viewport */
-    background-image:
-      radial-gradient(52rem 30rem at 12% -6%, oklch(0.72 0.155 287 / 7%), transparent 60%),
-      radial-gradient(44rem 26rem at 96% 4%, oklch(0.78 0.12 212 / 5%), transparent 55%);
-    background-attachment: fixed;
   }
   ::selection {
-    background: oklch(0.72 0.155 287 / 32%);
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
   }
   h1, h2, h3 {
     letter-spacing: -0.02em;
@@ -162,74 +132,53 @@
 
 /* ---------- LexGuard component idioms ---------- */
 
-/* Grotesk display heading */
+/* Display heading — Inter, tightened. Hierarchy via weight + tracking,
+   not a decorative face. */
 .lg-display {
-  font-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.021em;
 }
 
-/* Gradient headline text — violet → cyan drift */
+/* Kept for backward compatibility with views that reference it; renders
+   as solid ink — no gradient text in this system. */
 .lg-grad-text {
-  background: linear-gradient(
-    104deg,
-    oklch(0.97 0.01 270) 18%,
-    oklch(0.8 0.13 292) 52%,
-    oklch(0.82 0.11 212) 88%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--foreground);
 }
 
 /* Small tracked label above sections and cards */
 .lg-eyebrow {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: color-mix(in oklab, var(--primary) 52%, var(--muted-foreground));
+  color: color-mix(in oklab, var(--primary) 62%, var(--muted-foreground));
 }
 
-/* Glass panel — translucent surface, hairline border, deep shadow */
+/* Panel — white surface, hairline border, whisper shadow */
 .lg-panel {
-  background:
-    linear-gradient(180deg, oklch(1 0 0 / 3.5%), transparent 42%),
-    color-mix(in oklab, var(--card) 92%, transparent);
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: calc(var(--radius) + 6px);
+  border-radius: calc(var(--radius) + 4px);
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 5%),
-    0 20px 48px -24px oklch(0.08 0.03 285 / 80%);
+    0 1px 2px oklch(0.24 0.02 255 / 4%),
+    0 1px 3px oklch(0.24 0.02 255 / 3%);
 }
 
-/* Hero panel — violet/cyan glows over a fine engineering grid */
+/* Hero panel — white with the faintest blue wash at the top; no texture,
+   no glows. Differentiation comes from scale and air. */
 .lg-hero {
-  position: relative;
-  background:
-    radial-gradient(120% 150% at 0% 0%, oklch(0.72 0.155 287 / 13%), transparent 56%),
-    radial-gradient(90% 120% at 100% 100%, oklch(0.78 0.12 212 / 9%), transparent 52%),
-    color-mix(in oklab, var(--card) 94%, transparent);
-  border: 1px solid color-mix(in oklab, var(--primary) 22%, var(--border));
-  border-radius: calc(var(--radius) + 12px);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--primary) 4%, var(--card)) 0%,
+    var(--card) 58%
+  );
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 8px);
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 6%),
-    0 28px 72px -28px oklch(0.08 0.03 285 / 90%);
-  overflow: hidden;
-}
-.lg-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, oklch(1 0 0 / 2.6%) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 39px, oklch(1 0 0 / 2.6%) 40px);
-  mask-image: radial-gradient(90% 90% at 30% 10%, black 0%, transparent 75%);
-}
-.lg-hero > * {
-  position: relative;
+    0 1px 2px oklch(0.24 0.02 255 / 4%),
+    0 8px 24px -12px oklch(0.24 0.02 255 / 8%);
 }
 
 /* Quiet underline link used in footers and body copy */
@@ -245,15 +194,16 @@
   text-decoration-color: var(--primary);
 }
 
-/* Numbered step marker */
+/* Numbered step marker — tabular, quiet */
 .lg-step-num {
-  font-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
   line-height: 1;
 }
 
-/* Custom scrollbar — thin, cool */
+/* Custom scrollbar — thin, neutral */
 * {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklab, var(--muted-foreground) 38%, transparent) transparent;
@@ -266,18 +216,18 @@
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklab, var(--muted-foreground) 34%, transparent);
+  background-color: color-mix(in oklab, var(--muted-foreground) 32%, transparent);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklab, var(--primary) 55%, transparent);
+  background-color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
 }
 
 /* Refined focus ring for keyboard users */
 :focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--ring) 80%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--ring) 75%, transparent);
   outline-offset: 2px;
 }
 

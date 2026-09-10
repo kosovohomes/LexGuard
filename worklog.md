@@ -214,3 +214,26 @@ Stage Summary:
 - "Nightfall" design language shipped product-wide: dark security-tech aesthetic that matches the product's privacy story (vault, PIN lock, quick exit); zero logic changes, all flows intact in both languages and storage modes
 - For future style work: never hardcode hues — use primary/copper/destructive tokens + .lg-* idioms; gradient companion color for cyan is oklch(0.78 0.12 212) (used in logo, step tiles, progress bars, nav logo mark)
 - If the user wants a light variant later, define a separate light token set under a `.light` class (the old warm values are recoverable from commit f7c6257's globals.css)
+
+---
+Task ID: 10
+Agent: frontend-styling-expert
+Task: Third redesign after user rejected both "The Docket" (warm serif) and "Nightfall" (dark violet) — shipped a quiet, high-craft LIGHT design ("Meridian")
+
+Work Log:
+- Read worklog Tasks 8/9; diagnosed the rejection pattern: both attempts were "themed" designs (novelty palette + display font + texture/glow). Brief called for restraint: Stripe-docs/Linear-light/Notion register — so the concept strips decoration instead of adding another theme
+- globals.css fully rewritten: light-only token set (color-scheme: light; no .dark block — dark: variants can never match; no ambient glows, no body background-image), near-white cool canvas oklch(0.988 0.002 248), white cards, ink foreground oklch(0.245 0.02 255), single federal-blue primary oklch(0.51 0.17 258) (AA both ways), hairline border oklch(0.923 0.006 252), radius 0.625rem, whisper shadows, --copper retained by name and retuned to amber-700-equivalent oklch(0.63 0.13 66) for warning semantics (AA as text on white)
+- Idioms rebuilt: .lg-display = Inter 600 with -0.021em tracking (no second family); .lg-grad-text now renders solid ink (class kept for compat, zero view churn); .lg-eyebrow = tracked Inter with a 62/38 primary/slate mix; .lg-panel/.lg-hero = white + hairline + faint top wash (no grid texture, no glass, no glow); .lg-link/.lg-step-num quiet; neutral scrollbars; prefers-reduced-motion block untouched
+- layout.tsx: dropped Space_Grotesk import (all-Inter system; Geist Mono kept for data/pre only). Pitfall honored: .lg-display/.lg-eyebrow reference var(--font-inter) directly since plain CSS cannot consume @theme inline indirection
+- AppShell: solid primary logo mark (no gradient/glow), crisper nav (active = bg-primary/[0.08] text-primary, rounded-md), mobile pills matched, footer on bg-muted/40, PageTitle tightened to 28/30px scale, StateBadge → bordered tag, quick-exit left as the one loud element (persistent destructive-red pill, behavior untouched)
+- Swept the 5 hardcoded spots from Nightfall (grep oklch(/shadow-[): Home hero CTA + step-card glows + violet/cyan icon tiles, Onboarding gradient progress bars + hover glows, Journal create CTA + case-card glows, CaseDetail log CTA + violet glow timeline nodes; timeline now hairline border-border line with white bordered nodes; empty states unified to border-dashed border-border bg-muted/30
+- public/logo.svg rebranded: solid federal-blue shield (was violet→cyan gradient)
+- Zero logic/i18n/store/engine changes; all aria-*, semantic HTML, skip-link, triple-Esc + Quick exit behavior intact
+- Gates: npx tsc --noEmit clean, npx eslint src clean, dev-server HMR clean; browser E2E desktop 1440x900 + mobile 390x844: Home (EN+ES), Onboarding 3 steps (completed to restore TX/local prefs), Guides grid, Journal list + New-case dialog, case workspace (timeline/money/documents tabs + Log-entry dialog with EntryForm), Red-flag panel (engine output renders), Router questionnaire, Dossier, Deadlines, Directory, Search (typed query), Settings, Admin, Legal, /status page; console free of new errors; localStorage Dana Whitfield case preserved
+- Screenshots: download/redesign3-*.png (home, home-es, onboarding, guides, journal, dialog-newcase, case-timeline, case-money, case-documents, dialog-entryform, flags, router, dossier, deadlines, directory, search, settings, admin, legal, status, mobile-home, mobile-home-steps, mobile-journal, mobile-case); best copies in docs/screenshots/redesign3-{home,case-timeline,journal,onboarding,router,mobile-home}.png
+
+Stage Summary:
+- "Meridian" shipped: a light, token-driven system whose whole identity is restraint — near-white canvas, one federal blue, all-Inter hierarchy via size/weight/tracking, hairline borders, small radii, no gradients/glows/textures/second font. Information density and scannability in the case workspace improve precisely because nothing decorative competes with the content
+- Rationale vs rejected designs: The Docket failed by adding warmth/nostalgia, Nightfall by adding tech-noir drama; both made a stressful legal tool feel stylized. Meridian removes styling events: quiet professional clarity is the theme
+- For future agents: keep using semantic tokens + .lg-* idioms only — the light values are now the canonical set; do not reintroduce .dark, oklch literals, or shadow-[...] arbitrary values in views; .lg-grad-text exists only for backward compat and renders solid ink
+- Left for parent review: final visual judgment on hero type scale (text-4xl/2.75rem) and whether to commit + push (working tree intentionally left uncommitted)

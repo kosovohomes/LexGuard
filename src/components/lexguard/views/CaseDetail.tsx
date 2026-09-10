@@ -111,7 +111,7 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           <div className="mb-5">
             <Dialog open={logOpen} onOpenChange={setLogOpen}>
               <DialogTrigger asChild>
-                <Button className="shadow-[0_6px_20px_-6px_oklch(0.72_0.155_287/55%)]">+ {tr.logEntry}</Button>
+                <Button className="shadow-xs">+ {tr.logEntry}</Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
@@ -128,16 +128,16 @@ export function CaseDetailView({ caseId }: { caseId: string }) {
           </div>
 
           {entries.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-primary/25 bg-card/50 p-10 text-center">
-              <NotebookPen className="mx-auto h-8 w-8 text-primary/50" aria-hidden />
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
+              <NotebookPen className="mx-auto h-8 w-8 text-muted-foreground/50" aria-hidden />
               <p className="mt-3 text-muted-foreground">{tr.noPromises}</p>
             </div>
           ) : (
-            <ol className="relative border-l-2 border-primary/25 ml-3 space-y-5">
+            <ol className="relative border-l border-border ml-3 space-y-5">
               {entries.map((e) => (
                 <li key={e.id} className="ml-6">
-                  <span className="absolute -left-[15px] flex h-7 w-7 items-center justify-center rounded-full border border-primary/30 bg-[oklch(0.22_0.03_285)] text-primary shadow-[0_0_12px_-2px_oklch(0.72_0.155_287/45%)]">{typeIcon(e)}</span>
-                  <div className="rounded-xl border border-border/70 bg-card/80 p-4 transition-colors hover:border-border">
+                  <span className="absolute -left-[14.5px] flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-primary">{typeIcon(e)}</span>
+                  <div className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-input">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="secondary" className="text-[11px] font-medium">
                         {tr[`type_${e.type}` as keyof typeof tr]}

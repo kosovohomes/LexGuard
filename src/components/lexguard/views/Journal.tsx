@@ -62,7 +62,7 @@ export function JournalView() {
         <PageTitle title={tr.navJournal} sub={tr.tagline} />
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-1.5 mb-8 shadow-[0_6px_20px_-6px_oklch(0.72_0.155_287/55%)]">
+            <Button className="gap-1.5 mb-8">
               <Plus className="h-4 w-4" /> {tr.createCase}
             </Button>
           </DialogTrigger>
@@ -109,8 +109,8 @@ export function JournalView() {
       </div>
 
       {app.cases.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-primary/25 bg-card/50 p-10 text-center">
-          <FolderOpen className="mx-auto h-8 w-8 text-primary/50" aria-hidden />
+        <div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center">
+          <FolderOpen className="mx-auto h-8 w-8 text-muted-foreground/50" aria-hidden />
           <p className="mt-3 text-muted-foreground">{tr.noCases}</p>
         </div>
       ) : (
@@ -118,7 +118,7 @@ export function JournalView() {
           {app.cases.map((c) => (
             <Card
               key={c.id}
-              className="group cursor-pointer border-border/70 bg-card/70 transition-all hover:border-primary/40 hover:shadow-[0_16px_40px_-20px_oklch(0.72_0.155_287/45%)]"
+              className="group cursor-pointer transition-all hover:border-primary/30 hover:shadow-sm"
               onClick={() => {
                 void app.openCase(c.id);
                 app.navigate({ name: "case", caseId: c.id });
