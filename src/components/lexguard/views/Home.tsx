@@ -37,13 +37,13 @@ export function HomeView() {
           <ShieldCheck className="h-3.5 w-3.5 text-primary" />
           {app.locale === "es" ? "Texas · California · Fase 4" : "Texas · California · Phase 4"}
         </p>
-        <h1 className="lg-display mt-5 max-w-3xl text-4xl sm:text-5xl leading-[1.08]">{tr.homeHeroTitle}</h1>
+        <h1 className="lg-display lg-grad-text mt-5 max-w-3xl text-4xl sm:text-5xl leading-[1.08]">{tr.homeHeroTitle}</h1>
         <p className="mt-4 max-w-2xl text-muted-foreground text-lg leading-relaxed">{tr.homeHeroSub}</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button size="lg" onClick={go} className="gap-2 h-12 px-6 text-[15px] shadow-sm">
+          <Button size="lg" onClick={go} className="gap-2 h-12 px-6 text-[15px] shadow-[0_8px_28px_-8px_oklch(0.72_0.155_287/55%)]">
             {tr.startNow} <ArrowRight className="h-4 w-4" />
           </Button>
-          <Button size="lg" variant="outline" className="h-12 px-6 text-[15px] bg-card" onClick={() => app.navigate({ name: "guides" })}>
+          <Button size="lg" variant="outline" className="h-12 px-6 text-[15px] bg-card/60" onClick={() => app.navigate({ name: "guides" })}>
             {tr.readGuides}
           </Button>
         </div>
@@ -60,11 +60,11 @@ export function HomeView() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
-            <Card key={i} className="relative gap-3 pt-5 transition-shadow hover:shadow-md">
+            <Card key={i} className="relative gap-3 pt-5 bg-card/70 transition-all hover:border-primary/30 hover:shadow-[0_16px_40px_-20px_oklch(0.72_0.155_287/45%)]">
               <CardHeader className="pb-0">
                 <div className="flex items-center justify-between">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">{s.icon}</div>
-                  <span className="lg-step-num text-2xl text-primary/25">{String(i + 1).padStart(2, "0")}</span>
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/25 to-[oklch(0.78_0.12_212/18%)] text-primary ring-1 ring-inset ring-primary/25 flex items-center justify-center">{s.icon}</div>
+                  <span className="lg-step-num text-2xl text-primary/30">{String(i + 1).padStart(2, "0")}</span>
                 </div>
                 <CardTitle className="text-base mt-2">{s.title}</CardTitle>
               </CardHeader>
@@ -78,7 +78,7 @@ export function HomeView() {
         <h2 className="lg-display text-2xl mb-5">{tr.principlesTitle}</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {principles.map((p, i) => (
-            <div key={i} className="flex items-start gap-3 rounded-xl border border-border/80 bg-card p-4">
+            <div key={i} className="flex items-start gap-3 rounded-xl border border-border/70 bg-card/60 p-4">
               <XCircle className="h-5 w-5 text-copper shrink-0 mt-0.5" />
               <span className="text-sm leading-relaxed">{p}</span>
             </div>

@@ -67,13 +67,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {app.locale === "es" ? "Saltar al contenido" : "Skip to content"}
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 h-16 flex items-center gap-2">
           <button onClick={() => app.home()} className="flex items-center gap-2.5 mr-3 shrink-0 group" aria-label="LexGuard home">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-[10px] bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105" aria-hidden>
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-primary to-[oklch(0.78_0.12_212)] text-primary-foreground shadow-[0_4px_16px_-4px_oklch(0.72_0.155_287/50%)] transition-transform group-hover:scale-105" aria-hidden>
               <Shield className="h-4 w-4" />
             </span>
-            <span className={`lg-display text-xl leading-none pt-0.5 ${app.discreet ? "hidden" : "hidden sm:inline"}`}>LexGuard</span>
+            <span className={`lg-display text-lg tracking-tight leading-none ${app.discreet ? "hidden" : "hidden sm:inline"}`}>LexGuard</span>
           </button>
 
           <nav className="hidden md:flex items-center gap-0.5 flex-1" aria-label="Main">
@@ -84,7 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={n.active ? "page" : undefined}
                 className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors ${
                   n.active
-                    ? "bg-primary/10 font-semibold text-primary"
+                    ? "bg-primary/15 font-semibold text-primary ring-1 ring-inset ring-primary/25"
                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
@@ -132,8 +132,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-current={n.active ? "page" : undefined}
                 className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm transition-colors ${
                   n.active
-                    ? "border-primary/25 bg-primary/10 font-semibold text-primary"
-                    : "border-border/70 bg-card text-muted-foreground hover:text-accent-foreground"
+                    ? "border-primary/30 bg-primary/15 font-semibold text-primary"
+                    : "border-border/70 bg-card/60 text-muted-foreground hover:text-accent-foreground"
                 }`}
               >
                 {n.icon}
@@ -146,7 +146,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <main id="main-content" tabIndex={-1} className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 py-8 outline-none">{children}</main>
 
-      <footer className="mt-auto border-t border-border/70 bg-secondary/50 pb-[env(safe-area-inset-bottom)]">
+      <footer className="mt-auto border-t border-border/60 bg-[oklch(0.13_0.02_278)]/60 pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 grid gap-6 md:grid-cols-[1fr_auto] md:items-start">
           <div className="max-w-3xl space-y-2 text-sm text-muted-foreground">
             <p className="lg-eyebrow">{app.locale === "es" ? "Aviso importante" : "Important notice"}</p>
@@ -200,7 +200,7 @@ export function PageTitle({ title, sub, back }: { title: string; sub?: string; b
           <ArrowLeft className="h-4 w-4" /> {tr.back}
         </Button>
       ) : null}
-      <h1 className="lg-display text-3xl sm:text-[2.5rem] leading-tight">{title}</h1>
+      <h1 className="lg-display text-3xl sm:text-[2.5rem] leading-tight tracking-tight">{title}</h1>
       {sub ? <p className="text-muted-foreground mt-2 max-w-3xl leading-relaxed">{sub}</p> : null}
     </div>
   );

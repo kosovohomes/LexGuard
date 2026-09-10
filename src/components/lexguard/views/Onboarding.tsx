@@ -23,7 +23,7 @@ export function OnboardingView() {
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="flex items-center gap-2" aria-hidden>
         {[0, 1, 2].map((i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-primary" : "bg-border"}`} />
+          <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i <= step ? "bg-gradient-to-r from-primary to-[oklch(0.78_0.12_212)]" : "bg-border"}`} />
         ))}
       </div>
 
@@ -91,7 +91,7 @@ export function OnboardingView() {
           </CardHeader>
           <CardContent className="space-y-4">
             <button
-              className="w-full text-left rounded-xl border border-border/80 bg-card p-5 transition hover:border-primary/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full text-left rounded-xl border border-border/80 bg-card/70 p-5 transition hover:border-primary/50 hover:bg-card hover:shadow-[0_12px_36px_-16px_oklch(0.72_0.155_287/50%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => {
                 app.setMode("account");
                 app.navigate({ name: "auth" });
@@ -101,7 +101,7 @@ export function OnboardingView() {
               <div className="text-sm text-muted-foreground mt-1 leading-relaxed">{tr.modeAccountDesc}</div>
             </button>
             <button
-              className="w-full text-left rounded-xl border border-border/80 bg-card p-5 transition hover:border-primary/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full text-left rounded-xl border border-border/80 bg-card/70 p-5 transition hover:border-primary/50 hover:bg-card hover:shadow-[0_12px_36px_-16px_oklch(0.72_0.155_287/50%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => {
                 app.setMode("local");
                 app.home();
