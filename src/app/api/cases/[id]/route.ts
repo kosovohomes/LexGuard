@@ -50,13 +50,32 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   return NextResponse.json({ case: updated });
 }
 
-// DELETE /api/cases/[id]
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+// DELETE /api/cases/[id] — Phase 5c: ?purge=1 hard-deletes immediately;
+// otherwise the case is soft-deleted (trash, 30-day recovery window).
+// PRD Open Question 5 decision implemented: short soft-delete window for
+// accidental-deletion recovery, then automatic purge.
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "auth" }, { status: 401 });
   const { id } = await params;
   const c = await ownedCase(id, user.id);
   if (!c) return NextResponse.json({ error: "not_found" }, { status: 404 });
-  await db.case.delete({ where: { id } });
+  const purge = new URL(req.url).searchParams.get("purge");
+  if (purge) {
+    await db.case.delete({ where: { id } });
+  } else {
+    await db.case.update({ where: { id }, data: { deletedAt: new Date() } });
+  }
   return NextResponse.json({ ok: true });
+}
+
+// POST /api/cases/[id]/restore — clear the soft-delete marker (Phase 5c)
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const user = await currentUser();
+  if (!user) return NextResponse.json({ error: "auth" }, { status: 401 });
+  const { id } = await params;
+  const c = await ownedCase(id, user.id);
+  if (!c) return NextResponse.json({ error: "not_found" }, { status: 404 });
+  const restored = await db.case.update({ where: { id }, data: { deletedAt: null } });
+  return NextResponse.json({ case: restored });
 }

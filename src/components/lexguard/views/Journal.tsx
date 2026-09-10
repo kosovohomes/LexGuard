@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, FolderOpen, FileText, ArrowRight, CalendarClock } from "lucide-react";
+import { Plus, FolderOpen, FileText, ArrowRight, CalendarClock, Trash2 } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { PageTitle, StateBadge } from "@/components/lexguard/AppShell";
@@ -128,7 +128,21 @@ export function JournalView() {
                     <h3 className="font-semibold text-lg">{c.attorneyName}</h3>
                     {c.firm ? <p className="text-sm text-muted-foreground">{c.firm}</p> : null}
                   </div>
-                  <StateBadge state={c.state} />
+                  <div className="flex items-center gap-2">
+                    <StateBadge state={c.state} />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-red-700"
+                      aria-label={tr.trashMove}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(tr.trashConfirm)) void app.trashCase(c.id);
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1">

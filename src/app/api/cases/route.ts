@@ -2,10 +2,18 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { currentUser } from "@/lib/lexguard/auth";
 
-// GET /api/cases — list user's cases with counts
+// GET /api/cases — list user's cases with counts.
+// Phase 5c: cases soft-deleted more than 30 days ago are purged permanently
+// on list (the trash/recovery window); the response includes deletedAt so the
+// client can separate live cases from trashed ones.
+const TRASH_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
 export async function GET() {
   const user = await currentUser();
   if (!user) return NextResponse.json({ error: "auth" }, { status: 401 });
+  await db.case.deleteMany({
+    where: { userId: user.id, deletedAt: { lt: new Date(Date.now() - TRASH_WINDOW_MS) } },
+  });
   const cases = await db.case.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },

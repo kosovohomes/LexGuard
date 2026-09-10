@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, Lock, ShieldAlert, FileJson, Trash2, KeyRound, Download, Upload } from "lucide-react";
+import { Eye, Lock, ShieldAlert, FileJson, Trash2, KeyRound, Download, Upload, Undo2 } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { api } from "@/lib/lexguard/api";
@@ -261,6 +261,47 @@ export function SettingsView() {
           </CardContent>
         </Card>
       ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{tr.trashTitle}</CardTitle>
+          <p className="text-sm text-muted-foreground">{tr.trashNote}</p>
+        </CardHeader>
+        <CardContent>
+          {app.trashedCases.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{tr.trashEmpty}</p>
+          ) : (
+            <ul className="space-y-2">
+              {app.trashedCases.map((c) => {
+                const daysLeft = c.deletedAt ? Math.max(0, 30 - Math.floor((Date.now() - new Date(c.deletedAt).getTime()) / 86400000)) : 0;
+                return (
+                  <li key={c.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
+                    <div>
+                      <p className="font-medium text-sm">{c.attorneyName}{c.firm ? ` — ${c.firm}` : ""}</p>
+                      <p className="text-xs text-muted-foreground">{tr.trashDaysLeft.replace("{days}", String(daysLeft))}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="gap-1" onClick={() => void app.restoreCase(c.id)}>
+                        <Undo2 className="h-3.5 w-3.5" /> {tr.trashRestore}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="gap-1"
+                        onClick={() => {
+                          if (window.confirm(tr.trashPurgeConfirm)) void app.purgeCase(c.id);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> {tr.trashDeleteForever}
+                      </Button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

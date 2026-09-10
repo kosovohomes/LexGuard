@@ -50,6 +50,7 @@ model Case {
   contingencyPercent Float?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime? // Phase 5c: soft-delete — 30-day trash/recovery window
 
   entries    Entry[]
   documents  Document[]

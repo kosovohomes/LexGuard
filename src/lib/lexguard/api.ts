@@ -44,7 +44,9 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch),
     }).then(j<{ case: CaseData }>),
-  deleteCase: (id: string) => fetch(`/api/cases/${id}`, { method: "DELETE" }).then(j<{ ok: boolean }>),
+  deleteCase: (id: string, purge = false) =>
+    fetch(`/api/cases/${id}${purge ? "?purge=1" : ""}`, { method: "DELETE" }).then(j<{ ok: boolean }>),
+  restoreCase: (id: string) => fetch(`/api/cases/${id}`, { method: "POST" }).then(j<{ case: CaseData }>),
 
   createEntry: (caseId: string, data: Partial<EntryData>) =>
     fetch(`/api/cases/${caseId}/entries`, {

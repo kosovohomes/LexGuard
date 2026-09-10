@@ -66,6 +66,7 @@ export interface CaseData {
   agreedFeeAmount?: number | null;
   contingencyPercent?: number | null;
   createdAt?: string;
+  deletedAt?: string | null; // Phase 5c: soft-delete marker (30-day trash window)
 }
 
 // ---- Structured payloads per entry type (stored as JSON in `data`) ----

@@ -72,6 +72,7 @@ interface AppState extends Prefs {
   user: { id: string; email: string; state: string | null; locale: string } | null;
   stack: View[];
   cases: (CaseData & { _count?: { entries: number; documents: number; dossiers: number } })[];
+  trashedCases: (CaseData & { _count?: { entries: number; documents: number; dossiers: number } })[]; // Phase 5c
   active: CaseFull | null;
   activeLoading: boolean;
   // zero-knowledge vault status for local mode (PRD §9.1) — reactive mirror
@@ -103,6 +104,9 @@ interface AppState extends Prefs {
   createCase: (data: Partial<CaseData>) => Promise<CaseData>;
   updateCase: (id: string, patch: Partial<CaseData>) => Promise<void>;
   deleteCase: (id: string) => Promise<void>;
+  trashCase: (id: string) => Promise<void>; // Phase 5c — move to 30-day trash
+  restoreCase: (id: string) => Promise<void>; // Phase 5c — recover from trash
+  purgeCase: (id: string) => Promise<void>; // Phase 5c — delete forever now
   addEntry: (caseId: string, e: Partial<EntryData> & { type: EntryType; title: string; occurredAt: string }) => Promise<void>;
   editEntry: (id: string, patch: Partial<EntryData>) => Promise<void>;
   removeEntry: (id: string) => Promise<void>;
@@ -128,6 +132,7 @@ export const useApp = create<AppState>((set, get) => ({
   vault: currentVault(),
   stack: [{ name: "home" }],
   cases: [],
+  trashedCases: [],
   active: null,
   activeLoading: false,
 
@@ -190,23 +195,31 @@ export const useApp = create<AppState>((set, get) => ({
   setUser: (u) => set({ user: u }),
   signOut: async () => {
     await api.logout().catch(() => undefined);
-    set({ user: null, mode: null, cases: [], active: null, stack: [{ name: "home" }] });
+    set({ user: null, mode: null, cases: [], trashedCases: [], active: null, stack: [{ name: "home" }] });
     savePrefs(get());
   },
 
   loadCases: async () => {
     if (get().mode === "account") {
       const res = await api.listCases();
+      const all = res.cases.map((c) => ({
+        ...c,
+        engagementStart: c.engagementStart ?? null,
+        engagementEnd: c.engagementEnd ?? null,
+        createdAt: c.createdAt ?? undefined,
+        deletedAt: c.deletedAt ?? null,
+      }));
       set({
-        cases: res.cases.map((c) => ({
-          ...c,
-          engagementStart: c.engagementStart ?? null,
-          engagementEnd: c.engagementEnd ?? null,
-          createdAt: c.createdAt ?? undefined,
-        })),
+        cases: all.filter((c) => !c.deletedAt),
+        trashedCases: all.filter((c) => Boolean(c.deletedAt)),
       });
     } else {
-      set({ cases: localStore.listCases() });
+      localStore.purgeExpiredTrashed(); // Phase 5c — auto-purge past the 30-day window
+      const all = localStore.listCases();
+      set({
+        cases: all.filter((c) => !c.deletedAt),
+        trashedCases: all.filter((c) => Boolean(c.deletedAt)),
+      });
     }
   },
 
@@ -279,6 +292,37 @@ export const useApp = create<AppState>((set, get) => ({
       localStore.deleteCase(id);
     }
     set({ active: null });
+    await get().loadCases();
+  },
+
+  // Phase 5c — soft-delete: the case (with its entries and documents) moves to
+  // a 30-day trash from which it can be restored; it is purged automatically
+  // after the window. The client owns its data and gets one safety net.
+  trashCase: async (id) => {
+    if (get().mode === "account") {
+      await api.deleteCase(id);
+    } else {
+      localStore.trashCase(id);
+    }
+    if (get().active?.case.id === id) set({ active: null });
+    await get().loadCases();
+  },
+
+  restoreCase: async (id) => {
+    if (get().mode === "account") {
+      await api.restoreCase(id);
+    } else {
+      localStore.restoreCase(id);
+    }
+    await get().loadCases();
+  },
+
+  purgeCase: async (id) => {
+    if (get().mode === "account") {
+      await api.deleteCase(id, true);
+    } else {
+      localStore.deleteCase(id);
+    }
     await get().loadCases();
   },
 

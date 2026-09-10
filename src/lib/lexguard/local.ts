@@ -15,6 +15,8 @@ import type { SurveyResponse, SurveyStatus } from "./surveys";
 import { createCipher, decryptJson, isZkPayload, type VaultCipher } from "./zk";
 
 const KEY = "lexguard.local.v1";
+// Phase 5c — trash/recovery window (PRD Open Question 5 decision)
+export const TRASH_WINDOW_DAYS = 30;
 const VAULT_KEY = "lexguard.local.v1.vault";
 const LOCAL_FILE_LIMIT = 1024 * 1024;
 const PERSIST_DEBOUNCE_MS = 150;
@@ -171,6 +173,35 @@ export const localStore = {
     db.entries = db.entries.filter((e) => e.caseId !== id);
     db.documents = db.documents.filter((d) => d.caseId !== id);
     save(db);
+  },
+  // Phase 5c — soft-delete (trash) with a 30-day recovery window.
+  trashCase(id: string): CaseData | null {
+    const db = load();
+    const i = db.cases.findIndex((x) => x.id === id);
+    if (i < 0) return null;
+    db.cases[i] = { ...db.cases[i], deletedAt: new Date().toISOString() };
+    save(db);
+    return db.cases[i];
+  },
+  restoreCase(id: string): CaseData | null {
+    const db = load();
+    const i = db.cases.findIndex((x) => x.id === id);
+    if (i < 0) return null;
+    db.cases[i] = { ...db.cases[i], deletedAt: null };
+    save(db);
+    return db.cases[i];
+  },
+  // purge cases trashed more than TRASH_WINDOW_DAYS ago (runs on read)
+  purgeExpiredTrashed(): string[] {
+    const cutoff = Date.now() - TRASH_WINDOW_DAYS * 86400000;
+    const db = load();
+    const expired = db.cases.filter((c) => c.deletedAt && new Date(c.deletedAt).getTime() < cutoff).map((c) => c.id);
+    if (expired.length === 0) return [];
+    db.cases = db.cases.filter((x) => !expired.includes(x.id));
+    db.entries = db.entries.filter((e) => !expired.includes(e.caseId));
+    db.documents = db.documents.filter((d) => !expired.includes(d.caseId));
+    save(db);
+    return expired;
   },
   createEntry(data: Omit<EntryData, "id" | "createdAt" | "edited" | "editedAt">): EntryData {
     const db = load();
