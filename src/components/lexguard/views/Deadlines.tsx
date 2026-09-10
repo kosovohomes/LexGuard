@@ -7,10 +7,11 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, AlertTriangle, Clock, Info, ExternalLink, FolderOpen } from "lucide-react";
+import { CalendarClock, AlertTriangle, Clock, Info, ExternalLink, FolderOpen, CalendarPlus } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { computeDeadlines, type DeadlineInsight } from "@/lib/lexguard/deadlines";
+import { downloadIcs } from "@/lib/lexguard/ics";
 import type { CaseData, EntryData } from "@/lib/lexguard/types";
 import { api, normalizeEntry } from "@/lib/lexguard/api";
 import { localStore } from "@/lib/lexguard/local";
@@ -100,6 +101,12 @@ export function DeadlinesView() {
   const user = items.filter((i) => i.kind === "user_deadline");
   const windows = items.filter((i) => i.kind === "statutory_window");
 
+  const exportItem = (it: DeadlineInsight) => (
+    <Button size="sm" variant="outline" className="gap-1" onClick={() => downloadIcs([it], app.locale)}>
+      <CalendarPlus className="h-3.5 w-3.5" /> {tr.icsExport}
+    </Button>
+  );
+
   const renderItem = (it: DeadlineInsight) => (
     <li key={it.id}>
       <Card>
@@ -119,6 +126,7 @@ export function DeadlinesView() {
               </span>
             ) : null}
             <Badge variant="secondary">{it.state}</Badge>
+            {it.when ? exportItem(it) : null}
           </div>
         </CardContent>
       </Card>
@@ -136,12 +144,20 @@ export function DeadlinesView() {
       ) : (
         <div className="space-y-8">
           <section aria-label={tr.deadlinesUser}>
-            <h2 className="text-xl font-bold mb-3">{tr.deadlinesUser}</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h2 className="text-xl font-bold">{tr.deadlinesUser}</h2>
+              {user.length > 0 ? (
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => downloadIcs(user, app.locale)}>
+                  <CalendarPlus className="h-3.5 w-3.5" /> {tr.icsExportAll}
+                </Button>
+              ) : null}
+            </div>
             {user.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tr.deadlinesEmpty}</p>
             ) : (
               <ul className="space-y-3">{user.map(renderItem)}</ul>
             )}
+            <p className="mt-2 text-xs text-muted-foreground">{tr.icsNote}</p>
           </section>
 
           <section aria-label={tr.deadlinesWindows}>
