@@ -8,6 +8,7 @@ import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { LEGAL_DOCS, type LegalSlug } from "@/lib/lexguard/legal";
 import { PageTitle } from "@/components/lexguard/AppShell";
+import { ReportIssueButton } from "@/components/lexguard/ReportIssueButton";
 
 const SLUGS: LegalSlug[] = ["privacy", "terms", "accessibility"];
 
@@ -64,6 +65,7 @@ export function LegalView({ slug }: { slug?: string }) {
           </Card>
         ))}
       </div>
+      <ReportIssueButton slug={slug} />
     </div>
   );
 }

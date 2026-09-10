@@ -8,6 +8,7 @@ import { BookOpen, Clock, CalendarCheck } from "lucide-react";
 import { useApp } from "@/lib/lexguard/store";
 import { t } from "@/lib/lexguard/i18n";
 import { GUIDES, guideBySlug } from "@/lib/lexguard/guides";
+import { ReportIssueButton } from "@/components/lexguard/ReportIssueButton";
 import { PageTitle } from "@/components/lexguard/AppShell";
 
 export function GuidesView() {
@@ -112,13 +113,14 @@ export function GuideView({ slug }: { slug: string }) {
         ) : null}
       </div>
 
-      <div className="mt-10 flex flex-wrap gap-3">
+      <div className="mt-10 flex flex-wrap items-center gap-3">
         <Button className="bg-emerald-700 hover:bg-emerald-800" onClick={() => app.navigate({ name: "journal" })}>
           {tr.openJournal}
         </Button>
         <Button variant="outline" onClick={() => app.navigate({ name: "router" })}>
           {tr.navRouter}
         </Button>
+        <ReportIssueButton slug={g.slug} />
       </div>
     </article>
   );

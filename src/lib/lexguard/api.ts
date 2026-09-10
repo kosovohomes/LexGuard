@@ -118,10 +118,12 @@ export const api = {
             totalCasesConsidered: number;
             casesWithObservations: number;
             minCell: number;
-            cells: {
-              TX: Record<string, number | null>;
-              CA: Record<string, number | null>;
-            };
+            cells: Record<string, Record<string, number | null>>;
+          };
+          reports: {
+            total: number;
+            last30d: number;
+            recent: { id: string; category: string; slug: string | null; locale: string; state: string | null; message: string | null; createdAt: string }[];
           };
         };
         rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];

@@ -26,10 +26,12 @@ interface AdminData {
       totalCasesConsidered: number;
       casesWithObservations: number;
       minCell: number;
-      cells: {
-        TX: Record<string, number | null>;
-        CA: Record<string, number | null>;
-      };
+      cells: Record<string, Record<string, number | null>>;
+    };
+    reports: {
+      total: number;
+      last30d: number;
+      recent: { id: string; category: string; slug: string | null; locale: string; state: string | null; message: string | null; createdAt: string }[];
     };
   };
   rules: { id: string; trigger: string; states: string[]; severity: string; title: string; reviewer: string | null; reviewedAt: string | null; effectiveFrom: string }[];
@@ -132,20 +134,62 @@ export function AdminView() {
                     <th className="p-3">{tr.adminPatternCat}</th>
                     <th className="p-3">TX</th>
                     <th className="p-3">CA</th>
+                    <th className="p-3">FL</th>
+                    <th className="p-3">NY</th>
+                    <th className="p-3">AZ</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Object.entries(data.stats.patterns?.cells?.TX ?? {}).map(([cat]) => (
                     <tr key={cat} className="border-t">
                       <td className="p-3">{tr[`pattern_${cat}` as keyof typeof tr]}</td>
-                      <td className="p-3">{data.stats.patterns.cells.TX[cat] ?? "—"}</td>
-                      <td className="p-3">{data.stats.patterns.cells.CA[cat] ?? "—"}</td>
+                      {(["TX", "CA", "FL", "NY", "AZ"] as const).map((st) => (
+                        <td key={st} className="p-3">{data.stats.patterns.cells[st]?.[cat] ?? "\u2014"}</td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{tr.adminPatternsNote}</p>
+          </section>
+
+          {/* PRD §14 trust metric — anonymous content-correction requests */}
+          <section>
+            <h2 className="mb-3 text-lg font-semibold">{tr.adminReportsTitle}</h2>
+            <p className="mb-3 text-sm text-muted-foreground">{tr.adminReportsIntro}</p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold">{data.stats.reports?.last30d ?? 0}</p>
+                  <p className="text-xs text-muted-foreground">{tr.adminReports30d}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold">{data.stats.reports?.total ?? 0}</p>
+                  <p className="text-xs text-muted-foreground">{tr.adminReportsTotal}</p>
+                </CardContent>
+              </Card>
+            </div>
+            {(data.stats.reports?.recent?.length ?? 0) > 0 ? (
+              <ul className="mt-3 space-y-2">
+                {data.stats.reports.recent.map((r) => (
+                  <li key={r.id} className="rounded-lg border p-3 text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="capitalize">{r.category}</Badge>
+                      {r.slug ? <code className="text-xs">{r.slug}</code> : null}
+                      <span className="text-xs text-muted-foreground">
+                        {r.locale.toUpperCase()}{r.state ? ` · ${r.state}` : ""} · {r.createdAt.slice(0, 10)}
+                      </span>
+                    </div>
+                    {r.message ? <p className="mt-1 text-sm text-muted-foreground">{r.message}</p> : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">{tr.adminReportsEmpty}</p>
+            )}
           </section>
 
           <section>

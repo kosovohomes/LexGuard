@@ -122,3 +122,16 @@ model QuizResponse {
   score     Int // 0..5
   createdAt DateTime @default(now())
 }
+
+// Phase 5d — anonymous content-correction reports (PRD §14 trust metric:
+// "content-correction requests"; §15 mitigation: content review gate).
+// Deliberately stores NO user identifier — same anonymity design as QuizResponse.
+model ContentReport {
+  id        String   @id @default(cuid())
+  category  String // error | outdated | unclear | other
+  slug      String? // guide slug or legal page it refers to (context only)
+  locale    String // "en" | "es" — which language version the report is about
+  state     String? // user's state when reporting (context for state notes)
+  message   String? // optional free text, trimmed + length-capped
+  createdAt DateTime @default(now())
+}

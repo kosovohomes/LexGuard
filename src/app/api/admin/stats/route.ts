@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { RULES, RULE_LIBRARY_VERSION } from "@/lib/lexguard/rules";
 import { aggregatePatterns } from "@/lib/lexguard/aggregate";
 import { normalizeEntry } from "@/lib/lexguard/api";
+import { isUSState } from "@/lib/lexguard/types";
 import type { CaseData, EntryData, USState } from "@/lib/lexguard/types";
 
 // GET /api/admin/stats?code=... — aggregate-only stats (PRD FR-8, §14: no
@@ -14,7 +15,7 @@ export async function GET(req: Request) {
   const expected = process.env.ADMIN_CODE ?? "lexguard-admin";
   if (code !== expected) return NextResponse.json({ error: "auth" }, { status: 401 });
 
-  const [users, cases, entries, documents, dossiers, surveyTotal, surveyFiled, quizRows] = await Promise.all([
+  const [users, cases, entries, documents, dossiers, surveyTotal, surveyFiled, quizRows, reportTotal, report30d, reportRows] = await Promise.all([
     db.user.count(),
     db.case.count(),
     db.entry.count(),
@@ -23,6 +24,9 @@ export async function GET(req: Request) {
     db.survey.count(),
     db.survey.count({ where: { status: "filed" } }),
     db.quizResponse.findMany({ select: { phase: true, score: true } }),
+    db.contentReport.count(),
+    db.contentReport.count({ where: { createdAt: { gte: new Date(Date.now() - 30 * 86400000) } } }),
+    db.contentReport.findMany({ orderBy: { createdAt: "desc" }, take: 10 }),
   ]);
 
   // Aggregate pre/post averages — no identifiers exist to expose.
@@ -67,7 +71,7 @@ export async function GET(req: Request) {
   const inputs = caseRows.map((c) => ({
     case: {
       ...c,
-      state: (c.state === "CA" ? "CA" : "TX") as USState,
+      state: (isUSState(c.state) ? c.state : "TX") as USState,
       caseType: c.caseType as CaseData["caseType"],
       status: c.status as CaseData["status"],
       feeType: (c.feeType ?? null) as CaseData["feeType"],
@@ -109,6 +113,20 @@ export async function GET(req: Request) {
         casesWithObservations: patterns.casesWithObservations,
         cells: patterns.patterns,
         minCell: 5,
+      },
+      // trust metric (PRD §14): content-correction requests — anonymous, counts + recent queue
+      reports: {
+        total: reportTotal,
+        last30d: report30d,
+        recent: reportRows.map((r) => ({
+          id: r.id,
+          category: r.category,
+          slug: r.slug,
+          locale: r.locale,
+          state: r.state,
+          message: r.message,
+          createdAt: r.createdAt.toISOString(),
+        })),
       },
     },
     rules: RULES.map((r) => ({
